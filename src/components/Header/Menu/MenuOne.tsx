@@ -35,6 +35,24 @@ const MenuOne: React.FC<Props> = ({ props }) => {
         setOpenSubNavMobile(openSubNavMobile === index ? null : index)
     }
 
+
+   // Kiểm tra trạng thái đăng nhập
+   const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('token')
+
+   // Xử lý click vào biểu tượng tài khoản để bật/tắt popup
+   const handleAccountClick = () => {
+       handleLoginPopup()
+   }
+
+   // Xử lý đăng xuất
+   const handleLogout = () => {
+       if (typeof window !== 'undefined') {
+           localStorage.removeItem('token')
+           handleLoginPopup() // Đóng popup sau khi đăng xuất
+           router.push('/') // Chuyển hướng về trang chủ
+       }
+   }
+
     const [fixedHeader, setFixedHeader] = useState(false)
     const [lastScrollPosition, setLastScrollPosition] = useState(0);
 
@@ -85,136 +103,12 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                 <ul className='flex items-center gap-8 h-full'>
                                     <li className='h-full relative'>
                                         <Link
-                                            href="#!"
+                                            href="/"
                                             className={`text-button-uppercase duration-300 h-full flex items-center justify-center gap-1 ${pathname === '/' ? 'active' : ''}`}
                                         >
-                                            Demo
+                                            HOME
                                         </Link>
-                                        <div className="sub-menu py-3 px-5 -left-10 w-max absolute grid grid-cols-4 gap-5 bg-white rounded-b-xl">
-                                            <ul>
-                                                <li>
-                                                    <Link href="/" className={`link text-secondary duration-300 ${pathname === '/' ? 'active' : ''}`}>
-                                                        Home Fashion 1
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion2" className='link text-secondary duration-300'>
-                                                        Home Fashion 2
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion3" className='link text-secondary duration-300'>
-                                                        Home Fashion 3
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion4" className='link text-secondary duration-300'>
-                                                        Home Fashion 4
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion5" className='link text-secondary duration-300'>
-                                                        Home Fashion 5
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion6" className='link text-secondary duration-300'>
-                                                        Home Fashion 6
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                            <ul>
-                                                <li>
-                                                    <Link href="/homepages/fashion7" className='link text-secondary duration-300'>
-                                                        Home Fashion 7
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion8" className='link text-secondary duration-300'>
-                                                        Home Fashion 8
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion9" className='link text-secondary duration-300'>
-                                                        Home Fashion 9
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion10" className='link text-secondary duration-300'>
-                                                        Home Fashion 10
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/fashion11" className='link text-secondary duration-300'>
-                                                        Home Fashion 11
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/underwear" className='link text-secondary duration-300'>
-                                                        Home Underwear
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                            <ul>
-                                                <li>
-                                                    <Link href="/homepages/cosmetic1" className='link text-secondary duration-300'>
-                                                        Home Cosmetic 1
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/cosmetic2" className='link text-secondary duration-300'>
-                                                        Home Cosmetic 2
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/cosmetic3" className='link text-secondary duration-300'>
-                                                        Home Cosmetic 3
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/pet" className='link text-secondary duration-300'>
-                                                        Home Pet Store
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/jewelry" className='link text-secondary duration-300'>
-                                                        Home Jewelry
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/furniture" className='link text-secondary duration-300'>
-                                                        Home Furniture
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                            <ul>
-                                                <li>
-                                                    <Link href="/homepages/watch" className='link text-secondary duration-300'>
-                                                        Home Watch
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/toys" className='link text-secondary duration-300'>
-                                                        Home Toys Kid
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/yoga" className='link text-secondary duration-300'>
-                                                        Home Yoga
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/organic" className='link text-secondary duration-300'>
-                                                        Home Organic
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link href="/homepages/marketplace" className='text-secondary duration-300'>
-                                                        Home Marketplace
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                        </div>
+
                                     </li>
                                     <li className='h-full'>
                                         <Link href="#!" className='text-button-uppercase duration-300 h-full flex items-center justify-center'>
@@ -581,7 +475,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                     </li>
                                     <li className='h-full'>
                                         <Link
-                                            href="#!"
+                                            href="/shop/default-grid"
                                             className={`text-button-uppercase duration-300 h-full flex items-center justify-center ${pathname.includes('/shop/') ? 'active' : ''}`}
                                         >
                                             Shop
@@ -1064,33 +958,51 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                             </div>
                         </div>
                         <div className="right flex gap-12">
-                            <div className="max-md:hidden search-icon flex items-center cursor-pointer relative">
-                                <Icon.MagnifyingGlass size={24} color='black' onClick={openModalSearch} />
-                                <div className="line absolute bg-line w-px h-6 -right-6"></div>
-                            </div>
-                            <div className="list-action flex items-center gap-4">
-                                <div className="user-icon flex items-center justify-center cursor-pointer">
-                                    <Icon.User size={24} color='black' onClick={handleLoginPopup} />
-                                    <div
-                                        className={`login-popup absolute top-[74px] w-[320px] p-7 rounded-xl bg-white box-shadow-small 
-                                            ${openLoginPopup ? 'open' : ''}`}
+                <div className="max-md:hidden search-icon flex items-center cursor-pointer relative">
+                    <Icon.MagnifyingGlass size={24} color='black' onClick={openModalSearch} />
+                    <div className="line absolute bg-line w-px h-6 -right-6"></div>
+                </div>
+                <div className="list-action flex items-center gap-4">
+                    <div className="user-icon flex items-center justify-center cursor-pointer relative">
+                        <Icon.User size={24} color='black' onClick={handleAccountClick} />
+                        <div
+                            className={`login-popup absolute top-[50px] p-7 rounded-xl bg-white box-shadow-small 
+                            ${openLoginPopup ? 'open' : ''} 
+                            md:w-[320px] w-[180px]`}
+                        >
+                            {isLoggedIn ? (
+                                <>
+                                    <Link href="/my-account" className="button-main w-full text-center mb-3 block">
+                                        Tài khoản
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="button-main w-full text-center bg-red-500 hover:bg-red-600"
                                     >
-                                        <Link href={'/login'} className="button-main w-full text-center">Login</Link>
-                                        <div className="text-secondary text-center mt-3 pb-4">Don't have an account?
-                                            <Link href={'/register'} className='text-black pl-1 hover:underline'>Register</Link>
-                                        </div>
-                                        <div className="bottom pt-4 border-t border-line"></div>
-                                        <Link href={'#!'} className='body1 hover:underline'>Support</Link>
+                                        Đăng xuất
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href={'/login'} className="button-main w-full text-center">Đăng nhập</Link>
+                                    <div className="text-secondary text-center mt-3 pb-4">
+                                        Chưa có tài khoản?
+                                        <Link href={'/register'} className='text-black pl-1 hover:underline'>Đăng ký</Link>
                                     </div>
-                                </div>
-                                <div className="max-md:hidden wishlist-icon flex items-center cursor-pointer" onClick={openModalWishlist}>
-                                    <Icon.Heart size={24} color='black' />
-                                </div>
-                                <div className="cart-icon flex items-center relative cursor-pointer" onClick={openModalCart}>
-                                    <Icon.Handbag size={24} color='black' />
-                                    <span className="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{cartState.cartArray.length}</span>
-                                </div>
-                            </div>
+                                    <div className="bottom pt-4 border-t border-line"></div>
+                                    <Link href={'#!'} className='body1 hover:underline'>Hỗ trợ</Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    <div className="max-md:hidden wishlist-icon flex items-center cursor-pointer" onClick={openModalWishlist}>
+                        <Icon.Heart size={24} color='black' />
+                    </div>
+                    <div className="cart-icon flex items-center relative cursor-pointer" onClick={openModalCart}>
+                        <Icon.Handbag size={24} color='black' />
+                        <span className="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{cartState.cartArray.length}</span>
+                    </div>
+                </div>
                         </div>
                     </div>
                 </div>
@@ -1119,7 +1031,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                         className={`${openSubNavMobile === 1 ? 'open' : ''}`}
                                         onClick={() => handleOpenSubNavMobile(1)}
                                     >
-                                        <a href={'#!'} className={`text-xl font-semibold flex items-center justify-between`}>Demo
+                                        <a href={'/'} className={`text-xl font-semibold flex items-center justify-between`}>Home
                                             <span className='text-right'>
                                                 <Icon.CaretRight size={20} />
                                             </span>
@@ -1586,7 +1498,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                         className={`${openSubNavMobile === 3 ? 'open' : ''}`}
                                         onClick={() => handleOpenSubNavMobile(3)}
                                     >
-                                        <a href={'#!'} className='text-xl font-semibold flex items-center justify-between mt-5'>Shop
+                                        <a href={'shop/default-grid'} className='text-xl font-semibold flex items-center justify-between mt-5'>Shop
                                             <span className='text-right'>
                                                 <Icon.CaretRight size={20} />
                                             </span>

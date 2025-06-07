@@ -1,5 +1,7 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import TopNavOne from '@/components/Header/TopNav/TopNavOne'
@@ -8,7 +10,82 @@ import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 import Footer from '@/components/Footer/Footer'
 import * as Icon from "@phosphor-icons/react/dist/ssr";
 
+interface UserInfo {
+    id: number
+    username: string
+    firstName: string
+    lastName: string
+    address: string
+    email: string
+    phoneNumber: string
+}
+
 const MyAccount = () => {
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
+    const router = useRouter()
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const token = localStorage.getItem('token')
+                if (!token) {
+                    router.push('/login')
+                    return
+                }
+
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+
+                setUserInfo(response.data)
+            } catch (err: any) {
+                setError(err.response?.data?.message || 'Failed to fetch user information')
+                if (err.response?.status === 401) {
+                    router.push('/login')
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchUserInfo()
+    }, [router])
+
+    if (loading) {
+        return (
+            <>
+                <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
+                <div id="header" className='relative w-full'>
+                    <MenuOne props="bg-transparent" />
+                    <Breadcrumb heading='My Account' subHeading='My Account' />
+                </div>
+                <div className="container py-20">
+                    <div className="text-center">Loading...</div>
+                </div>
+                <Footer />
+            </>
+        )
+    }
+
+    if (error) {
+        return (
+            <>
+                <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
+                <div id="header" className='relative w-full'>
+                    <MenuOne props="bg-transparent" />
+                    <Breadcrumb heading='My Account' subHeading='My Account' />
+                </div>
+                <div className="container py-20">
+                    <div className="text-center text-red-500">{error}</div>
+                </div>
+                <Footer />
+            </>
+        )
+    }
 
     return (
         <>
@@ -32,8 +109,8 @@ const MyAccount = () => {
                                             className='md:w-[140px] w-[120px] md:h-[140px] h-[120px] rounded-full'
                                         />
                                     </div>
-                                    <div className="name heading6 mt-4 text-center">Tony Nguyen</div>
-                                    <div className="mail heading6 font-normal normal-case text-center mt-1">hi.avitex@gmail.com</div>
+                                    <div className="name heading6 mt-4 text-center">{userInfo?.firstName} {userInfo?.lastName}</div>
+                                    <div className="mail heading6 font-normal normal-case text-center mt-1">{userInfo?.email}</div>
                                 </div>
                                 <div className="menu-tab lg:mt-10 mt-6">
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer">
@@ -48,7 +125,10 @@ const MyAccount = () => {
                                         <Icon.MapPin size={20} weight='bold' />
                                         <div className="heading6">My Address</div>
                                     </div>
-                                    <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2">
+                                    <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2" onClick={() => {
+                                        localStorage.removeItem('token')
+                                        router.push('/login')
+                                    }}>
                                         <Icon.SignOut size={20} weight='bold' />
                                         <div className="heading6">Logout</div>
                                     </div>
@@ -61,30 +141,24 @@ const MyAccount = () => {
                                     <div className="heading5 pb-4">Information</div>
                                     <div className='grid sm:grid-cols-2 gap-4 gap-y-5'>
                                         <div className="first-name ">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="firstName" type="text" defaultValue={'Tony'} placeholder='First name' required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="firstName" type="text" defaultValue={userInfo?.firstName} placeholder='First name' required />
                                         </div>
                                         <div className="last-name">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="lastName" type="text" defaultValue={'Nguyen'} placeholder='Last name' required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="lastName" type="text" defaultValue={userInfo?.lastName} placeholder='Last name' required />
                                         </div>
                                         <div className="email ">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" defaultValue={'hi.avitex@gmail.com'} placeholder="Email address" required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" defaultValue={userInfo?.email} placeholder="Email address" required />
                                         </div>
                                         <div className="phone-number">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="phoneNumber" type="text" defaultValue={'(+12) 345 678 910'} placeholder="Phone number" required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="phoneNumber" type="text" defaultValue={userInfo?.phoneNumber} placeholder="Phone number" required />
                                         </div>
-                                        <div className="col-span-full select-block">
-                                            <select className="border border-line px-4 py-3 w-full rounded-lg" id="region" name="region" defaultValue={'default'}>
-                                                <option value="default" disabled>Choose Country/Region</option>
-                                                <option value="India">India</option>
-                                                <option value="France">France</option>
-                                                <option value="Singapore">Singapore</option>
-                                            </select>
-                                            <Icon.CaretDown className='arrow-down' />
+                                        <div className="col-span-full">
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="address" type="text" defaultValue={userInfo?.address} placeholder="Address" required />
                                         </div>
                                     </div>
                                     <div className="heading5 pb-4 lg:mt-10 mt-6">Change Password</div>
                                     <div className="pass">
-                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password" type="password" placeholder="Password *" required />
+                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password" type="password" placeholder="Current Password *" required />
                                     </div>
                                     <div className="new-pass mt-5">
                                         <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="newPassword" type="password" placeholder="New Password *" required />
