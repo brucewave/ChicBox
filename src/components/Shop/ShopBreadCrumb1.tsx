@@ -71,7 +71,6 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 100 });
     const [currentPage, setCurrentPage] = useState(0);
     const productsPerPage = productPerPage;
-    const offset = currentPage * productsPerPage;
 
     const handleShowOnlySale = () => {
         setShowOnlySale(toggleSelect => !toggleSelect)
@@ -109,90 +108,98 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
         setCurrentPage(0);
     }
 
+    const filterProducts = () => {
+        let filteredProducts = [...data];
 
-    // Filter product
-    let filteredData = data.filter(product => {
-        let isShowOnlySaleMatched = true;
+        // Filter by show only sale
         if (showOnlySale) {
-            isShowOnlySaleMatched = product.discount > 0
+            filteredProducts = filteredProducts.filter(item => item.discount > 0);
         }
 
-        let isDatagenderMatched = true;
+        // Filter by gender
         if (gender) {
-            isDatagenderMatched = product.categoryName.toLowerCase().includes(gender.toLowerCase())
+            filteredProducts = filteredProducts.filter(item => item.categoryName === gender);
         }
 
-        let isDataCategoryMatched = true;
+        // Filter by category
         if (category) {
-            isDataCategoryMatched = product.categoryName.toLowerCase() === category.toLowerCase()
+            filteredProducts = filteredProducts.filter(item => item.categoryName === category);
         }
 
-        let isDataTypeMatched = true;
+        // Filter by data type
         if (dataType) {
-            isDataTypeMatched = product.categoryName.toLowerCase() === dataType.toLowerCase()
+            filteredProducts = filteredProducts.filter(item => item.categoryName === dataType);
         }
 
-        let isTypeMatched = true;
+        // Filter by type
         if (type) {
-            dataType = type
-            isTypeMatched = product.categoryName.toLowerCase() === type.toLowerCase();
+            filteredProducts = filteredProducts.filter(item => item.categoryName === type);
         }
 
-        let isSizeMatched = true;
+        // Filter by size
         if (size) {
-            isSizeMatched = product.productSize === size
+            filteredProducts = filteredProducts.filter(item => item.productSize === size);
         }
 
-        let isPriceRangeMatched = true;
+        // Filter by price range
         if (priceRange.min !== 0 || priceRange.max !== 100) {
-            isPriceRangeMatched = product.price >= priceRange.min && product.price <= priceRange.max;
+            filteredProducts = filteredProducts.filter(item => item.price >= priceRange.min && item.price <= priceRange.max);
         }
 
-        let isColorMatched = true;
+        // Filter by color
         if (color) {
-            isColorMatched = product.color.toLowerCase() === color.toLowerCase()
+            filteredProducts = filteredProducts.filter(item => item.color?.toLowerCase().includes(color.toLowerCase()));
         }
 
-        let isBrandMatched = true;
+        // Filter by brand
         if (brand) {
-            isBrandMatched = product.brandName.toLowerCase() === brand.toLowerCase();
+            filteredProducts = filteredProducts.filter(item => item.brandName?.toLowerCase() === brand.toLowerCase());
         }
 
-        return isShowOnlySaleMatched && isDatagenderMatched && isDataCategoryMatched && isDataTypeMatched && isTypeMatched && isSizeMatched && isColorMatched && isBrandMatched && isPriceRangeMatched
-    })
+        // Sort products
+        if (sortOption === 'soldQuantityHighToLow') {
+            filteredProducts.sort((a, b) => b.ratingCount - a.ratingCount);
+        } else if (sortOption === 'discountHighToLow') {
+            filteredProducts.sort((a, b) => b.discount - a.discount);
+        } else if (sortOption === 'priceHighToLow') {
+            filteredProducts.sort((a, b) => b.price - a.price);
+        } else if (sortOption === 'priceLowToHigh') {
+            filteredProducts.sort((a, b) => a.price - b.price);
+        }
 
+        return filteredProducts;
+    };
 
-    // Create a copy array filtered to sort
-    let sortedData = [...filteredData];
+    const filteredData = filterProducts();
+    const totalProducts = filteredData.length;
+    const selectedType = type;
+    const selectedSize = size;
+    const selectedColor = color;
+    const selectedBrand = brand;
 
-    if (sortOption === 'soldQuantityHighToLow') {
-        filteredData = sortedData.sort((a, b) => b.ratingCount - a.ratingCount)
-    }
+    // Get unique brands and their counts
+    const brandCounts = data.reduce((acc, item) => {
+        const brandName = item.brandName?.toLowerCase() || '';
+        if (brandName) {
+            acc[brandName] = (acc[brandName] || 0) + 1;
+        }
+        return acc;
+    }, {} as Record<string, number>);
 
-    if (sortOption === 'discountHighToLow') {
-        filteredData = sortedData.sort((a, b) => b.discount - a.discount)
-    }
-
-    if (sortOption === 'priceHighToLow') {
-        filteredData = sortedData.sort((a, b) => b.price - a.price)
-    }
-
-    if (sortOption === 'priceLowToHigh') {
-        filteredData = sortedData.sort((a, b) => a.price - b.price)
-    }
-
-    const totalProducts = filteredData.length
-    const selectedType = type
-    const selectedSize = size
-    const selectedColor = color
-    const selectedBrand = brand
-
+    // Get filtered brand counts
+    const filteredBrandCounts = filteredData.reduce((acc, item) => {
+        const brandName = item.brandName?.toLowerCase() || '';
+        if (brandName) {
+            acc[brandName] = (acc[brandName] || 0) + 1;
+        }
+        return acc;
+    }, {} as Record<string, number>);
 
     if (filteredData.length === 0) {
-        filteredData = [{
+        filteredData.push({
             id: 0,
             name: 'No products found',
-            description: 'No products match the selected criteria.',
+            description: '',
             price: 0,
             brandName: '',
             productSize: '',
@@ -207,9 +214,8 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
             primaryImageUrl: '',
             imageUrls: [],
             createdAt: null
-        }];
+        });
     }
-
 
     // Find page number base on filteredData
     const pageCount = Math.ceil(filteredData.length / productsPerPage);
@@ -223,9 +229,9 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     let currentProducts: ProductType[];
 
     if (filteredData.length > 0) {
-        currentProducts = filteredData.slice(offset, offset + productsPerPage);
+        currentProducts = filteredData.slice(currentPage * productsPerPage, (currentPage + 1) * productsPerPage);
     } else {
-        currentProducts = []
+        currentProducts = [];
     }
 
     const handlePageChange = (selected: number) => {
@@ -400,22 +406,22 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                             <div className="filter-brand mt-8">
                                 <div className="heading6">Brands</div>
                                 <div className="list-brand mt-4">
-                                    {['adidas', 'hermes', 'zara', 'nike', 'gucci'].map((item, index) => (
-                                        <div key={index} className="brand-item flex items-center justify-between">
+                                    {Object.entries(brandCounts).map(([brandName, count]) => (
+                                        <div key={brandName} className="brand-item flex items-center justify-between">
                                             <div className="left flex items-center cursor-pointer">
                                                 <div className="block-input">
                                                     <input
                                                         type="checkbox"
-                                                        name={item}
-                                                        id={item}
-                                                        checked={brand === item}
-                                                        onChange={() => handleBrand(item)} />
+                                                        name={brandName}
+                                                        id={brandName}
+                                                        checked={brand === brandName}
+                                                        onChange={() => handleBrand(brandName)} />
                                                     <Icon.CheckSquare size={20} weight='fill' className='icon-checkbox' />
                                                 </div>
-                                                <label htmlFor={item} className="brand-name capitalize pl-2 cursor-pointer">{item}</label>
+                                                <label htmlFor={brandName} className="brand-name capitalize pl-2 cursor-pointer">{brandName}</label>
                                             </div>
                                             <div className='text-secondary2'>
-                                                ({data.filter(dataItem => dataItem.brand === item && dataItem.category === 'fashion').length})
+                                                ({filteredBrandCounts[brandName] || 0})
                                             </div>
                                         </div>
                                     ))}
@@ -530,8 +536,8 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                                 id: item.id.toString(),
                                                 name: item.name,
                                                 description: item.description,
-                                                price: item.price || 0,
-                                                originPrice: (item.price || 0) + (item.discount || 0),
+                                                price: item.discount > 0 ? Number((item.price * (1 - item.discount/100)).toFixed(2)) : item.price,
+                                                originPrice: item.discount > 0 ? item.price : item.price,
                                                 brand: item.brandName,
                                                 sold: item.ratingCount || 0,
                                                 quantity: item.stockQuantity || 0,
@@ -561,7 +567,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                                 category: item.categoryName,
                                                 gender: item.categoryName,
                                                 new: false,
-                                                sale: (item.discount || 0) > 0,
+                                                sale: item.discount > 0,
                                                 rate: item.averageRating || 0,
                                                 quantityPurchase: 0,
                                                 slug: item.name.toLowerCase().replace(/\s+/g, '-')
