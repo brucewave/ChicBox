@@ -3,11 +3,55 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import * as Icon from "@phosphor-icons/react/dist/ssr";
-import { ProductType } from '@/type/ProductType'
 import Product from '../Product/Product';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css'
 import HandlePagination from '../Other/HandlePagination';
+
+interface Variation {
+    color: string;
+    colorCode: string;
+    colorImage: string;
+    image: string;
+}
+
+interface ProductType {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    brandName: string;
+    productSize: string;
+    color: string;
+    conditionPoints: number;
+    status: string;
+    stockQuantity: number;
+    discount: number;
+    averageRating: number;
+    ratingCount: number;
+    categoryName: string;
+    primaryImageUrl: string;
+    imageUrls: string[];
+    createdAt: string | null;
+    // Additional properties for Product component
+    category?: string;
+    type?: string;
+    gender?: string;
+    brand?: string;
+    sold?: number;
+    quantity?: number;
+    sizes?: string[];
+    variation?: Variation[];
+    thumbImage?: string[];
+    images?: string[];
+    action?: string;
+    new?: boolean;
+    sale?: boolean;
+    rate?: number;
+    quantityPurchase?: number;
+    slug?: string;
+    originPrice?: number;
+}
 
 interface Props {
     data: Array<ProductType>
@@ -70,33 +114,33 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     let filteredData = data.filter(product => {
         let isShowOnlySaleMatched = true;
         if (showOnlySale) {
-            isShowOnlySaleMatched = product.sale
+            isShowOnlySaleMatched = product.discount > 0
         }
 
         let isDatagenderMatched = true;
         if (gender) {
-            isDatagenderMatched = product.gender === gender
+            isDatagenderMatched = product.categoryName.toLowerCase().includes(gender.toLowerCase())
         }
 
         let isDataCategoryMatched = true;
         if (category) {
-            isDataCategoryMatched = product.category === category
+            isDataCategoryMatched = product.categoryName.toLowerCase() === category.toLowerCase()
         }
 
         let isDataTypeMatched = true;
         if (dataType) {
-            isDataTypeMatched = product.type === dataType
+            isDataTypeMatched = product.categoryName.toLowerCase() === dataType.toLowerCase()
         }
 
         let isTypeMatched = true;
         if (type) {
             dataType = type
-            isTypeMatched = product.type === type;
+            isTypeMatched = product.categoryName.toLowerCase() === type.toLowerCase();
         }
 
         let isSizeMatched = true;
         if (size) {
-            isSizeMatched = product.sizes.includes(size)
+            isSizeMatched = product.productSize === size
         }
 
         let isPriceRangeMatched = true;
@@ -106,12 +150,12 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
 
         let isColorMatched = true;
         if (color) {
-            isColorMatched = product.variation.some(item => item.color === color)
+            isColorMatched = product.color.toLowerCase() === color.toLowerCase()
         }
 
         let isBrandMatched = true;
         if (brand) {
-            isBrandMatched = product.brand === brand;
+            isBrandMatched = product.brandName.toLowerCase() === brand.toLowerCase();
         }
 
         return isShowOnlySaleMatched && isDatagenderMatched && isDataCategoryMatched && isDataTypeMatched && isTypeMatched && isSizeMatched && isColorMatched && isBrandMatched && isPriceRangeMatched
@@ -122,14 +166,11 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     let sortedData = [...filteredData];
 
     if (sortOption === 'soldQuantityHighToLow') {
-        filteredData = sortedData.sort((a, b) => b.sold - a.sold)
+        filteredData = sortedData.sort((a, b) => b.ratingCount - a.ratingCount)
     }
 
     if (sortOption === 'discountHighToLow') {
-        filteredData = sortedData
-            .sort((a, b) => (
-                (Math.floor(100 - ((b.price / b.originPrice) * 100))) - (Math.floor(100 - ((a.price / a.originPrice) * 100)))
-            ))
+        filteredData = sortedData.sort((a, b) => b.discount - a.discount)
     }
 
     if (sortOption === 'priceHighToLow') {
@@ -149,27 +190,23 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
 
     if (filteredData.length === 0) {
         filteredData = [{
-            id: 'no-data',
-            category: 'no-data',
-            type: 'no-data',
-            name: 'no-data',
-            gender: 'no-data',
-            new: false,
-            sale: false,
-            rate: 0,
+            id: 0,
+            name: 'No products found',
+            description: 'No products match the selected criteria.',
             price: 0,
-            originPrice: 0,
-            brand: 'no-data',
-            sold: 0,
-            quantity: 0,
-            quantityPurchase: 0,
-            sizes: [],
-            variation: [],
-            thumbImage: [],
-            images: [],
-            description: 'no-data',
-            action: 'no-data',
-            slug: 'no-data'
+            brandName: '',
+            productSize: '',
+            color: '',
+            conditionPoints: 0,
+            status: '',
+            stockQuantity: 0,
+            discount: 0,
+            averageRating: 0,
+            ratingCount: 0,
+            categoryName: '',
+            primaryImageUrl: '',
+            imageUrls: [],
+            createdAt: null
         }];
     }
 
@@ -484,10 +521,53 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
 
                             <div className="list-product hide-product-sold grid lg:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7">
                                 {currentProducts.map((item) => (
-                                    item.id === 'no-data' ? (
+                                    item.id === 0 ? (
                                         <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
                                     ) : (
-                                        <Product key={item.id} data={item} type='grid' />
+                                        <Product 
+                                            key={item.id} 
+                                            data={{
+                                                id: item.id.toString(),
+                                                name: item.name,
+                                                description: item.description,
+                                                price: item.price || 0,
+                                                originPrice: (item.price || 0) + (item.discount || 0),
+                                                brand: item.brandName,
+                                                sold: item.ratingCount || 0,
+                                                quantity: item.stockQuantity || 0,
+                                                sizes: [item.productSize],
+                                                variation: item.color?.split('/').map(color => ({
+                                                    color: color.trim(),
+                                                    colorCode: color.trim().toLowerCase() === 'red' ? '#DB4444' :
+                                                             color.trim().toLowerCase() === 'yellow' ? '#ECB018' :
+                                                             color.trim().toLowerCase() === 'white' ? '#F6EFDD' :
+                                                             color.trim().toLowerCase() === 'purple' ? '#8684D4' :
+                                                             color.trim().toLowerCase() === 'pink' ? '#F4407D' :
+                                                             color.trim().toLowerCase() === 'black' ? '#1F1F1F' :
+                                                             color.trim().toLowerCase() === 'green' ? '#D2EF9A' :
+                                                             color.trim().toLowerCase() === 'navy' ? '#000080' : '#000000',
+                                                    colorImage: '/images/product/1000x1000.png',
+                                                    image: '/images/product/1000x1000.png'
+                                                })) || [{
+                                                    color: item.color || '',
+                                                    colorCode: '#000000',
+                                                    colorImage: '/images/product/1000x1000.png',
+                                                    image: '/images/product/1000x1000.png'
+                                                }],
+                                                thumbImage: ['/images/product/1000x1000.png'],
+                                                images: ['/images/product/1000x1000.png'],
+                                                action: 'add to cart',
+                                                type: item.categoryName,
+                                                category: item.categoryName,
+                                                gender: item.categoryName,
+                                                new: false,
+                                                sale: (item.discount || 0) > 0,
+                                                rate: item.averageRating || 0,
+                                                quantityPurchase: 0,
+                                                slug: item.name.toLowerCase().replace(/\s+/g, '-')
+                                            }} 
+                                            type='grid' 
+                                        />
                                     )
                                 ))}
                             </div>
