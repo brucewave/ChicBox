@@ -13,11 +13,10 @@ interface Props {
 }
 
 const BreadcrumbProduct: React.FC<Props> = ({ data, productPage, productId }) => {
-    const productMain = data.filter(product => product.id === productId)
-    const router = useRouter()
+    const productMain = data.find(product => product.id.toString() === productId);
+    const router = useRouter();
 
     const handleDetailProduct = (productId: string | number | null) => {
-        // Chuyển hướng đến trang shop với category được chọn
         router.push(`/product/${productPage}?id=${productId}`);
     };
 
@@ -29,9 +28,9 @@ const BreadcrumbProduct: React.FC<Props> = ({ data, productPage, productId }) =>
                         <div className="left flex items-center gap-1">
                             <Link href={'/'} className='caption1 text-secondary2 hover:underline'>Homepage</Link>
                             <Icon.CaretRight size={12} className='text-secondary2' />
-                            <div className='caption1 text-secondary2'>Product</div>
+                            <Link href={'/shop/breadcrumb1'} className='caption1 text-secondary2 hover:underline'>Shop</Link>
                             <Icon.CaretRight size={12} className='text-secondary2' />
-                            <div className='caption1 capitalize'>{`Product ${productPage}`}</div>
+                            <div className='caption1 capitalize'>{productMain ? productMain.name : `Product ${productPage}`}</div>
                         </div>
                         <div className="right flex items-center gap-3">
                             {productId !== null && Number(productId) >= 2 ? (

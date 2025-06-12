@@ -41,10 +41,42 @@ const Default: React.FC<Props> = ({ data, productId }) => {
     const { openModalWishlist } = useModalWishlistContext()
     const { addToCompare, removeFromCompare, compareState } = useCompare();
     const { openModalCompare } = useModalCompareContext()
-    let productMain = data.find(product => product.id === productId) as ProductType
-    if (productMain === undefined) {
-        productMain = data[0]
-    }
+    let productMainFound = data.find(product => product.id === productId);
+
+    // Create a default product object with all properties initialized as empty/default values
+    const defaultProduct: ProductType = {
+        id: "", // Ensure ID is a string as per ProductType definition
+        category: "",
+        type: "",
+        name: "",
+        gender: "",
+        new: false,
+        sale: false,
+        rate: 0,
+        price: 0,
+        originPrice: 0,
+        brand: "",
+        sold: 0,
+        quantity: 0,
+        quantityPurchase: 0,
+        sizes: [],
+        variation: [],
+        thumbImage: [],
+        images: [],
+        description: "",
+        action: "",
+        slug: ""
+    };
+
+    // Use the found product, or the first product in data, or the default product as a fallback
+    const productMain: ProductType = {
+        ...defaultProduct, // Start with all default properties
+        ...(productMainFound || data[0] || {}), // Overlay with actual data, or fallback to data[0], or empty object
+        // Explicitly ensure array properties are arrays, as spread might not handle undefined correctly for nested arrays
+        images: (productMainFound?.images || data[0]?.images || defaultProduct.images),
+        variation: (productMainFound?.variation || data[0]?.variation || defaultProduct.variation),
+        sizes: (productMainFound?.sizes || data[0]?.sizes || defaultProduct.sizes)
+    };
 
     const percentSale = Math.floor(100 - ((productMain?.price / productMain?.originPrice) * 100))
 
@@ -81,52 +113,59 @@ const Default: React.FC<Props> = ({ data, productId }) => {
     }
 
     const handleIncreaseQuantity = () => {
-        productMain.quantityPurchase += 1
-        updateCart(productMain.id, productMain.quantityPurchase + 1, activeSize, activeColor);
+        if (productMain) {
+            productMain.quantityPurchase += 1
+            updateCart(productMain.id, productMain.quantityPurchase + 1, activeSize, activeColor);
+        }
     };
 
     const handleDecreaseQuantity = () => {
-        if (productMain.quantityPurchase > 1) {
+        if (productMain && productMain.quantityPurchase > 1) {
             productMain.quantityPurchase -= 1
             updateCart(productMain.id, productMain.quantityPurchase - 1, activeSize, activeColor);
         }
     };
 
     const handleAddToCart = () => {
-        if (!cartState.cartArray.find(item => item.id === productMain.id)) {
-            addToCart({ ...productMain });
-            updateCart(productMain.id, productMain.quantityPurchase, activeSize, activeColor)
-        } else {
-            updateCart(productMain.id, productMain.quantityPurchase, activeSize, activeColor)
+        if (productMain) {
+            if (!cartState.cartArray.find(item => item.id === productMain.id)) {
+                addToCart({ ...productMain });
+                updateCart(productMain.id, productMain.quantityPurchase, activeSize, activeColor)
+            } else {
+                updateCart(productMain.id, productMain.quantityPurchase, activeSize, activeColor)
+            }
+            openModalCart()
         }
-        openModalCart()
     };
 
     const handleAddToWishlist = () => {
-        // if product existed in wishlit, remove from wishlist and set state to false
-        if (wishlistState.wishlistArray.some(item => item.id === productMain.id)) {
-            removeFromWishlist(productMain.id);
-        } else {
-            // else, add to wishlist and set state to true
-            addToWishlist(productMain);
+        if (productMain) {
+            // if product existed in wishlit, remove from wishlist and set state to false
+            if (wishlistState.wishlistArray.some(item => item.id === productMain.id)) {
+                removeFromWishlist(productMain.id);
+            } else {
+                // else, add to wishlist and set state to true
+                addToWishlist({ ...productMain });
+            }
+            openModalWishlist();
         }
-        openModalWishlist();
     };
 
     const handleAddToCompare = () => {
-        // if product existed in wishlit, remove from wishlist and set state to false
-        if (compareState.compareArray.length < 3) {
-            if (compareState.compareArray.some(item => item.id === productMain.id)) {
-                removeFromCompare(productMain.id);
+        if (productMain) {
+            // if product existed in wishlit, remove from wishlist and set state to false
+            if (compareState.compareArray.length < 3) {
+                if (compareState.compareArray.some(item => item.id === productMain.id)) {
+                    removeFromCompare(productMain.id);
+                } else {
+                    // else, add to wishlist and set state to true
+                    addToCompare({ ...productMain });
+                }
             } else {
-                // else, add to wishlist and set state to true
-                addToCompare(productMain);
+                alert('Compare up to 3 products')
             }
-        } else {
-            alert('Compare up to 3 products')
+            openModalCompare();
         }
-
-        openModalCompare();
     };
 
     const handleActiveTab = (tab: string) => {
@@ -147,7 +186,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                 modules={[Thumbs]}
                                 className="mySwiper2 rounded-2xl overflow-hidden"
                             >
-                                {productMain.images.map((item, index) => (
+                                {(productMain?.images || []).map((item, index) => (
                                     <SwiperSlide
                                         key={index}
                                         onClick={() => {
@@ -176,7 +215,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                 modules={[Navigation, Thumbs]}
                                 className="mySwiper"
                             >
-                                {productMain.images.map((item, index) => (
+                                {(productMain?.images || []).map((item, index) => (
                                     <SwiperSlide
                                         key={index}
                                     >
@@ -210,7 +249,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         swiperRef.current = swiper
                                     }}
                                 >
-                                    {productMain.images.map((item, index) => (
+                                    {(productMain?.images || []).map((item, index) => (
                                         <SwiperSlide
                                             key={index}
                                             onClick={() => {
@@ -272,7 +311,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                 <div className="choose-color">
                                     <div className="text-title">Colors: <span className='text-title color'>{activeColor}</span></div>
                                     <div className="list-color flex items-center gap-2 flex-wrap mt-3">
-                                        {productMain.variation.map((item, index) => (
+                                        {(productMain?.variation || []).map((item, index) => (
                                             <div
                                                 className={`color-item w-12 h-12 rounded-xl duration-300 relative ${activeColor === item.color ? 'active' : ''}`}
                                                 key={index}
@@ -307,7 +346,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         <ModalSizeguide data={productMain} isOpen={openSizeGuide} onClose={handleCloseSizeGuide} />
                                     </div>
                                     <div className="list-size flex items-center gap-2 flex-wrap mt-3">
-                                        {productMain.sizes.map((item, index) => (
+                                        {(productMain?.sizes || []).map((item, index) => (
                                             <div
                                                 className={`size-item ${item === 'freesize' ? 'px-3 py-2' : 'w-12 h-12'} flex items-center justify-center text-button rounded-full bg-white border border-line ${activeSize === item ? 'active' : ''}`}
                                                 key={index}

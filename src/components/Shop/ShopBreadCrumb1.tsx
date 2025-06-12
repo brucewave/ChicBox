@@ -35,7 +35,6 @@ interface ProductType {
     primaryImageUrl: string;
     imageUrls: string[];
     createdAt: string | null;
-    // Additional properties for Product component
     category?: string;
     type?: string;
     gender?: string;
@@ -113,52 +112,42 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     const filterProducts = () => {
         let filteredProducts = [...data];
 
-        // Filter by show only sale
         if (showOnlySale) {
             filteredProducts = filteredProducts.filter(item => item.discount > 0);
         }
 
-        // Filter by gender
         if (gender) {
             filteredProducts = filteredProducts.filter(item => item.categoryName === gender);
         }
 
-        // Filter by category
         if (category) {
             filteredProducts = filteredProducts.filter(item => item.categoryName === category);
         }
 
-        // Filter by data type
         if (dataType) {
             filteredProducts = filteredProducts.filter(item => item.categoryName === dataType);
         }
 
-        // Filter by type
         if (type) {
             filteredProducts = filteredProducts.filter(item => item.categoryName === type);
         }
 
-        // Filter by size
         if (size) {
             filteredProducts = filteredProducts.filter(item => item.productSize === size);
         }
 
-        // Filter by price range
         if (priceRange.min !== 0 || priceRange.max !== 100) {
             filteredProducts = filteredProducts.filter(item => item.price >= priceRange.min && item.price <= priceRange.max);
         }
 
-        // Filter by color
         if (color) {
             filteredProducts = filteredProducts.filter(item => item.color?.toLowerCase().includes(color.toLowerCase()));
         }
 
-        // Filter by brand
         if (brand) {
             filteredProducts = filteredProducts.filter(item => item.brandName?.toLowerCase() === brand.toLowerCase());
         }
 
-        // Sort products
         if (sortOption === 'soldQuantityHighToLow') {
             filteredProducts.sort((a, b) => b.ratingCount - a.ratingCount);
         } else if (sortOption === 'discountHighToLow') {
@@ -179,7 +168,6 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     const selectedColor = color;
     const selectedBrand = brand;
 
-    // Get unique brands and their counts
     const brandCounts = data.reduce((acc, item) => {
         const brandName = item.brandName?.toLowerCase() || '';
         if (brandName) {
@@ -188,7 +176,6 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
         return acc;
     }, {} as Record<string, number>);
 
-    // Get filtered brand counts
     const filteredBrandCounts = filteredData.reduce((acc, item) => {
         const brandName = item.brandName?.toLowerCase() || '';
         if (brandName) {
@@ -219,15 +206,12 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
         });
     }
 
-    // Find page number base on filteredData
     const pageCount = Math.ceil(filteredData.length / productsPerPage);
 
-    // If page number 0, set current page = 0
     if (pageCount === 0) {
         setCurrentPage(0);
     }
 
-    // Get product data for current page
     let currentProducts: ProductType[];
 
     if (filteredData.length > 0) {
@@ -241,7 +225,6 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     };
 
     const handleClearAll = () => {
-        dataType = null
         setShowOnlySale(false);
         setSortOption('');
         setType(null);
@@ -250,7 +233,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
         setBrand(null);
         setPriceRange({ min: 0, max: 100 });
         setCurrentPage(0);
-        handleType(null)
+        handleType(null);
     };
 
     return (
@@ -307,17 +290,15 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                             <div className="filter-size pb-8 border-b border-line mt-8">
                                 <div className="heading6">Size</div>
                                 <div className="list-size flex items-center flex-wrap gap-3 gap-y-4 mt-4">
-                                    {
-                                        ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'].map((item, index) => (
-                                            <div
-                                                key={index}
-                                                className={`size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line ${size === item ? 'active' : ''}`}
-                                                onClick={() => handleSize(item)}
-                                            >
-                                                {item}
-                                            </div>
-                                        ))
-                                    }
+                                    {['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'].map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className={`size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line ${size === item ? 'active' : ''}`}
+                                            onClick={() => handleSize(item)}
+                                        >
+                                            {item}
+                                        </div>
+                                    ))}
                                     <div
                                         className={`size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line ${size === 'freesize' ? 'active' : ''}`}
                                         onClick={() => handleSize('freesize')}
@@ -352,7 +333,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                 </div>
                             </div>
                             <div className="filter-color pb-8 border-b border-line mt-8">
-                                <div className="heading6">colors</div>
+                                <div className="heading6">Colors</div>
                                 <div className="list-color flex items-center flex-wrap gap-3 gap-y-4 mt-4">
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'pink' ? 'active' : ''}`}
@@ -485,100 +466,99 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                     {totalProducts}
                                     <span className='text-secondary pl-1'>Products Found</span>
                                 </div>
-                                {
-                                    (selectedType || selectedSize || selectedColor || selectedBrand) && (
-                                        <>
-                                            <div className="list flex items-center gap-3">
-                                                <div className='w-px h-4 bg-line'></div>
-                                                {selectedType && (
-                                                    <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setType(null) }}>
-                                                        <Icon.X className='cursor-pointer' />
-                                                        <span>{selectedType}</span>
-                                                    </div>
-                                                )}
-                                                {selectedSize && (
-                                                    <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setSize(null) }}>
-                                                        <Icon.X className='cursor-pointer' />
-                                                        <span>{selectedSize}</span>
-                                                    </div>
-                                                )}
-                                                {selectedColor && (
-                                                    <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setColor(null) }}>
-                                                        <Icon.X className='cursor-pointer' />
-                                                        <span>{selectedColor}</span>
-                                                    </div>
-                                                )}
-                                                {selectedBrand && (
-                                                    <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setBrand(null) }}>
-                                                        <Icon.X className='cursor-pointer' />
-                                                        <span>{selectedBrand}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div
-                                                className="clear-btn flex items-center px-2 py-1 gap-1 rounded-full border border-red cursor-pointer"
-                                                onClick={handleClearAll}
-                                            >
-                                                <Icon.X color='rgb(219, 68, 68)' className='cursor-pointer' />
-                                                <span className='text-button-uppercase text-red'>Clear All</span>
-                                            </div>
-                                        </>
-                                    )
-                                }
+                                {(selectedType || selectedSize || selectedColor || selectedBrand) && (
+                                    <>
+                                        <div className="list flex items-center gap-3">
+                                            <div className='w-px h-4 bg-line'></div>
+                                            {selectedType && (
+                                                <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setType(null) }}>
+                                                    <Icon.X className='cursor-pointer' />
+                                                    <span>{selectedType}</span>
+                                                </div>
+                                            )}
+                                            {selectedSize && (
+                                                <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setSize(null) }}>
+                                                    <Icon.X className='cursor-pointer' />
+                                                    <span>{selectedSize}</span>
+                                                </div>
+                                            )}
+                                            {selectedColor && (
+                                                <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setColor(null) }}>
+                                                    <Icon.X className='cursor-pointer' />
+                                                    <span>{selectedColor}</span>
+                                                </div>
+                                            )}
+                                            {selectedBrand && (
+                                                <div className="item flex items-center px-2 py-1 gap-1 bg-linear rounded-full capitalize" onClick={() => { setBrand(null) }}>
+                                                    <Icon.X className='cursor-pointer' />
+                                                    <span>{selectedBrand}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div
+                                            className="clear-btn flex items-center px-2 py-1 gap-1 rounded-full border border-red cursor-pointer"
+                                            onClick={handleClearAll}
+                                        >
+                                            <Icon.X color='rgb(219, 68, 68)' className='cursor-pointer' />
+                                            <span className='text-button-uppercase text-red'>Clear All</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             <div className="list-product hide-product-sold grid lg:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7">
-                {currentProducts.map((item) => (
-                    item.id === 0 ? (
-                        <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
-                    ) : (
-                        <Product 
-                            key={item.id} 
-                            data={{
-                                id: item.id.toString(),
-                                name: item.name,
-                                description: item.description,
-                                price: item.discount > 0 ? Number((item.price * (1 - item.discount/100)).toFixed(2)) : item.price,
-                                originPrice: item.discount > 0 ? item.price : item.price,
-                                brand: item.brandName,
-                                sold: item.ratingCount || 0,
-                                quantity: item.stockQuantity || 0,
-                                sizes: [item.productSize],
-                                variation: item.color?.split('/').map(color => ({
-                                    color: color.trim(),
-                                    colorCode: color.trim().toLowerCase() === 'red' ? '#DB4444' :
-                                             color.trim().toLowerCase() === 'yellow' ? '#ECB018' :
-                                             color.trim().toLowerCase() === 'white' ? '#F6EFDD' :
-                                             color.trim().toLowerCase() === 'purple' ? '#8684D4' :
-                                             color.trim().toLowerCase() === 'pink' ? '#F4407D' :
-                                             color.trim().toLowerCase() === 'black' ? '#1F1F1F' :
-                                             color.trim().toLowerCase() === 'green' ? '#D2EF9A' :
-                                             color.trim().toLowerCase() === 'navy' ? '#000080' : '#000000',
-                                    colorImage: `${baseUrl}/api/v1/images/${color.trim().toLowerCase()}.png`,
-                                    image: item.primaryImageUrl ? `${baseUrl}/api/v1/images/${item.primaryImageUrl}` : `${baseUrl}/api/v1/images/back.png`
-                                })) || [{
-                                    color: item.color || '',
-                                    colorCode: '#000000',
-                                    colorImage: `${baseUrl}/api/v1/images/back.png`,
-                                    image: item.primaryImageUrl ? `${baseUrl}/api/v1/images/${item.primaryImageUrl}` : `${baseUrl}/api/v1/images/back.png`
-                                }],
-                                thumbImage: item.primaryImageUrl ? [`${baseUrl}/api/v1/images/${item.primaryImageUrl}`] : [`${baseUrl}/api/v1/images/back.png`],
-                                images: item.imageUrls?.length > 0 ? item.imageUrls.map(url => `${baseUrl}/api/v1/images/${url}`) : [`${baseUrl}/api/v1/images/back.png`],
-                                action: 'add to cart',
-                                type: item.categoryName,
-                                category: item.categoryName,
-                                gender: item.categoryName,
-                                new: false,
-                                sale: item.discount > 0,
-                                rate: item.averageRating || 0,
-                                quantityPurchase: 0,
-                                slug: item.name.toLowerCase().replace(/\s+/g, '-')
-                            }} 
-                            type='grid' 
-                        />
-                    )
-                ))}
-            </div>
+                                {currentProducts.map((item) => (
+                                    item.id === 0 ? (
+                                        <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
+                                    ) : (
+                                        <Link href={`/product/default?id=${item.id}`} key={item.id}>
+                                            <Product 
+                                                data={{
+                                                    id: item.id.toString(),
+                                                    name: item.name,
+                                                    description: item.description,
+                                                    price: item.discount > 0 ? Number((item.price * (1 - item.discount/100)).toFixed(2)) : item.price,
+                                                    originPrice: item.discount > 0 ? item.price : item.price,
+                                                    brand: item.brandName,
+                                                    sold: item.ratingCount || 0,
+                                                    quantity: item.stockQuantity || 0,
+                                                    sizes: [item.productSize],
+                                                    variation: item.color?.split('/').map(color => ({
+                                                        color: color.trim(),
+                                                        colorCode: color.trim().toLowerCase() === 'red' ? '#DB4444' :
+                                                                 color.trim().toLowerCase() === 'yellow' ? '#ECB018' :
+                                                                 color.trim().toLowerCase() === 'white' ? '#F6EFDD' :
+                                                                 color.trim().toLowerCase() === 'purple' ? '#868I4D4' :
+                                                                 color.trim().toLowerCase() === 'pink' ? '#F4407D' :
+                                                                 color.trim().toLowerCase() === 'black' ? '#1F1F1F' :
+                                                                 color.trim().toLowerCase() === 'green' ? '#D2EF9A' :
+                                                                 color.trim().toLowerCase() === 'navy' ? '#000080' : '#000000',
+                                                        colorImage: `${baseUrl}/api/v1/images/${color.trim().toLowerCase()}.png`,
+                                                        image: item.primaryImageUrl ? `${baseUrl}/api/v1/images/${item.primaryImageUrl}` : `${baseUrl}/api/v1/images/back.png`
+                                                    })) || [{
+                                                        color: item.color || '',
+                                                        colorCode: '#000000',
+                                                        colorImage: `${baseUrl}/api/v1/images/back.png`,
+                                                        image: item.primaryImageUrl ? `${baseUrl}/api/v1/images/${item.primaryImageUrl}` : `${baseUrl}/api/v1/images/back.png`
+                                                    }],
+                                                    thumbImage: item.primaryImageUrl ? [`${baseUrl}/api/v1/images/${item.primaryImageUrl}`] : [`${baseUrl}/api/v1/images/back.png`],
+                                                    images: item.imageUrls?.length > 0 ? item.imageUrls.map(url => `${baseUrl}/api/v1/images/${url}`) : [`${baseUrl}/api/v1/images/back.png`],
+                                                    action: 'add to cart',
+                                                    type: item.categoryName,
+                                                    category: item.categoryName,
+                                                    gender: item.categoryName,
+                                                    new: false,
+                                                    sale: item.discount > 0,
+                                                    rate: item.averageRating || 0,
+                                                    quantityPurchase: 0,
+                                                    slug: item.name.toLowerCase().replace(/\s+/g, '-')
+                                                }} 
+                                                type='grid' 
+                                            />
+                                        </Link>
+                                    )
+                                ))}
+                            </div>
 
                             {pageCount > 1 && (
                                 <div className="list-pagination flex items-center md:mt-10 mt-7">
@@ -588,7 +568,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
         </>
     )
 }
