@@ -8,6 +8,8 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css'
 import HandlePagination from '../Other/HandlePagination';
 
+const baseUrl = 'https://api.roomily.tech';
+
 interface Variation {
     color: string;
     colorCode: string;
@@ -526,57 +528,57 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                             </div>
 
                             <div className="list-product hide-product-sold grid lg:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7">
-                                {currentProducts.map((item) => (
-                                    item.id === 0 ? (
-                                        <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
-                                    ) : (
-                                        <Product 
-                                            key={item.id} 
-                                            data={{
-                                                id: item.id.toString(),
-                                                name: item.name,
-                                                description: item.description,
-                                                price: item.discount > 0 ? Number((item.price * (1 - item.discount/100)).toFixed(2)) : item.price,
-                                                originPrice: item.discount > 0 ? item.price : item.price,
-                                                brand: item.brandName,
-                                                sold: item.ratingCount || 0,
-                                                quantity: item.stockQuantity || 0,
-                                                sizes: [item.productSize],
-                                                variation: item.color?.split('/').map(color => ({
-                                                    color: color.trim(),
-                                                    colorCode: color.trim().toLowerCase() === 'red' ? '#DB4444' :
-                                                             color.trim().toLowerCase() === 'yellow' ? '#ECB018' :
-                                                             color.trim().toLowerCase() === 'white' ? '#F6EFDD' :
-                                                             color.trim().toLowerCase() === 'purple' ? '#8684D4' :
-                                                             color.trim().toLowerCase() === 'pink' ? '#F4407D' :
-                                                             color.trim().toLowerCase() === 'black' ? '#1F1F1F' :
-                                                             color.trim().toLowerCase() === 'green' ? '#D2EF9A' :
-                                                             color.trim().toLowerCase() === 'navy' ? '#000080' : '#000000',
-                                                    colorImage: '/images/product/1000x1000.png',
-                                                    image: '/images/product/1000x1000.png'
-                                                })) || [{
-                                                    color: item.color || '',
-                                                    colorCode: '#000000',
-                                                    colorImage: '/images/product/1000x1000.png',
-                                                    image: '/images/product/1000x1000.png'
-                                                }],
-                                                thumbImage: ['/images/product/1000x1000.png'],
-                                                images: ['/images/product/1000x1000.png'],
-                                                action: 'add to cart',
-                                                type: item.categoryName,
-                                                category: item.categoryName,
-                                                gender: item.categoryName,
-                                                new: false,
-                                                sale: item.discount > 0,
-                                                rate: item.averageRating || 0,
-                                                quantityPurchase: 0,
-                                                slug: item.name.toLowerCase().replace(/\s+/g, '-')
-                                            }} 
-                                            type='grid' 
-                                        />
-                                    )
-                                ))}
-                            </div>
+                {currentProducts.map((item) => (
+                    item.id === 0 ? (
+                        <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
+                    ) : (
+                        <Product 
+                            key={item.id} 
+                            data={{
+                                id: item.id.toString(),
+                                name: item.name,
+                                description: item.description,
+                                price: item.discount > 0 ? Number((item.price * (1 - item.discount/100)).toFixed(2)) : item.price,
+                                originPrice: item.discount > 0 ? item.price : item.price,
+                                brand: item.brandName,
+                                sold: item.ratingCount || 0,
+                                quantity: item.stockQuantity || 0,
+                                sizes: [item.productSize],
+                                variation: item.color?.split('/').map(color => ({
+                                    color: color.trim(),
+                                    colorCode: color.trim().toLowerCase() === 'red' ? '#DB4444' :
+                                             color.trim().toLowerCase() === 'yellow' ? '#ECB018' :
+                                             color.trim().toLowerCase() === 'white' ? '#F6EFDD' :
+                                             color.trim().toLowerCase() === 'purple' ? '#8684D4' :
+                                             color.trim().toLowerCase() === 'pink' ? '#F4407D' :
+                                             color.trim().toLowerCase() === 'black' ? '#1F1F1F' :
+                                             color.trim().toLowerCase() === 'green' ? '#D2EF9A' :
+                                             color.trim().toLowerCase() === 'navy' ? '#000080' : '#000000',
+                                    colorImage: `${baseUrl}/api/v1/images/${color.trim().toLowerCase()}.png`,
+                                    image: item.primaryImageUrl ? `${baseUrl}/api/v1/images/${item.primaryImageUrl}` : `${baseUrl}/api/v1/images/back.png`
+                                })) || [{
+                                    color: item.color || '',
+                                    colorCode: '#000000',
+                                    colorImage: `${baseUrl}/api/v1/images/back.png`,
+                                    image: item.primaryImageUrl ? `${baseUrl}/api/v1/images/${item.primaryImageUrl}` : `${baseUrl}/api/v1/images/back.png`
+                                }],
+                                thumbImage: item.primaryImageUrl ? [`${baseUrl}/api/v1/images/${item.primaryImageUrl}`] : [`${baseUrl}/api/v1/images/back.png`],
+                                images: item.imageUrls?.length > 0 ? item.imageUrls.map(url => `${baseUrl}/api/v1/images/${url}`) : [`${baseUrl}/api/v1/images/back.png`],
+                                action: 'add to cart',
+                                type: item.categoryName,
+                                category: item.categoryName,
+                                gender: item.categoryName,
+                                new: false,
+                                sale: item.discount > 0,
+                                rate: item.averageRating || 0,
+                                quantityPurchase: 0,
+                                slug: item.name.toLowerCase().replace(/\s+/g, '-')
+                            }} 
+                            type='grid' 
+                        />
+                    )
+                ))}
+            </div>
 
                             {pageCount > 1 && (
                                 <div className="list-pagination flex items-center md:mt-10 mt-7">
