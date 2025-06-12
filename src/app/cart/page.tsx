@@ -25,14 +25,26 @@ const Cart = () => {
 
     const { cartState, updateCart, removeFromCart } = useCart();
 
-    const handleQuantityChange = (productId: string, newQuantity: number) => {
-        // Tìm sản phẩm trong giỏ hàng
-        const itemToUpdate = cartState.cartArray.find((item) => item.id === productId);
+    const handleQuantityChange = async (productId: string, newQuantity: number) => {
+        try {
+            // Tìm sản phẩm trong giỏ hàng
+            const itemToUpdate = cartState.cartArray.find((item) => item.id === productId);
 
-        // Kiểm tra xem sản phẩm có tồn tại không
-        if (itemToUpdate) {
-            // Truyền giá trị hiện tại của selectedSize và selectedColor
-            updateCart(productId, newQuantity, itemToUpdate.selectedSize, itemToUpdate.selectedColor);
+            // Kiểm tra xem sản phẩm có tồn tại không
+            if (itemToUpdate) {
+                // Truyền giá trị hiện tại của selectedSize và selectedColor
+                updateCart(productId, newQuantity, itemToUpdate.selectedSize, itemToUpdate.selectedColor);
+            }
+        } catch (error) {
+            console.error('Failed to update quantity:', error);
+        }
+    };
+
+    const handleRemoveFromCart = async (productId: string) => {
+        try {
+            await removeFromCart(productId);
+        } catch (error) {
+            console.error('Failed to remove item from cart:', error);
         }
     };
 
@@ -129,7 +141,7 @@ const Cart = () => {
                                                         <div className="flex items-center gap-6">
                                                             <div className="bg-img md:w-[100px] w-20 aspect-[3/4]">
                                                                 <Image
-                                                                    src={product.thumbImage[0]}
+                                                                    src={product.thumbImage && product.thumbImage.length > 0 ? product.thumbImage[0] : '/assets/images/product_placeholder.png'}
                                                                     width={1000}
                                                                     height={1000}
                                                                     alt={product.name}
@@ -168,9 +180,7 @@ const Cart = () => {
                                                     <div className="w-1/12 flex items-center justify-center">
                                                         <Icon.XCircle
                                                             className='text-xl max-md:text-base text-red cursor-pointer hover:text-black duration-500'
-                                                            onClick={() => {
-                                                                removeFromCart(product.id)
-                                                            }}
+                                                            onClick={() => handleRemoveFromCart(product.id)}
                                                         />
                                                     </div>
                                                 </div>
