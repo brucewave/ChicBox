@@ -26,5 +26,8 @@ export interface ProductType {
     images: Array<string>,
     description: string,
     action: string,
-    slug: string
+    slug: string,
+    conditionPoints?: number;
+    status?: string;
+     averageRating?: number;
 }
