@@ -30,28 +30,29 @@ const MenuOne: React.FC<Props> = ({ props }) => {
     const { cartState } = useCart()
     const { openModalWishlist } = useModalWishlistContext()
     const { openModalSearch } = useModalSearchContext()
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const handleOpenSubNavMobile = (index: number) => {
         setOpenSubNavMobile(openSubNavMobile === index ? null : index)
     }
 
+    useEffect(() => {
+        setIsLoggedIn(!!localStorage.getItem('token'));
+    }, []);
 
-   // Kiểm tra trạng thái đăng nhập
-   const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('token')
+    // Xử lý click vào biểu tượng tài khoản để bật/tắt popup
+    const handleAccountClick = () => {
+        handleLoginPopup()
+    }
 
-   // Xử lý click vào biểu tượng tài khoản để bật/tắt popup
-   const handleAccountClick = () => {
-       handleLoginPopup()
-   }
-
-   // Xử lý đăng xuất
-   const handleLogout = () => {
-       if (typeof window !== 'undefined') {
-           localStorage.removeItem('token')
-           handleLoginPopup() // Đóng popup sau khi đăng xuất
-           router.push('/') // Chuyển hướng về trang chủ
-       }
-   }
+    // Xử lý đăng xuất
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('token')
+            handleLoginPopup() // Đóng popup sau khi đăng xuất
+            router.push('/') // Chuyển hướng về trang chủ
+        }
+    }
 
     const [fixedHeader, setFixedHeader] = useState(false)
     const [lastScrollPosition, setLastScrollPosition] = useState(0);

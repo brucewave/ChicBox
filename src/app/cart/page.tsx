@@ -143,7 +143,7 @@ const Cart = () => {
                                                         </div>
                                                     </div>
                                                     <div className="w-1/12 price flex items-center justify-center">
-                                                        <div className="text-title text-center">${product.price}.00</div>
+                                                        <div className="text-title text-center">${product.price}</div>
                                                     </div>
                                                     <div className="w-1/6 flex items-center justify-center">
                                                         <div className="quantity-block bg-surface md:p-3 p-2 flex items-center justify-between rounded-lg border border-line md:w-[100px] flex-shrink-0 w-20">
@@ -163,7 +163,7 @@ const Cart = () => {
                                                         </div>
                                                     </div>
                                                     <div className="w-1/6 flex total-price items-center justify-center">
-                                                        <div className="text-title text-center">${product.quantity * product.price}.00</div>
+                                                        <div className="text-title text-center">${product.quantity * product.price}</div>
                                                     </div>
                                                     <div className="w-1/12 flex items-center justify-center">
                                                         <Icon.XCircle
@@ -254,11 +254,11 @@ const Cart = () => {
                                 <div className="heading5">Order Summary</div>
                                 <div className="total-block py-5 flex justify-between border-b border-line">
                                     <div className="text-title">Subtotal</div>
-                                    <div className="text-title">$<span className="total-product">{totalCart}</span><span>.00</span></div>
+                                    <div className="text-title">$<span className="total-product">{totalCart}</span><span></span></div>
                                 </div>
                                 <div className="discount-block py-5 flex justify-between border-b border-line">
                                     <div className="text-title">Discounts</div>
-                                    <div className="text-title"> <span>-$</span><span className="discount">{discountCart}</span><span>.00</span></div>
+                                    <div className="text-title"> <span>-$</span><span className="discount">{discountCart}</span><span></span></div>
                                 </div>
                                 <div className="ship-block py-5 flex justify-between border-b border-line">
                                     <div className="text-title">Shipping</div>
@@ -308,9 +308,9 @@ const Cart = () => {
                                             </div>
                                         </div>
                                         <div className="right">
-                                            <div className="ship">$0.00</div>
-                                            <div className="local text-on-surface-variant1 mt-1">$30.00</div>
-                                            <div className="flat text-on-surface-variant1 mt-1">$40.00</div>
+                                            <div className="ship">$0</div>
+                                            <div className="local text-on-surface-variant1 mt-1">$30</div>
+                                            <div className="flat text-on-surface-variant1 mt-1">$40</div>
                                         </div>
                                     </div>
                                 </div>
@@ -318,7 +318,7 @@ const Cart = () => {
                                     <div className="heading5">Total</div>
                                     <div className="heading5">$
                                         <span className="total-cart heading5">{totalCart - discountCart + shipCart}</span>
-                                        <span className='heading5'>.00</span></div>
+                                        <span className='heading5'></span></div>
                                 </div>
                                 <div className="block-button flex flex-col items-center gap-y-4 mt-5">
                                     <div className="checkout-btn button-main text-center w-full" onClick={redirectToCheckout}>Process To Checkout</div>
