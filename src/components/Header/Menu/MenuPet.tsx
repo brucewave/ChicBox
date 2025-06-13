@@ -23,7 +23,7 @@ const MenuPet = () => {
     const { openMenuMobile, handleMenuMobile } = useMenuMobile()
     const [openSubNavMobile, setOpenSubNavMobile] = useState<number | null>(null)
     const { openModalCart } = useModalCartContext()
-    const { cartState } = useCart()
+    const { cartState, getCartCount } = useCart()
     const { openModalWishlist } = useModalWishlistContext()
     const { openModalSearch } = useModalSearchContext()
 
@@ -111,7 +111,7 @@ const MenuPet = () => {
                                             ${openLoginPopup ? 'open' : ''}`}
                                     >
                                         <Link href={'/login'} className="button-main w-full text-center">Login</Link>
-                                        <div className="text-secondary text-center mt-3 pb-4">Don’t have an account?
+                                        <div className="text-secondary text-center mt-3 pb-4">Don't have an account?
                                             <Link href={'/register'} className='text-black pl-1 hover:underline'>Register</Link>
                                         </div>
                                         <div className="bottom pt-4 border-t border-line"></div>
@@ -125,7 +125,7 @@ const MenuPet = () => {
                                 <div className="cart-icon flex flex-col items-center relative cursor-pointer" onClick={openModalCart}>
                                     <Icon.Handbag size={24} color='black' />
                                     <div className="caption1">Cart</div>
-                                    <span className="quantity cart-quantity absolute -right-1 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{cartState.cartArray.length}</span>
+                                    <span className="quantity cart-quantity absolute -right-1 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{getCartCount()}</span>
                                 </div>
                             </div>
                         </div>

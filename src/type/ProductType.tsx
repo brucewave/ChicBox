@@ -29,6 +29,6 @@ export interface ProductType {
     slug: string,
     conditionPoints?: number;
     status?: string;
-    averageRating?: number;
+     averageRating?: number;
     isAvailable?: boolean;
 }

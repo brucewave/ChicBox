@@ -10,6 +10,7 @@ import Footer from '@/components/Footer/Footer'
 import * as Icon from "@phosphor-icons/react/dist/ssr";
 import { useCart } from '@/context/CartContext'
 import { countdownTime } from '@/store/countdownTime'
+import { cartService } from '@/services/cartService'
 
 const Cart = () => {
     const [timeLeft, setTimeLeft] = useState(countdownTime());
@@ -27,12 +28,20 @@ const Cart = () => {
 
     const handleQuantityChange = async (productId: string, newQuantity: number) => {
         try {
-            // Tìm sản phẩm trong giỏ hàng
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
             const itemToUpdate = cartState.cartArray.find((item) => item.id === productId);
 
-            // Kiểm tra xem sản phẩm có tồn tại không
             if (itemToUpdate) {
-                // Truyền giá trị hiện tại của selectedSize và selectedColor
+                if (token) {
+                    // If user is logged in, update through API
+                    if (newQuantity > itemToUpdate.quantity) {
+                        // Add items
+                        await cartService.addToCart(productId);
+                    } else {
+                        // Remove items
+                        await cartService.removeFromCart(productId);
+                    }
+                }
                 updateCart(productId, newQuantity, itemToUpdate.selectedSize, itemToUpdate.selectedColor);
             }
         } catch (error) {
