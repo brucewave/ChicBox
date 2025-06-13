@@ -18,6 +18,7 @@ interface UserInfo {
     address: string
     email: string
     phoneNumber: string
+    totalPurchasedItems?: number
 }
 
 const MyAccount = () => {
@@ -124,6 +125,13 @@ const MyAccount = () => {
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2">
                                         <Icon.MapPin size={20} weight='bold' />
                                         <div className="heading6">My Address</div>
+                                    </div>
+                                    <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2">
+                                        <Icon.Gift size={20} weight='bold' />
+                                        <div className="heading6">Rewards Program</div>
+                                        <div className="ml-auto text-sm">
+                                            {userInfo?.totalPurchasedItems || 0}/5 items
+                                        </div>
                                     </div>
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2" onClick={() => {
                                         localStorage.removeItem('token')

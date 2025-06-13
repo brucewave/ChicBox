@@ -11,9 +11,15 @@ import { useCart } from '@/context/CartContext'
 import { countdownTime } from '@/store/countdownTime'
 import CountdownTimeType from '@/type/CountdownType';
 import { cartService } from '@/services/cartService'
+import { couponService, Coupon } from '@/services/couponService'
 
 const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) => {
     const [timeLeft, setTimeLeft] = useState(serverTimeLeft);
+    const [coupons, setCoupons] = useState<Coupon[]>([]);
+    const [userCoupons, setUserCoupons] = useState<Coupon[]>([]);
+    const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+    const [couponCode, setCouponCode] = useState('');
+    const [couponError, setCouponError] = useState('');
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -21,6 +27,22 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
         }, 1000);
 
         return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
+        const fetchCoupons = async () => {
+            try {
+                const [activeCoupons, userSpecificCoupons] = await Promise.all([
+                    couponService.getActiveCoupons(),
+                    couponService.getUserCoupons()
+                ]);
+                setCoupons(activeCoupons);
+                setUserCoupons(userSpecificCoupons);
+            } catch (error) {
+                console.error('Failed to fetch coupons:', error);
+            }
+        };
+        fetchCoupons();
     }, []);
 
     const [activeTab, setActiveTab] = useState<string | undefined>('')
@@ -105,12 +127,55 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
     let moneyForFreeship = 150;
     let [totalCart, setTotalCart] = useState<number>(0)
     let [discountCart, setDiscountCart] = useState<number>(0)
+    let [freeItemApplied, setFreeItemApplied] = useState<boolean>(false)
 
     // Calculate total cart value
     useEffect(() => {
         const total = cartState.cartArray.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         setTotalCart(total);
     }, [cartState.cartArray]);
+
+    const handleApplyFreeItem = () => {
+        const totalItems = cartState.cartArray.reduce((sum, item) => sum + item.quantity, 0);
+        if (totalItems >= 5 && !freeItemApplied) {
+            // Find the cheapest item to make it free
+            const cheapestItem = cartState.cartArray.reduce((min, item) => 
+                item.price < min.price ? item : min
+            , cartState.cartArray[0]);
+            
+            setDiscountCart(prev => prev + cheapestItem.price);
+            setFreeItemApplied(true);
+        } else if (totalItems < 5) {
+            alert('You need at least 5 items to get one free!');
+        }
+    };
+
+    const handleApplyCoupon = async () => {
+        try {
+            if (!couponCode) {
+                setCouponError('Please enter a coupon code');
+                return;
+            }
+
+            const coupon = await couponService.getCouponByCode(couponCode);
+            if (!coupon.isCurrentlyValid) {
+                setCouponError('This coupon is not currently valid');
+                return;
+            }
+
+            if (coupon.remainingUses <= 0) {
+                setCouponError('This coupon has no remaining uses');
+                return;
+            }
+
+            const result = await couponService.applyCoupon(couponCode, totalCart);
+            setSelectedCoupon(coupon);
+            setDiscountCart(Math.floor((totalCart * coupon.couponPercentage) / 100));
+            setCouponError('');
+        } catch (error) {
+            setCouponError('Invalid coupon code');
+        }
+    };
 
     return (
         <>
@@ -350,11 +415,81 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
                                 <div className="form pt-4 px-6">
                                     <div className="">
                                         <label htmlFor='select-discount' className="caption1 text-secondary">Enter Code</label>
-                                        <input className="border-line px-5 py-3 w-full rounded-xl mt-3" id="select-discount" type="text" placeholder="Discount code" />
+                                        <input 
+                                            className="border-line px-5 py-3 w-full rounded-xl mt-3" 
+                                            id="select-discount" 
+                                            type="text" 
+                                            placeholder="Discount code"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value)}
+                                        />
+                                        {couponError && <div className="text-red-500 text-sm mt-2">{couponError}</div>}
+                                    </div>
+                                    <div className="mt-4">
+                                        <div className={`item ${freeItemApplied ? 'bg-green' : ''} border border-line rounded-lg py-2 px-4`}>
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <div className="caption1 font-bold">Buy 5 Get 1 Free</div>
+                                                    <div className="caption1 text-secondary">Get your cheapest item free when you buy 5 or more items</div>
+                                                </div>
+                                                <div
+                                                    className="button-main py-1 px-2.5 capitalize text-xs"
+                                                    onClick={handleApplyFreeItem}
+                                                >
+                                                    {freeItemApplied ? 'Applied' : 'Apply Offer'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {userCoupons.length > 0 && (
+                                            <div className="mt-4">
+                                                <div className="text-button mb-3">Your Coupons</div>
+                                                {userCoupons.map((coupon) => (
+                                                    <div key={coupon.id} className={`item ${selectedCoupon?.id === coupon.id ? 'bg-green' : ''} border border-line rounded-lg py-2 px-4 mb-3`}>
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <div className="caption1 font-bold">{coupon.name}</div>
+                                                                <div className="caption1 text-secondary">{coupon.couponPercentage}% OFF - Valid until {new Date(coupon.validUntil).toLocaleDateString()}</div>
+                                                            </div>
+                                                            <div
+                                                                className="button-main py-1 px-2.5 capitalize text-xs"
+                                                                onClick={() => {
+                                                                    setCouponCode(coupon.couponCode);
+                                                                    handleApplyCoupon();
+                                                                }}
+                                                            >
+                                                                {selectedCoupon?.id === coupon.id ? 'Applied' : 'Apply Code'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="mt-4">
+                                            <div className="text-button mb-3">Available Coupons</div>
+                                            {coupons.map((coupon) => (
+                                                <div key={coupon.id} className={`item ${selectedCoupon?.id === coupon.id ? 'bg-green' : ''} border border-line rounded-lg py-2 px-4 mb-3`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <div className="caption1 font-bold">{coupon.name}</div>
+                                                            <div className="caption1 text-secondary">{coupon.couponPercentage}% OFF - Valid until {new Date(coupon.validUntil).toLocaleDateString()}</div>
+                                                        </div>
+                                                        <div
+                                                            className="button-main py-1 px-2.5 capitalize text-xs"
+                                                            onClick={() => {
+                                                                setCouponCode(coupon.couponCode);
+                                                                handleApplyCoupon();
+                                                            }}
+                                                        >
+                                                            {selectedCoupon?.id === coupon.id ? 'Applied' : 'Apply Code'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="block-button text-center pt-4 px-6 pb-6">
-                                    <div className='button-main w-full text-center' onClick={() => setActiveTab('')}>Apply</div>
+                                    <div className='button-main w-full text-center' onClick={handleApplyCoupon}>Apply</div>
                                     <div onClick={() => setActiveTab('')} className="text-button-uppercase mt-4 text-center has-line-before cursor-pointer inline-block">Cancel</div>
                                 </div>
                             </div>

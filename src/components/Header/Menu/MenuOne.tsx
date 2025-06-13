@@ -39,21 +39,15 @@ const MenuOne: React.FC<Props> = ({ props }) => {
     }
 
     useEffect(() => {
-        setIsLoggedIn(!!localStorage.getItem('token'));
-    }, []);
+        const token = localStorage.getItem('token')
+        setIsLoggedIn(!!token)
+    }, [])
 
-    // Xử lý click vào biểu tượng tài khoản để bật/tắt popup
-    const handleAccountClick = () => {
-        handleLoginPopup()
-    }
-
-    // Xử lý đăng xuất
     const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('token')
-            handleLoginPopup() // Đóng popup sau khi đăng xuất
-            router.push('/') // Chuyển hướng về trang chủ
-        }
+        localStorage.removeItem('token')
+        setIsLoggedIn(false)
+        handleLoginPopup()
+        router.push('/login')
     }
 
     const [fixedHeader, setFixedHeader] = useState(false)
@@ -963,6 +957,33 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                         <div className="right flex items-center gap-5">
                             <div className="max-md:hidden search-icon flex items-center cursor-pointer" onClick={openModalSearch}>
                                 <Icon.MagnifyingGlass size={24} color='black' />
+                            </div>
+                            <div className="user-icon flex items-center justify-center cursor-pointer">
+                                <Icon.User size={24} color='black' onClick={handleLoginPopup} />
+                                <div
+                                    className={`login-popup absolute top-[74px] w-[320px] p-7 rounded-xl bg-white box-shadow-small 
+                                        ${openLoginPopup ? 'open' : ''}`}
+                                >
+                                    {isLoggedIn ? (
+                                        <>
+                                            <Link href={'/my-account'} className="button-main w-full text-center" onClick={handleLoginPopup}>My Account</Link>
+                                            <div className="text-secondary text-center mt-3 pb-4">
+                                                <button onClick={handleLogout} className='text-black hover:underline'>Logout</button>
+                                            </div>
+                                            <div className="bottom pt-4 border-t border-line"></div>
+                                            <Link href={'#!'} className='body1 hover:underline'>Support</Link>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Link href={'/login'} className="button-main w-full text-center" onClick={handleLoginPopup}>Login</Link>
+                                            <div className="text-secondary text-center mt-3 pb-4">Don't have an account?
+                                                <Link href={'/register'} className='text-black pl-1 hover:underline' onClick={handleLoginPopup}>Register</Link>
+                                            </div>
+                                            <div className="bottom pt-4 border-t border-line"></div>
+                                            <Link href={'#!'} className='body1 hover:underline'>Support</Link>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                             <div className="cart-icon flex items-center relative cursor-pointer" onClick={openModalCart}>
                                 <Icon.Handbag size={24} color='black' />
