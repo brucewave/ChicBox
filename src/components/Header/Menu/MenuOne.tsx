@@ -14,6 +14,7 @@ import { useModalWishlistContext } from '@/context/ModalWishlistContext';
 import { useModalSearchContext } from '@/context/ModalSearchContext';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
+import { useWishlist } from '@/context/WishlistContext';
 
 interface Props {
     props: string;
@@ -29,6 +30,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
     const { openModalCart } = useModalCartContext()
     const { cartState, getCartCount } = useCart()
     const { openModalWishlist } = useModalWishlistContext()
+    const { wishlistState, getWishlistCount } = useWishlist()
     const { openModalSearch } = useModalSearchContext()
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -958,52 +960,14 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                 </ul>
                             </div>
                         </div>
-                        <div className="right flex gap-12">
-                <div className="max-md:hidden search-icon flex items-center cursor-pointer relative">
-                    <Icon.MagnifyingGlass size={24} color='black' onClick={openModalSearch} />
-                    <div className="line absolute bg-line w-px h-6 -right-6"></div>
-                </div>
-                <div className="list-action flex items-center gap-4">
-                    <div className="user-icon flex items-center justify-center cursor-pointer relative">
-                        <Icon.User size={24} color='black' onClick={handleAccountClick} />
-                        <div
-                            className={`login-popup absolute top-[50px] p-7 rounded-xl bg-white box-shadow-small 
-                            ${openLoginPopup ? 'open' : ''} 
-                            md:w-[320px] w-[180px]`}
-                        >
-                            {isLoggedIn ? (
-                                <>
-                                    <Link href="/my-account" className="button-main w-full text-center mb-3 block">
-                                        Tài khoản
-                                    </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="button-main w-full text-center bg-red-500 hover:bg-red-600"
-                                    >
-                                        Đăng xuất
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <Link href={'/login'} className="button-main w-full text-center">Đăng nhập</Link>
-                                    <div className="text-secondary text-center mt-3 pb-4">
-                                        Chưa có tài khoản?
-                                        <Link href={'/register'} className='text-black pl-1 hover:underline'>Đăng ký</Link>
-                                    </div>
-                                    <div className="bottom pt-4 border-t border-line"></div>
-                                    <Link href={'#!'} className='body1 hover:underline'>Hỗ trợ</Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                    <div className="max-md:hidden wishlist-icon flex items-center cursor-pointer" onClick={openModalWishlist}>
-                        <Icon.Heart size={24} color='black' />
-                    </div>
-                    <div className="cart-icon flex items-center relative cursor-pointer" onClick={openModalCart}>
-                        <Icon.Handbag size={24} color='black' />
-                        <span className="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{getCartCount()}</span>
-                    </div>
-                </div>
+                        <div className="right flex items-center gap-5">
+                            <div className="max-md:hidden search-icon flex items-center cursor-pointer" onClick={openModalSearch}>
+                                <Icon.MagnifyingGlass size={24} color='black' />
+                            </div>
+                            <div className="cart-icon flex items-center relative cursor-pointer" onClick={openModalCart}>
+                                <Icon.Handbag size={24} color='black' />
+                                <span className="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{getCartCount()}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

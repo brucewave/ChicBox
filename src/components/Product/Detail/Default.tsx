@@ -303,20 +303,6 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                     <div className="caption2 text-secondary font-semibold uppercase">{productMain.type}</div>
                                     <div className="heading4 mt-1">{productMain.name}</div>
                                 </div>
-                                <div
-                                    className={`add-wishlist-btn w-12 h-12 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white ${wishlistState.wishlistArray.some(item => item.id === productMain.id) ? 'active' : ''}`}
-                                    onClick={handleAddToWishlist}
-                                >
-                                    {wishlistState.wishlistArray.some(item => item.id === productMain.id) ? (
-                                        <>
-                                            <Icon.Heart size={24} weight='fill' className='text-white' />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Icon.Heart size={24} />
-                                        </>
-                                    )}
-                                </div>
                             </div>
                             <div className="flex items-center mt-3">
                                 <Rate currentRate={productMain.rate} size={14} />

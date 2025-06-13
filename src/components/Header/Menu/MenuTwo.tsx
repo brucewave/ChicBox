@@ -1060,6 +1060,7 @@ const MenuTwo = () => {
                                 </li>
                             </ul>
                         </div>
+                        <div className="right flex items-center gap-5">
                         <div className="right flex gap-12">
                             <div className="max-md:hidden search-icon flex items-center cursor-pointer relative">
                                 <Icon.MagnifyingGlass size={24} color='black' onClick={openModalSearch} />

@@ -511,7 +511,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                     item.id === 0 ? (
                                         <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
                                     ) : (
-                                        <Link href={`/product/default?id=${item.id}`} key={item.id}>
+                                        <div key={item.id} className="product-wrapper">
                                             <Product 
                                                 data={{
                                                     id: item.id.toString(),
@@ -555,7 +555,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                                 }} 
                                                 type='grid' 
                                             />
-                                        </Link>
+                                        </div>
                                     )
                                 ))}
                             </div>

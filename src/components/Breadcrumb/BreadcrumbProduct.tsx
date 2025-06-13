@@ -5,6 +5,7 @@ import Link from 'next/link'
 import * as Icon from "@phosphor-icons/react/dist/ssr";
 import { ProductType } from '@/type/ProductType'
 import { useRouter } from 'next/navigation'
+import { useModalQuickviewContext } from '@/context/ModalQuickviewContext'
 
 interface Props {
     data: Array<ProductType>
@@ -15,9 +16,13 @@ interface Props {
 const BreadcrumbProduct: React.FC<Props> = ({ data, productPage, productId }) => {
     const productMain = data.find(product => product.id.toString() === productId);
     const router = useRouter();
+    const { openQuickview } = useModalQuickviewContext();
 
-    const handleDetailProduct = (productId: string | number | null) => {
-        router.push(`/product/${productPage}?id=${productId}`);
+    const handleQuickView = (productId: string | number | null) => {
+        const product = data.find(item => item.id.toString() === productId?.toString());
+        if (product) {
+            openQuickview(product);
+        }
     };
 
     return (
@@ -32,14 +37,15 @@ const BreadcrumbProduct: React.FC<Props> = ({ data, productPage, productId }) =>
                             <Icon.CaretRight size={12} className='text-secondary2' />
                             <div className='caption1 capitalize'>{productMain ? productMain.name : `Product ${productPage}`}</div>
                         </div>
+                        {/* Temporarily hide Previous/Next Product buttons
                         <div className="right flex items-center gap-3">
                             {productId !== null && Number(productId) >= 2 ? (
                                 <>
-                                    <div onClick={() => handleDetailProduct(Number(productId) - 1)} className='flex items-center cursor-pointer text-secondary hover:text-black border-r border-line pr-3'>
+                                    <div onClick={() => handleQuickView(Number(productId) - 1)} className='flex items-center cursor-pointer text-secondary hover:text-black border-r border-line pr-3'>
                                         <Icon.CaretCircleLeft className='text-2xl text-black' />
                                         <span className='caption1 pl-1'>Previous Product</span>
                                     </div>
-                                    <div onClick={() => handleDetailProduct(Number(productId) + 1)} className='flex items-center cursor-pointer text-secondary hover:text-black'>
+                                    <div onClick={() => handleQuickView(Number(productId) + 1)} className='flex items-center cursor-pointer text-secondary hover:text-black'>
                                         <span className='caption1 pr-1'>Next Product</span>
                                         <Icon.CaretCircleRight className='text-2xl text-black' />
                                     </div>
@@ -47,7 +53,7 @@ const BreadcrumbProduct: React.FC<Props> = ({ data, productPage, productId }) =>
                             ) : (
                                 <>
                                     {productId !== null && Number(productId) === 1 && (
-                                        <div onClick={() => handleDetailProduct(Number(productId) + 1)} className='flex items-center cursor-pointer text-secondary hover:text-black'>
+                                        <div onClick={() => handleQuickView(Number(productId) + 1)} className='flex items-center cursor-pointer text-secondary hover:text-black'>
                                             <span className='caption1 pr-1'>Next Product</span>
                                             <Icon.CaretCircleRight className='text-2xl text-black' />
                                         </div>
@@ -55,6 +61,7 @@ const BreadcrumbProduct: React.FC<Props> = ({ data, productPage, productId }) =>
                                 </>
                             )}
                         </div>
+                        */}
                     </div>
                 </div>
             </div>

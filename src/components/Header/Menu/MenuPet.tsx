@@ -101,32 +101,20 @@ const MenuPet = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="right flex gap-12">
-                            <div className="list-action flex items-center gap-6">
-                                <div className="user-icon flex items-center flex-col justify-center cursor-pointer">
-                                    <Icon.User size={24} color='black' onClick={handleLoginPopup} />
-                                    <div className="caption1" onClick={handleLoginPopup}>Account</div>
-                                    <div
-                                        className={`login-popup absolute top-[74px] w-[320px] p-7 rounded-xl bg-white box-shadow-small 
-                                            ${openLoginPopup ? 'open' : ''}`}
-                                    >
-                                        <Link href={'/login'} className="button-main w-full text-center">Login</Link>
-                                        <div className="text-secondary text-center mt-3 pb-4">Don't have an account?
-                                            <Link href={'/register'} className='text-black pl-1 hover:underline'>Register</Link>
-                                        </div>
-                                        <div className="bottom pt-4 border-t border-line"></div>
-                                        <Link href={'#!'} className='body1 hover:underline'>Support</Link>
-                                    </div>
-                                </div>
-                                <div className="max-md:hidden wishlist-icon flex flex-col items-center cursor-pointer" onClick={openModalWishlist}>
-                                    <Icon.Heart size={24} color='black' />
-                                    <div className="caption1">Wishlist</div>
-                                </div>
-                                <div className="cart-icon flex flex-col items-center relative cursor-pointer" onClick={openModalCart}>
-                                    <Icon.Handbag size={24} color='black' />
-                                    <div className="caption1">Cart</div>
-                                    <span className="quantity cart-quantity absolute -right-1 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{getCartCount()}</span>
-                                </div>
+                        <div className="right flex items-center gap-5">
+                            <div className="max-md:hidden search-icon flex items-center cursor-pointer" onClick={openModalSearch}>
+                                <Icon.MagnifyingGlass size={24} color='black' />
+                            </div>
+                            {/* Temporarily hide wishlist
+                            <div className="max-md:hidden wishlist-icon flex items-center cursor-pointer" onClick={openModalWishlist}>
+                                <Icon.Heart size={24} color='black' />
+                                <span className="quantity wishlist-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{getWishlistCount()}</span>
+                            </div>
+                            */}
+                            <div className="cart-icon flex flex-col items-center relative cursor-pointer" onClick={openModalCart}>
+                                <Icon.Handbag size={24} color='black' />
+                                <div className="caption1">Cart</div>
+                                <span className="quantity cart-quantity absolute -right-1 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">{getCartCount()}</span>
                             </div>
                         </div>
                     </div>
