@@ -132,5 +132,84 @@ export const couponService = {
             }
             return [];
         }
+    },
+
+    updateCouponStatus: async (couponId: number): Promise<boolean> => {
+        try {
+            const headers = getAuthHeader();
+            if (!headers) {
+                console.warn('Skipping updateCouponStatus: No authentication token');
+                return false;
+            }
+
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/coupons/${couponId}`,
+                {
+                    status: "INACTIVE"
+                },
+                { headers }
+            );
+            return response.status === 200;
+        } catch (error) {
+            console.error('Error updating coupon status:', error);
+            return false;
+        }
+    },
+
+    updateCouponUses: async (couponId: number, remainingUses: number): Promise<boolean> => {
+        try {
+            const headers = getAuthHeader();
+            if (!headers) {
+                console.warn('Skipping updateCouponUses: No authentication token');
+                return false;
+            }
+
+            // First get the current coupon data
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/coupons/${couponId}`,
+                { headers }
+            );
+            
+            const currentCoupon = response.data;
+            console.log('Current coupon data:', currentCoupon);
+            
+            // Convert date format
+            const formatDate = (dateStr: string) => {
+                const date = new Date(dateStr);
+                return date.toISOString().split('.')[0]; // Format: YYYY-MM-DDTHH:mm:ss
+            };
+
+            // Check if coupon should be deactivated
+            const isExpired = new Date(currentCoupon.validUntil) < new Date();
+            const isUsedUp = remainingUses <= 0;
+            const shouldDeactivate = isExpired || isUsedUp;
+            
+            // Update the coupon with new remaining uses
+            const updateData = {
+                name: currentCoupon.name,
+                couponPercentage: Number(currentCoupon.couponPercentage),
+                couponCode: currentCoupon.couponCode,
+                status: shouldDeactivate ? "INACTIVE" : currentCoupon.status || "ACTIVE",
+                remainingUses: Number(remainingUses),
+                validFrom: formatDate(currentCoupon.validFrom),
+                validUntil: formatDate(currentCoupon.validUntil)
+            };
+            
+            console.log('Sending update data:', updateData);
+
+            const updateResponse = await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/coupons/${couponId}`,
+                updateData,
+                { headers }
+            );
+            return updateResponse.status === 200;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error('Error updating coupon uses:', error.response?.data);
+            } else {
+                console.error('Error updating coupon uses:', error);
+            }
+            return false;
+        }
     }
 }; 

@@ -150,6 +150,11 @@ const Cart = () => {
                 return;
             }
 
+            // Check if coupon is already applied
+            if (selectedCoupon?.couponCode === couponCode) {
+                return;
+            }
+
             // Check if user is logged in
             const token = localStorage.getItem('token');
             if (!token) {
@@ -168,16 +173,54 @@ const Cart = () => {
                 return;
             }
 
-            setSelectedCoupon({
-                id: result.couponCode,
-                name: result.couponCode,
-                couponCode: result.couponCode,
-                couponPercentage: (result.couponAmount / result.originalPrice) * 100,
-                validFrom: new Date().toISOString(),
-                validUntil: new Date().toISOString(),
-                isCurrentlyValid: true,
-                remainingUses: 1
-            });
+            // Find the coupon in the available coupons list
+            const appliedCoupon = coupons.find(c => c.couponCode === result.couponCode) || 
+                                userCoupons.find(c => c.couponCode === result.couponCode);
+            
+            if (appliedCoupon) {
+                // Update remaining uses
+                const newRemainingUses = appliedCoupon.remainingUses - 1;
+                const success = await couponService.updateCouponUses(appliedCoupon.id, newRemainingUses);
+                if (success) {
+                    // Update the coupon in the lists
+                    const updatedCoupon = {
+                        ...appliedCoupon,
+                        remainingUses: newRemainingUses
+                    };
+                    
+                    // Update in coupons list
+                    setCoupons(coupons.map(c => 
+                        c.id === appliedCoupon.id ? updatedCoupon : c
+                    ));
+                    
+                    // Update in userCoupons list
+                    setUserCoupons(userCoupons.map(c => 
+                        c.id === appliedCoupon.id ? updatedCoupon : c
+                    ));
+
+                    // If remaining uses is 0, remove from lists
+                    if (newRemainingUses === 0) {
+                        setCoupons(coupons.filter(c => c.id !== appliedCoupon.id));
+                        setUserCoupons(userCoupons.filter(c => c.id !== appliedCoupon.id));
+                    }
+
+                    setSelectedCoupon(updatedCoupon);
+                }
+            } else {
+                // If coupon not found in lists, create a temporary one
+                setSelectedCoupon({
+                    id: 0,
+                    name: result.couponCode,
+                    couponCode: result.couponCode,
+                    couponPercentage: (result.couponAmount / result.originalPrice) * 100,
+                    isActive: true,
+                    remainingUses: 1,
+                    isCurrentlyValid: true,
+                    validFrom: new Date().toISOString(),
+                    validUntil: new Date().toISOString(),
+                    status: 'active'
+                });
+            }
             setDiscountCart(Number(result.couponAmount));
             setCouponError('');
         } catch (error) {
@@ -186,8 +229,83 @@ const Cart = () => {
         }
     };
 
-    const redirectToCheckout = () => {
-        router.push(`/checkout?discount=${discountCart}&ship=${shipCart}`)
+    const handleDirectApplyCoupon = async (coupon: Coupon) => {
+        try {
+            // Check if coupon is already applied
+            if (selectedCoupon?.id === coupon.id) {
+                return;
+            }
+
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setCouponError('Please login to apply coupon');
+                return;
+            }
+
+            console.log('Applying coupon directly:', {
+                couponCode: coupon.couponCode,
+                totalCart: totalCart.toFixed(2)
+            });
+
+            const result = await couponService.applyCoupon(coupon.couponCode, totalCart);
+            if (!result) {
+                setCouponError('Failed to apply coupon. Please check if the code is valid.');
+                return;
+            }
+
+            // Update remaining uses
+            const newRemainingUses = coupon.remainingUses - 1;
+            const success = await couponService.updateCouponUses(coupon.id, newRemainingUses);
+            if (success) {
+                // Update the coupon in the lists
+                const updatedCoupon = {
+                    ...coupon,
+                    remainingUses: newRemainingUses
+                };
+                
+                // Update in coupons list
+                setCoupons(coupons.map(c => 
+                    c.id === coupon.id ? updatedCoupon : c
+                ));
+                
+                // Update in userCoupons list
+                setUserCoupons(userCoupons.map(c => 
+                    c.id === coupon.id ? updatedCoupon : c
+                ));
+
+                // If remaining uses is 0, remove from lists
+                if (newRemainingUses === 0) {
+                    setCoupons(coupons.filter(c => c.id !== coupon.id));
+                    setUserCoupons(userCoupons.filter(c => c.id !== coupon.id));
+                }
+
+                setSelectedCoupon(updatedCoupon);
+            }
+
+            setDiscountCart(Number(result.couponAmount));
+            setCouponError('');
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+            setCouponError('Failed to apply coupon. Please try again later.');
+        }
+    };
+
+    const redirectToCheckout = async () => {
+        if (selectedCoupon) {
+            try {
+                const success = await couponService.updateCouponStatus(selectedCoupon.id);
+                if (success) {
+                    // Remove the coupon from the lists
+                    setCoupons(coupons.filter(c => c.id !== selectedCoupon.id));
+                    setUserCoupons(userCoupons.filter(c => c.id !== selectedCoupon.id));
+                    setSelectedCoupon(null);
+                }
+            } catch (error) {
+                console.error('Error deactivating coupon:', error);
+            }
+        }
+        router.push(`/checkout?discount=${discountCart}&ship=${shipCart}`);
     }
 
     return (
@@ -308,15 +426,21 @@ const Cart = () => {
                                     <input 
                                         type="text" 
                                         placeholder='Add voucher discount' 
-                                        className='w-full h-full bg-surface pl-4 pr-14 rounded-lg border border-line' 
+                                        className={`w-full h-full bg-surface pl-4 pr-14 rounded-lg border border-line ${
+                                            selectedCoupon ? 'bg-gray-100 cursor-not-allowed' : ''
+                                        }`}
                                         value={couponCode}
-                                        onChange={(e) => setCouponCode(e.target.value)}
+                                        onChange={(e) => !selectedCoupon && setCouponCode(e.target.value)}
+                                        disabled={!!selectedCoupon}
                                     />
                                     <button 
                                         type="submit" 
-                                        className='button-main absolute top-1 bottom-1 right-1 px-5 rounded-lg flex items-center justify-center'
+                                        className={`button-main absolute top-1 bottom-1 right-1 px-5 rounded-lg flex items-center justify-center bg-black ${
+                                            selectedCoupon ? 'bg-red-400 cursor-not-allowed' : ''
+                                        }`}
+                                        disabled={!!selectedCoupon}
                                     >
-                                        Apply Code
+                                        {selectedCoupon ? 'Applied' : 'Apply Code'}
                                     </button>
                                 </form>
                                 {couponError && <div className="text-red-500 text-sm mt-2">{couponError}</div>}
@@ -349,7 +473,13 @@ const Cart = () => {
                                         {userCoupons.length > 0 && (
                                             <div className="w-full mt-4">
                                                 <div className="text-button mb-3">Your Coupons</div>
-                                                {userCoupons.map((coupon) => (
+                                                {userCoupons
+                                                    .filter(coupon => 
+                                                        coupon.remainingUses > 0 && 
+                                                        new Date(coupon.validUntil) > new Date() &&
+                                                        coupon.isCurrentlyValid
+                                                    )
+                                                    .map((coupon) => (
                                                     <div key={coupon.id} className={`item ${selectedCoupon?.id === coupon.id ? 'bg-green' : ''} border border-line rounded-lg py-2 mb-3`}>
                                                         <div className="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
                                                             <div className="left">
@@ -363,11 +493,10 @@ const Cart = () => {
                                                         <div className="bottom gap-6 items-center flex justify-between px-3 pt-2">
                                                             <div className="text-button-uppercase">Code: {coupon.couponCode}</div>
                                                             <div
-                                                                className="button-main py-1 px-2.5 capitalize text-xs"
-                                                                onClick={() => {
-                                                                    setCouponCode(coupon.couponCode);
-                                                                    handleApplyCoupon();
-                                                                }}
+                                                                className={`button-main py-1 px-2.5 capitalize text-xs ${
+                                                                    selectedCoupon?.id === coupon.id ? 'bg-gray-400 cursor-not-allowed' : ''
+                                                                }`}
+                                                                onClick={() => selectedCoupon?.id !== coupon.id && handleDirectApplyCoupon(coupon)}
                                                             >
                                                                 {selectedCoupon?.id === coupon.id ? 'Applied' : 'Apply Code'}
                                                             </div>
@@ -381,7 +510,13 @@ const Cart = () => {
                                             {coupons.length === 0 ? (
                                                 <div className="text-center py-4 text-gray-500">No available coupons at the moment</div>
                                             ) : (
-                                                coupons.map((coupon) => (
+                                                coupons
+                                                    .filter(coupon => 
+                                                        coupon.remainingUses > 0 && 
+                                                        new Date(coupon.validUntil) > new Date() &&
+                                                        coupon.isCurrentlyValid
+                                                    )
+                                                    .map((coupon) => (
                                                     <div key={coupon.id} className={`item ${selectedCoupon?.id === coupon.id ? 'bg-green' : ''} border border-line rounded-lg py-2 mb-3`}>
                                                         <div className="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
                                                             <div className="left">
@@ -395,11 +530,10 @@ const Cart = () => {
                                                         <div className="bottom gap-6 items-center flex justify-between px-3 pt-2">
                                                             <div className="text-button-uppercase">Code: {coupon.couponCode}</div>
                                                             <div
-                                                                className="button-main py-1 px-2.5 capitalize text-xs"
-                                                                onClick={() => {
-                                                                    setCouponCode(coupon.couponCode);
-                                                                    handleApplyCoupon();
-                                                                }}
+                                                                className={`button-main py-1 px-2.5 capitalize text-xs ${
+                                                                    selectedCoupon?.id === coupon.id ? 'bg-gray-400 cursor-not-allowed' : ''
+                                                                }`}
+                                                                onClick={() => selectedCoupon?.id !== coupon.id && handleDirectApplyCoupon(coupon)}
                                                             >
                                                                 {selectedCoupon?.id === coupon.id ? 'Applied' : 'Apply Code'}
                                                             </div>
