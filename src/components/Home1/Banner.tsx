@@ -18,7 +18,7 @@ const Banner = () => {
                         />
                     </div>
                     <div className="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                        <div className="heading2 text-white">Best Sellers</div>
+                        <div className="heading2 text-white">Best Sellerrrr</div>
                         <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
                     </div>
                 </Link>
@@ -34,7 +34,7 @@ const Banner = () => {
                         />
                     </div>
                     <div className="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                        <div className="heading2 text-white">New Arrivals</div>
+                        <div className="heading2 text-white">New Arrivalsssssss</div>
                         <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
                     </div>
                 </Link>

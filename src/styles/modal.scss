@@ -136,13 +136,11 @@
         }
 
         @media (max-width: 1023.98px) {
-            .list-product {
-                max-height: calc(100% - 140px - 30px + 24px);
-            }
+            width: 350px;
         }
 
         @media (max-width: 767.98px) {
-            width: 480px;
+            width: 100%;
             border-radius: 16px;
 
             .list-product {
@@ -252,10 +250,33 @@
     }
 
     .modal-cart-main {
-        width: 980px;
+        position: absolute;
+        top: 20px;
+        right: -100%;
+        width: 400px;
+        height: calc(100vh - 40px);
+        background-color: var(--white);
+        border-radius: 32px;
+        overflow: hidden;
+        transition: all ease 0.5s;
+
+        &.open {
+            right: 20px;
+        }
 
         .list-product {
-            max-height: calc(100% - 210px - 180px);
+            max-height: calc(100% - 180px);
+            overflow-y: auto;
+            padding-bottom: 0;
+        }
+
+        .footer-modal {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            box-shadow: 0px -5px 18px 5px rgba(64, 72, 87, 0.15);
         }
 
         .tab-item {
@@ -278,77 +299,26 @@
         }
 
         @media (max-width: 1023.98px) {
-            width: 720px;
+            width: 350px;
 
             .list-product {
-                max-height: calc(100% - 210px - 212px);
+                max-height: calc(100% - 180px);
             }
         }
 
         @media (max-width: 767.98px) {
-            width: 480px;
-
-            .list-product {
-                max-height: calc(100% - 210px - 125px);
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            width: unset;
-
-            .list-product {
-                max-height: calc(100% - 210px - 165px);
-            }
-        }
-    }
-
-    .modal-cart-main {
-        width: 980px;
-
-        .list-product {
-            max-height: calc(100% - 210px - 180px);
-        }
-
-        .tab-item {
-            position: absolute;
-            bottom: 0;
-            left: 0;
             width: 100%;
-            background-color: var(--white);
-            opacity: 0;
-            visibility: hidden;
-            transition: all ease 0.4s;
-            transform: translateY(100%);
-            box-shadow: 0px 5px 18px 5px rgba(64, 72, 87, 0.15);
+            right: -100%;
+            left: auto;
+            border-radius: 16px;
 
-            &.active {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
+            &.open {
+                right: 0;
+                left: 0;
             }
-        }
-
-        @media (max-width: 1023.98px) {
-            width: 720px;
 
             .list-product {
-                max-height: calc(100% - 210px - 212px);
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            width: 480px;
-
-            .list-product {
-                max-height: calc(100% - 210px - 125px);
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            width: unset;
-
-            .list-product {
-                max-height: calc(100% - 210px - 165px);
+                max-height: calc(100% - 180px);
             }
         }
     }

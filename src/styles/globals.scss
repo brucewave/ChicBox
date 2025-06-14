@@ -1,3 +1,5 @@
+@import './fonts.css';
+
 /* Main color */
 :root {
   --green: #D2EF9A;
@@ -31,6 +33,7 @@ body {
   line-height: 26px;
   color: var(--black);
   font-weight: 400;
+  font-family: 'SpaceGrotesk', sans-serif;
   overflow-x: hidden;
   user-select: none;
   scroll-behavior: smooth;
@@ -109,6 +112,7 @@ textarea:focus {
 }
 
 .text-sub-display {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 18px;
   font-weight: 600;
   line-height: 24px;
@@ -117,6 +121,7 @@ textarea:focus {
 }
 
 .text-display {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 80px;
   font-weight: 500;
   line-height: 88px;
@@ -124,6 +129,7 @@ textarea:focus {
 }
 
 .heading1 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 56px;
   line-height: 68px;
   font-weight: 500;
@@ -131,6 +137,7 @@ textarea:focus {
 }
 
 .heading2 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 44px;
   line-height: 50px;
   font-weight: 600;
@@ -138,6 +145,7 @@ textarea:focus {
 }
 
 .heading3 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 36px;
   line-height: 40px;
   font-weight: 600;
@@ -145,6 +153,7 @@ textarea:focus {
 }
 
 .heading4 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 30px;
   line-height: 42px;
   font-weight: 600;
@@ -152,6 +161,7 @@ textarea:focus {
 }
 
 .heading5 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 24px;
   line-height: 30px;
   font-weight: 600;
@@ -159,6 +169,7 @@ textarea:focus {
 }
 
 .heading6 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 20px;
   line-height: 28px;
   font-weight: 600;
@@ -166,6 +177,7 @@ textarea:focus {
 }
 
 .text-title {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
@@ -173,12 +185,14 @@ textarea:focus {
 }
 
 .body1 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 18px;
   line-height: 28px;
   font-weight: 400;
 }
 
 .text-button {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 16px;
   line-height: 26px;
   font-weight: 600;
@@ -186,6 +200,7 @@ textarea:focus {
 }
 
 .text-button-uppercase {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 14px;
   line-height: 20px;
   font-weight: 600;
@@ -193,12 +208,14 @@ textarea:focus {
 }
 
 .caption1 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 14px;
   line-height: 22px;
   font-weight: 400;
 }
 
 .caption2 {
+  font-family: 'SpaceGrotesk', sans-serif;
   font-size: 12px;
   line-height: 16px;
   font-weight: 400;
