@@ -29,6 +29,13 @@ export interface ProductType {
     slug: string,
     conditionPoints?: number;
     status?: string;
-     averageRating?: number;
+    averageRating?: number;
     isAvailable?: boolean;
+    material?: string;
+    shoulder?: number;
+    width?: number;
+    length?: number;
+    arm?: number;
+    form?: string;
+    fault?: string;
 }

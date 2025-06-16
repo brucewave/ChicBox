@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ProductType } from '@/type/ProductType'
@@ -41,11 +41,43 @@ const Default: React.FC<Props> = ({ data, productId }) => {
     const { openModalWishlist } = useModalWishlistContext()
     const { addToCompare, removeFromCompare, compareState } = useCompare();
     const { openModalCompare } = useModalCompareContext()
-    let productMainFound = data.find(product => product.id === productId);
+    const [productData, setProductData] = useState<any>(null);
+
+    const getColorCode = (colorName: string): string => {
+        const colorMap: { [key: string]: string } = {
+            'red': '#DB4444',
+            'yellow': '#ECB018',
+            'white': '#F6EFDD',
+            'purple': '#8681D4', 
+            'pink': '#F4407D',
+            'black': '#1F1F1F',
+            'green': '#D2EF9A',
+            'navy': '#000080',
+            'blue': '#0000FF'
+        };
+        return colorMap[colorName.toLowerCase()] || '#000000';
+    }
+
+    useEffect(() => {
+        const fetchProductData = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${productId}`);
+                const data = await response.json();
+                console.log('Product data from API:', data);
+                setProductData(data);
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+            }
+        };
+
+        if (productId) {
+            fetchProductData();
+        }
+    }, [productId]);
 
     // Create a default product object with all properties initialized as empty/default values
     const defaultProduct: ProductType = {
-        id: "", // Ensure ID is a string as per ProductType definition
+        id: "",
         category: "",
         type: "",
         name: "",
@@ -68,14 +100,37 @@ const Default: React.FC<Props> = ({ data, productId }) => {
         slug: ""
     };
 
-    // Use the found product, or the first product in data, or the default product as a fallback
     const productMain: ProductType = {
-        ...defaultProduct, // Start with all default properties
-        ...(productMainFound || data[0] || {}), // Overlay with actual data, or fallback to data[0], or empty object
-        // Explicitly ensure array properties are arrays, as spread might not handle undefined correctly for nested arrays
-        images: (productMainFound?.images || data[0]?.images || defaultProduct.images),
-        variation: (productMainFound?.variation || data[0]?.variation || defaultProduct.variation),
-        sizes: (productMainFound?.sizes || data[0]?.sizes || defaultProduct.sizes)
+        ...defaultProduct,
+        id: productData?.id?.toString() || "",
+        name: productData?.name || "",
+        description: productData?.description || "",
+        price: productData?.price || 0,
+        originPrice: productData?.discount ? productData.price * (1 + productData.discount/100) : productData?.price || 0,
+        brand: productData?.brandName || "",
+        category: productData?.categoryName || "",
+        type: productData?.categoryName || "",
+        gender: productData?.categoryName || "",
+        quantity: productData?.stockQuantity || 0,
+        rate: productData?.averageRating || 0,
+        sale: Boolean(productData?.discount && productData.discount > 0),
+        sizes: productData?.productSize ? [productData.productSize] : [],
+        variation: [{
+            color: productData?.color || "",
+            colorCode: getColorCode(productData?.color || ""),
+            colorImage: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${productData?.color?.toLowerCase()}.png`,
+            image: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${productData?.primaryImageUrl}`
+        }],
+        images: productData?.imageUrls?.map((url: string) => `${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${url}`) || [],
+        thumbImage: productData?.imageUrls?.map((url: string) => `${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${url}`) || [],
+        slug: productData?.name?.toLowerCase().replace(/\s+/g, '-') || "",
+        material: productData?.material || "",
+        shoulder: productData?.shoulder || 0,
+        width: productData?.width || 0,
+        length: productData?.length || 0,
+        arm: productData?.arm || 0,
+        form: productData?.form || "",
+        fault: productData?.fault || ""
     };
 
     const percentSale = Math.floor(100 - ((productMain?.price / productMain?.originPrice) * 100))
@@ -170,20 +225,6 @@ const Default: React.FC<Props> = ({ data, productId }) => {
 
     const handleActiveTab = (tab: string) => {
         setActiveTab(tab)
-    }
-
-    const getColorCode = (colorName: string): string => {
-        const colorMap: { [key: string]: string } = {
-            'red': '#DB4444',
-            'yellow': '#ECB018',
-            'white': '#F6EFDD',
-            'purple': '#8681D4', 
-            'pink': '#F4407D',
-            'black': '#1F1F1F',
-            'green': '#D2EF9A',
-            'navy': '#000080'
-        };
-        return colorMap[colorName.toLowerCase()] || '#000000';
     }
 
     // Hàm xác định màu sáng/tối để chọn viền tương phản
@@ -306,7 +347,13 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                             </div>
                             <div className="flex items-center mt-3">
                                 <Rate currentRate={productMain.rate} size={14} />
-                                <span className='caption1 text-secondary'>(1.234 reviews)</span>
+                                {productData?.tag ? (
+                                    <div className="tag-new caption2 px-3 py-3 font-semibold bg-green inline-block rounded-sm ml-2">
+                                        New
+                                    </div>
+                                ) : (
+                                    <span className='caption1 text-secondary ml-2'>(1.234 reviews)</span>
+                                )}
                             </div>
                             <div className="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
                                 <div className="product-price heading5">${productMain.price}</div>
@@ -319,8 +366,8 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         </div>
                                     </>
                                 )}
-                                <div className='desc text-secondary mt-3'>{productMain.description}</div>
                             </div>
+                                <div className='desc text-secondary mt-3'>{productMain.description}</div>
                             <div className="list-action mt-6">
                                 <div className="choose-color">
                                     <div className="text-title">Colors: <span className='text-title color'>{activeColor}</span></div>
@@ -367,27 +414,68 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                             </div>
                                         ))}
                                     </div>
+                                    <div className="technical-specs mt-4 p-4 border border-line rounded-lg">
+                                        <div className="text-title mb-3">Technical Specifications</div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="spec-item">
+                                                <span className="text-secondary">Material:</span>
+                                                <span className="ml-2">{productData?.material || '-'}</span>
+                                            </div>
+                                            <div className="spec-item">
+                                                <span className="text-secondary">Form:</span>
+                                                <span className="ml-2">{productData?.form || '-'}</span>
+                                            </div>
+                                            <div className="spec-item">
+                                                <span className="text-secondary">Shoulder:</span>
+                                                <span className="ml-2">{productData?.shoulder ? `${productData.shoulder}cm` : '-'}</span>
+                                            </div>
+                                            <div className="spec-item">
+                                                <span className="text-secondary">Width:</span>
+                                                <span className="ml-2">{productData?.width ? `${productData.width}cm` : '-'}</span>
+                                            </div>
+                                            <div className="spec-item">
+                                                <span className="text-secondary">Length:</span>
+                                                <span className="ml-2">{productData?.length ? `${productData.length}cm` : '-'}</span>
+                                            </div>
+                                            <div className="spec-item">
+                                                <span className="text-secondary">Arm:</span>
+                                                <span className="ml-2">{productData?.arm ? `${productData.arm}cm` : '-'}</span>
+                                            </div>
+                                        </div>
+                                        {productData?.fault && (
+                                            <div className="fault-info mt-3 p-2 bg-red-50 rounded">
+                                                <span className="text-red">Note:</span>
+                                                <span className="ml-2">{productData.fault}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="text-title mt-5">Quantity:</div>
                                 <div className="choose-quantity flex items-center lg:justify-between gap-5 gap-y-3 mt-3">
-                                    <div className="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
-                                        <Icon.Minus
-                                            size={20}
-                                            onClick={handleDecreaseQuantity}
-                                            className={`${productMain.quantityPurchase === 1 ? 'disabled' : ''} cursor-pointer`}
-                                        />
-                                        <div className="body1 font-semibold">{productMain.quantityPurchase}</div>
-                                        <Icon.Plus
-                                            size={20}
-                                            onClick={handleIncreaseQuantity}
-                                            className='cursor-pointer'
-                                        />
-                                    </div>
+                                    {productData?.stockQuantity > 1 ? (
+                                        <div className="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
+                                            <Icon.Minus
+                                                size={20}
+                                                onClick={handleDecreaseQuantity}
+                                                className={`${productMain.quantityPurchase === 1 ? 'disabled' : ''} cursor-pointer`}
+                                            />
+                                            <div className="body1 font-semibold">{productMain.quantityPurchase}</div>
+                                            <Icon.Plus
+                                                size={20}
+                                                onClick={handleIncreaseQuantity}
+                                                className='cursor-pointer'
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-center rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
+                                            <div className="body1 font-semibold">1</div>
+                                        </div>
+                                    )}
                                     <div onClick={handleAddToCart} className="button-main w-full text-center bg-white text-black border border-black">Add To Cart</div>
                                 </div>
-                                <div className="button-block mt-5">
+                                {/* <div className="button-block mt-5">
                                     <div className="button-main w-full text-center">Buy It Now</div>
-                                </div>
+                                </div> */}
                                 <div className="flex items-center lg:gap-20 gap-8 mt-5 pb-6 border-b border-line">
                                     <div className="compare flex items-center gap-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); handleAddToCompare() }}>
                                         <div className="compare-btn md:w-12 md:h-12 w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white">
@@ -498,7 +586,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                     </div>
                                 </div> */}
                             </div>
-                            <div className="get-it mt-6 pb-8 border-b border-line">
+                            {/* <div className="get-it mt-6 pb-8 border-b border-line">
                                 <div className="heading5">Get it today</div>
                                 <div className="item flex items-center gap-3 mt-4">
                                     <div className="icon-delivery-truck text-4xl"></div>
@@ -521,8 +609,8 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         <div className="caption1 text-secondary mt-1">Not impressed? Get a refund. You have 100 days to break our hearts.</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="list-product hide-product-sold  menu-main mt-6">
+                            </div> */}
+                            {/* <div className="list-product hide-product-sold  menu-main mt-6">
                                 <div className="heading5 pb-4">You{String.raw`'ll`} love this too</div>
                                 <Swiper
                                     spaceBetween={12}
@@ -553,7 +641,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -637,7 +725,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                         </div>
                     </div>
                 </div>
-                <div className="review-block md:py-20 py-10 bg-surface">
+                {/* <div className="review-block md:py-20 py-10 bg-surface">
                     <div className="container">
                         <div className="heading flex items-center justify-between flex-wrap gap-4">
                             <div className="heading4">Customer Review</div>
@@ -990,14 +1078,17 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                 </div>
                 <div className="related-product md:py-20 py-10">
                     <div className="container">
-                        <div className="heading3 text-center">Related Products</div>
-                        <div className="list-product hide-product-sold  grid lg:grid-cols-4 grid-cols-2 md:gap-[30px] gap-5 md:mt-10 mt-6">
-                            {data.slice(Number(productId), Number(productId) + 4).map((item, index) => (
-                                <Product key={index} data={item} type='grid' />
-                            ))}
+                        <div className="heading3 text-center">Next Products</div>
+                        <div className="list-product hide-product-sold grid lg:grid-cols-4 grid-cols-2 md:gap-[30px] gap-5 md:mt-10 mt-6">
+                            {data
+                                .filter(item => Number(item.id) > Number(productId))
+                                .slice(0, 4)
+                                .map((item, index) => (
+                                    <Product key={index} data={item} type='grid' />
+                                ))}
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </>
     )

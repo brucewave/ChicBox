@@ -52,7 +52,7 @@ const ModalSizeguide: React.FC<Props> = ({ data, isOpen, onClose }) => {
         <>
             <div className={`modal-sizeguide-block`} onClick={onClose}>
                 <div
-                    className={`modal-sizeguide-main md:p-10 p-6 rounded-[32px] ${isOpen ? 'open' : ''}`}
+                    className={`modal-sizeguide-main md:p-5 mb-5 p-6 rounded-[32px] ${isOpen ? 'open' : ''}`}
                     onClick={(e) => { e.stopPropagation() }}
                 >
                     <div
