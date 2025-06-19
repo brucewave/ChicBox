@@ -242,9 +242,9 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                             </div>
                         </div>
                         <div className="right flex items-center gap-5">
-                            <div className="max-md:hidden search-icon flex items-center cursor-pointer" onClick={openModalSearch}>
+                            {/* <div className="max-md:hidden search-icon flex items-center cursor-pointer" onClick={openModalSearch}>
                                 <Icon.MagnifyingGlass size={24} color='black' />
-                            </div>
+                            </div> */}
                             <div className="user-icon flex items-center justify-center cursor-pointer">
                                 <Icon.User size={24} color='black' onClick={handleLoginPopup} />
                                 <div

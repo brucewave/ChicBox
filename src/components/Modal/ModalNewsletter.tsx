@@ -3,14 +3,18 @@
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
 import * as Icon from "@phosphor-icons/react/dist/ssr";
-import productData from '@/data/Product.json'
 import { useModalQuickviewContext } from '@/context/ModalQuickviewContext';
 import Image from 'next/image';
+import { ProductType } from '@/type/ProductType';
+
+const baseUrl = 'https://api.roomily.tech';
 
 const ModalNewsletter = () => {
     const [open, setOpen] = useState<boolean>(false)
     const router = useRouter()
     const { openQuickview } = useModalQuickviewContext()
+    const [products, setProducts] = useState<ProductType[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const handleDetailProduct = (productId: string) => {
         // redirect to shop with category selected
@@ -21,6 +25,60 @@ const ModalNewsletter = () => {
         setTimeout(() => {
             setOpen(true)
         }, 3000)
+        // Fetch products from API
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch(`${baseUrl}/api/v1/products`);
+                const data = await response.json();
+                const apiProducts = Array.isArray(data.content) ? data.content : [];
+                // Map API products to local ProductType
+                const mappedProducts: ProductType[] = apiProducts.map((product: any) => ({
+                    id: product.id?.toString() || '',
+                    category: product.categoryName || '',
+                    type: product.categoryName || '',
+                    name: product.name || '',
+                    gender: product.categoryName || '',
+                    new: !!product.tag,
+                    sale: product.discount > 0,
+                    rate: product.averageRating || 0,
+                    price: product.discount > 0 ? Number((product.price * (1 - product.discount/100)).toFixed(2)) : product.price,
+                    originPrice: product.price || 0,
+                    brand: product.brandName || '',
+                    sold: product.ratingCount || 0,
+                    quantity: product.stockQuantity || 0,
+                    quantityPurchase: 0,
+                    sizes: product.productSize ? [product.productSize] : [],
+                    variation: product.color?.split('/')?.map((color: string) => ({
+                        color: color.trim(),
+                        colorCode: '#000000',
+                        colorImage: product.primaryImageUrl ? `${baseUrl}/api/v1/images/${product.primaryImageUrl}` : '',
+                        image: product.primaryImageUrl ? `${baseUrl}/api/v1/images/${product.primaryImageUrl}` : ''
+                    })) || [],
+                    thumbImage: product.primaryImageUrl ? [`${baseUrl}/api/v1/images/${product.primaryImageUrl}`] : [],
+                    images: product.imageUrls?.length > 0 ? product.imageUrls.map((url: string) => `${baseUrl}/api/v1/images/${url}`) : [],
+                    description: product.description || '',
+                    action: 'add to cart',
+                    slug: product.name?.toLowerCase().replace(/\s+/g, '-') || '',
+                    conditionPoints: product.conditionPoints ?? 0,
+                    status: product.status ?? '',
+                    averageRating: product.averageRating ?? 0,
+                    isAvailable: product.isAvailable ?? true,
+                    material: product.material ?? '',
+                    shoulder: product.shoulder ?? 0,
+                    width: product.width ?? 0,
+                    length: product.length ?? 0,
+                    arm: product.arm ?? 0,
+                    form: product.form ?? '',
+                    fault: product.fault ?? '',
+                }));
+                setProducts(mappedProducts);
+            } catch (err) {
+                // handle error
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
     }, [])
 
     return (
@@ -51,37 +109,41 @@ const ModalNewsletter = () => {
                             </div>
                             <div className="heading5 pb-5">You May Also Like</div>
                             <div className="list flex flex-col gap-5 overflow-x-auto sm:pr-6">
-                                {productData.slice(11, 16).map((item, index) => (
-                                    <div
-                                        key={item.id}
-                                        className='product-item item pb-5 flex items-center justify-between gap-3 border-b border-line'
-                                    >
+                                {loading ? (
+                                    <div className="text-center py-10">Loading...</div>
+                                ) : (
+                                    products.slice(0, 5).map((item, index) => (
                                         <div
-                                            className="infor flex items-center gap-5 cursor-pointer"
-                                            onClick={() => handleDetailProduct(item.id)}
+                                            key={item.id}
+                                            className='product-item item pb-5 flex items-center justify-between gap-3 border-b border-line'
                                         >
-                                            <div className="bg-img flex-shrink-0">
-                                                <Image width={5000} height={5000} src={item.thumbImage[0]} alt={item.name}
-                                                    className='w-[100px] aspect-square flex-shrink-0 rounded-lg' />
-                                            </div>
-                                            <div className=''>
-                                                <div className="name text-button">{item.name}</div>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <div className="product-price text-title">${item.price}.00</div>
-                                                    <div className="product-origin-price text-title text-secondary2">
-                                                        <del>${item.originPrice}.00</del>
+                                            <div
+                                                className="infor flex items-center gap-5 cursor-pointer"
+                                                onClick={() => handleDetailProduct(item.id)}
+                                            >
+                                                <div className="bg-img flex-shrink-0">
+                                                    <Image width={5000} height={5000} src={item.thumbImage[0]} alt={item.name}
+                                                        className='w-[100px] aspect-square flex-shrink-0 rounded-lg' />
+                                                </div>
+                                                <div className=''>
+                                                    <div className="name text-button">{item.name}</div>
+                                                    <div className="flex items-center gap-2 mt-2">
+                                                        <div className="product-price text-title">${item.price}.00</div>
+                                                        <div className="product-origin-price text-title text-secondary2">
+                                                            <del>${item.originPrice}.00</del>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <button
+                                                className="quick-view-btn button-main sm:py-3 py-2 sm:px-5 px-4 bg-black hover:bg-green text-white rounded-full whitespace-nowrap"
+                                                onClick={() => openQuickview(item)}
+                                            >
+                                                QUICK VIEW
+                                            </button>
                                         </div>
-                                        <button
-                                            className="quick-view-btn button-main sm:py-3 py-2 sm:px-5 px-4 bg-black hover:bg-green text-white rounded-full whitespace-nowrap"
-                                            onClick={() => openQuickview(item)}
-                                        >
-                                            QUICK VIEW
-                                        </button>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
