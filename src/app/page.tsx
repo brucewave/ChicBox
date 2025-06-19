@@ -21,8 +21,9 @@ export default function Home() {
       <TopNavOne props="style-one bg-black" />
       <div id="header" className='relative w-full'>
         <MenuOne props="bg-transparent" />
-        <SliderOne />
       </div>
+      <div className="mt-[74px] md:mt-[74px] h-0"></div>
+      <SliderOne />
       <WhatNewOne data={productData} start={0} limit={4} />
       <Collection />
       <TabFeatures data={productData} start={0} limit={6} />
