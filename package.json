@@ -30,6 +30,7 @@
     "sass": "^1.69.5",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.0.4",
+    "xlsx": "^0.18.5",
     "zod": "^3.25.56"
   },
   "devDependencies": {
