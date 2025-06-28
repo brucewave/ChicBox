@@ -16,7 +16,7 @@ import {
   FiBell,
   FiSearch
 } from 'react-icons/fi';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -27,6 +27,15 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('role');
+    router.push('/admin-login');
+  };
 
   const menuItems = [
     { icon: FiHome, label: 'Dashboard', href: '/admin', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
@@ -36,7 +45,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
     { icon: FiTruck, label: 'Shipping', href: '/admin/shipping', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
     { icon: FiTag, label: 'Coupons', href: '/admin/manage-coupon', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
     { icon: FiBarChart, label: 'Analytics', href: '/admin/analytics', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiSettings, label: 'Settings', href: '/admin/settings', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiLogOut, label: 'Logout', onClick: handleLogout, color: 'bg-gradient-to-br from-red-500 to-red-600', hover: 'hover:bg-red-50', textColor: 'text-red-600', isLogout: true },
   ];
 
   return (
@@ -61,6 +70,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
         <nav className="mt-8 px-4">
           <div className="space-y-2">
             {menuItems.map((item, index) => {
+              if (item.isLogout) {
+                return (
+                  <button
+                    key={index}
+                    onClick={item.onClick}
+                    className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group relative overflow-hidden text-gray-600 ${item.hover} hover:scale-105`}
+                  >
+                    <span className={`w-10 h-10 flex items-center justify-center rounded-xl mr-3 transition-all duration-300 relative z-10 bg-gray-100 group-hover:bg-red-500`}>
+                      <item.icon className="w-5 h-5 text-gray-700 group-hover:text-white" />
+                    </span>
+                    <span className="relative z-10">{item.label}</span>
+                  </button>
+                );
+              }
               const isActive = pathname === item.href || (item.href === '/admin' && pathname === '/admin');
               return (
                 <a
@@ -84,12 +107,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
             })}
           </div>
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200/50 bg-gradient-to-r from-white to-green-50">
-          <button className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-300 group">
-            <FiLogOut className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
-            Logout
-          </button>
-        </div>
       </div>
       {/* Overlay for mobile */}
       {sidebarOpen && (
