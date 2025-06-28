@@ -9,6 +9,9 @@ import ModalQuickview from '@/components/Modal/ModalQuickview'
 import ModalCompare from '@/components/Modal/ModalCompare'
 import CountdownTimeType from '@/type/CountdownType'
 import { countdownTime } from '@/store/countdownTime'
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'rc-slider/assets/index.css';
 
 const serverTimeLeft: CountdownTimeType = countdownTime();
 
@@ -27,7 +30,7 @@ export default function RootLayout({
   return (
     <GlobalProvider>
       <html lang="en">
-        <body className={instrument.className}>
+        <body suppressHydrationWarning={true} className={`${instrument.className} overflow-x-hidden`}>
           {children}
           <ModalCart serverTimeLeft={serverTimeLeft} />
           <ModalWishlist />
