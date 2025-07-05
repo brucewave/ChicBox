@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css/bundle';
 import 'swiper/css/effect-fade';
+import RotatingBadge from '../Home1/RotatingBadge';
 
 const baseUrl = 'https://api.roomily.tech';
 
@@ -56,7 +57,7 @@ const SliderOne = () => {
 
     return (
         <>
-            <div className="slider-block style-one bg-linear xl:h-[860px] lg:h-[800px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[320px] w-full">
+            <div className="slider-block style-one bg-linear xl:h-[860px] lg:h-[800px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[320px] w-full relative">
                 <div className="slider-main h-full w-full">
                     {loading ? (
                         <div className="flex items-center justify-center h-full">Loading...</div>
@@ -78,10 +79,15 @@ const SliderOne = () => {
                                 <SwiperSlide key={product.id}>
                                     <div className="slider-item h-full w-full relative">
                                         <div className="container w-full h-full flex items-center relative">
-                                            <div className="text-content basis-1/2">
+                                            <div className="text-content basis-1/2 relative">
                                                 <div className="text-sub-display">{product.discount > 0 ? `Sale! Up To ${product.discount}% Off!` : 'New Arrival'}</div>
                                                 <div className="text-display md:mt-5 mt-2">{product.name}</div>
                                                 <Link href={`/product/default?id=${product.id}`} className="button-main md:mt-8 mt-3">Shop Now</Link>
+                                                
+                                                {/* Rotating Badge positioned below Shop Now button */}
+                                                <div className="mt-8 md:mt-12">
+                                                    <RotatingBadge />
+                                                </div>
                                             </div>
                                             <div className="sub-img absolute sm:w-1/2 w-3/5 2xl:-right-[60px] -right-[16px] bottom-0">
                                                 <Image

@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { FiShoppingCart, FiTrendingUp, FiUsers, FiPackage, FiDollarSign, FiEye, FiHeart, FiStar } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiShoppingCart, FiTrendingUp, FiUsers, FiPackage, FiDollarSign, FiEye, FiHeart, FiStar, FiGrid, FiTag, FiX } from 'react-icons/fi';
 import { 
   LineChart, 
   Line, 
@@ -21,9 +21,14 @@ import {
 } from 'recharts';
 import AdminLayout from '../../components/Admin/AdminLayout';
 import StatCard from '../../components/Admin/StatCard';
+import { dashboardService, DashboardStats } from '../../services/dashboardService';
 
 const AdminPage = () => {
-  // Sample data for charts
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Sample data for charts (keeping for now)
   const salesData = [
     { name: 'Jan', sales: 4000, orders: 2400, customers: 2400 },
     { name: 'Feb', sales: 3000, orders: 1398, customers: 2210 },
@@ -34,6 +39,24 @@ const AdminPage = () => {
     { name: 'Jul', sales: 3490, orders: 4300, customers: 2100 },
   ];
 
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await dashboardService.getDashboardStats();
+      setStats(data);
+    } catch (err: any) {
+      console.error('Error fetching dashboard stats:', err);
+      setError(err.message || 'Failed to fetch dashboard statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const pieData = [
     { name: 'Electronics', value: 400, color: '#8884d8' },
     { name: 'Fashion', value: 300, color: '#82ca9d' },
@@ -41,83 +64,91 @@ const AdminPage = () => {
     { name: 'Sports', value: 200, color: '#ff7300' },
   ];
 
-  const stats = [
-    { 
-      title: 'Total Sales', 
-      value: '$45,231', 
-      change: '+20.1%', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700', 
-      icon: <FiTrendingUp className="w-8 h-8 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-blue-400/20 to-blue-600/20'
-    },
-    { 
-      title: 'Orders', 
-      value: '2,350', 
-      change: '+180.1%', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700', 
-      icon: <FiShoppingCart className="w-8 h-8 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-emerald-400/20 to-emerald-600/20'
-    },
-    { 
-      title: 'Products', 
-      value: '1,234', 
-      change: '+19%', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-pink-500 via-pink-600 to-pink-700', 
-      icon: <FiPackage className="w-8 h-8 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-pink-400/20 to-pink-600/20'
-    },
-    { 
-      title: 'Customers', 
-      value: '573', 
-      change: '+201', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700', 
-      icon: <FiUsers className="w-8 h-8 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-amber-400/20 to-amber-600/20'
-    },
-  ];
+  const getMainStats = () => {
+    if (!stats) return [];
+    
+    return [
+      { 
+        title: 'Total Revenue', 
+        value: `$${stats.orders.totalRevenue.toLocaleString()}`, 
+        change: 'Total revenue', 
+        positive: true, 
+        color: 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700', 
+        icon: <FiTrendingUp className="w-8 h-8 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-blue-400/20 to-blue-600/20'
+      },
+      { 
+        title: 'Total Orders', 
+        value: stats.orders.total.toString(), 
+        change: `${stats.orders.totalItems} items`, 
+        positive: true, 
+        color: 'bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700', 
+        icon: <FiShoppingCart className="w-8 h-8 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-emerald-400/20 to-emerald-600/20'
+      },
+      { 
+        title: 'Products', 
+        value: stats.products.total.toString(), 
+        change: `${stats.products.active} active`, 
+        positive: true, 
+        color: 'bg-gradient-to-br from-pink-500 via-pink-600 to-pink-700', 
+        icon: <FiPackage className="w-8 h-8 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-pink-400/20 to-pink-600/20'
+      },
+      { 
+        title: 'Categories', 
+        value: stats.categories.total.toString(), 
+        change: 'Total categories', 
+        positive: true, 
+        color: 'bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700', 
+        icon: <FiGrid className="w-8 h-8 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-amber-400/20 to-amber-600/20'
+      },
+    ];
+  };
 
-  const additionalStats = [
-    { 
-      title: 'Revenue', 
-      value: '$12,345', 
-      change: '+15.3%', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700', 
-      icon: <FiDollarSign className="w-6 h-6 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-purple-400/20 to-purple-600/20'
-    },
-    { 
-      title: 'Views', 
-      value: '45.2K', 
-      change: '+8.7%', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-cyan-500 via-cyan-600 to-cyan-700', 
-      icon: <FiEye className="w-6 h-6 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-cyan-400/20 to-cyan-600/20'
-    },
-    { 
-      title: 'Likes', 
-      value: '2.1K', 
-      change: '+12.4%', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-rose-500 via-rose-600 to-rose-700', 
-      icon: <FiHeart className="w-6 h-6 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-rose-400/20 to-rose-600/20'
-    },
-    { 
-      title: 'Rating', 
-      value: '4.8', 
-      change: '+0.2', 
-      positive: true, 
-      color: 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700', 
-      icon: <FiStar className="w-6 h-6 text-white" />,
-      bgPattern: 'bg-gradient-to-br from-indigo-400/20 to-indigo-600/20'
-    },
-  ];
+  const getAdditionalStats = () => {
+    if (!stats) return [];
+    
+    return [
+      { 
+        title: 'Coupons', 
+        value: stats.coupons.total.toString(), 
+        change: `${stats.coupons.active} active`, 
+        positive: true, 
+        color: 'bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700', 
+        icon: <FiTag className="w-6 h-6 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-purple-400/20 to-purple-600/20'
+      },
+      { 
+        title: 'Pending', 
+        value: stats.orders.pending.toString(), 
+        change: 'Awaiting confirmation', 
+        positive: true, 
+        color: 'bg-gradient-to-br from-cyan-500 via-cyan-600 to-cyan-700', 
+        icon: <FiShoppingCart className="w-6 h-6 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-cyan-400/20 to-cyan-600/20'
+      },
+      { 
+        title: 'Confirmed', 
+        value: stats.orders.confirmed.toString(), 
+        change: 'Confirmed orders', 
+        positive: true, 
+        color: 'bg-gradient-to-br from-rose-500 via-rose-600 to-rose-700', 
+        icon: <FiTrendingUp className="w-6 h-6 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-rose-400/20 to-rose-600/20'
+      },
+      { 
+        title: 'Delivered', 
+        value: stats.orders.delivered.toString(), 
+        change: 'Completed orders', 
+        positive: true, 
+        color: 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-700', 
+        icon: <FiShoppingCart className="w-6 h-6 text-white" />,
+        bgPattern: 'bg-gradient-to-br from-indigo-400/20 to-indigo-600/20'
+      },
+    ];
+  };
 
   const statusColors = {
     completed: 'bg-gradient-to-r from-green-500 to-green-600 text-white',
@@ -145,33 +176,45 @@ const AdminPage = () => {
       title={<span className="bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 bg-clip-text text-transparent">Dashboard</span>} 
       subtitle={<span className="text-gray-600">Welcome back! Here's what's happening with your store today.</span>}
     >
-      {/* Main Stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={index === 0 ? '' : stat.title}
-            value={stat.value}
-            change={stat.change}
-            icon={stat.icon}
-            gradient={statGradients[index % statGradients.length]}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg text-gray-600">Loading dashboard statistics...</div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="text-red-800">Error loading dashboard: {error}</div>
+        </div>
+      ) : (
+        <>
+          {/* Main Stats cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {getMainStats().map((stat: any, index: number) => (
+              <StatCard
+                key={index}
+                title={stat.title}
+                value={stat.value}
+                change={stat.change}
+                icon={stat.icon}
+                gradient={statGradients[index % statGradients.length]}
+              />
+            ))}
+          </div>
 
-      {/* Additional Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {additionalStats.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            change={stat.change}
-            icon={stat.icon}
-            gradient={additionalStatGradients[index % additionalStatGradients.length]}
-          />
-        ))}
-      </div>
+          {/* Additional Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {getAdditionalStats().map((stat: any, index: number) => (
+              <StatCard
+                key={index}
+                title={stat.title}
+                value={stat.value}
+                change={stat.change}
+                icon={stat.icon}
+                gradient={additionalStatGradients[index % additionalStatGradients.length]}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -246,6 +289,45 @@ const AdminPage = () => {
         </div>
       </div>
 
+      {/* Order Status Breakdown */}
+      {stats && (
+        <div className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 rounded-2xl shadow-lg p-6 border border-emerald-200 mb-8">
+          <h3 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center">
+            <div className="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div>
+            Order Status Breakdown
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {Object.entries(stats.orders.statusCounts)
+              .filter(([status, count]) => count > 0 || ['PENDING', 'CONFIRMED', 'DELIVERED', 'CANCELLED'].includes(status))
+              .map(([status, count]) => (
+                <div key={status} className="bg-white/70 backdrop-blur-sm rounded-xl p-4 text-center">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 ${
+                    status === 'PENDING' ? 'bg-yellow-100' :
+                    status === 'CONFIRMED' ? 'bg-green-100' :
+                    status === 'PROCESSING' ? 'bg-blue-100' :
+                    status === 'DELIVERED' ? 'bg-purple-100' :
+                    status === 'CANCELLED' ? 'bg-red-100' :
+                    status === 'REFUNDED' ? 'bg-orange-100' :
+                    'bg-gray-100'
+                  }`}>
+                    <FiShoppingCart className={`w-6 h-6 ${
+                      status === 'PENDING' ? 'text-yellow-600' :
+                      status === 'CONFIRMED' ? 'text-green-600' :
+                      status === 'PROCESSING' ? 'text-blue-600' :
+                      status === 'DELIVERED' ? 'text-purple-600' :
+                      status === 'CANCELLED' ? 'text-red-600' :
+                      status === 'REFUNDED' ? 'text-orange-600' :
+                      'text-gray-600'
+                    }`} />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{count}</div>
+                  <div className="text-sm text-gray-600 capitalize">{status.toLowerCase()}</div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Bar Chart */}
       <div className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 rounded-2xl shadow-lg p-6 border border-emerald-200 mb-8">
         <h3 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center">
@@ -280,18 +362,26 @@ const AdminPage = () => {
             Recent Orders
           </h3>
           <div className="space-y-4">
-            {[1, 2, 3, 4].map((item, i) => (
-              <div key={item} className="flex items-center space-x-4 p-3 bg-white/50 rounded-xl backdrop-blur-sm">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${['bg-gradient-to-br from-blue-500 to-blue-600','bg-gradient-to-br from-emerald-500 to-emerald-600','bg-gradient-to-br from-pink-500 to-pink-600','bg-gradient-to-br from-amber-500 to-amber-600'][i]}`}>
-                  <FiShoppingCart className="w-5 h-5 text-white" />
+            {stats?.recentOrders.length ? (
+              stats.recentOrders.map((order, i) => (
+                <div key={order.id} className="flex items-center space-x-4 p-3 bg-white/50 rounded-xl backdrop-blur-sm">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${['bg-gradient-to-br from-blue-500 to-blue-600','bg-gradient-to-br from-emerald-500 to-emerald-600','bg-gradient-to-br from-pink-500 to-pink-600','bg-gradient-to-br from-amber-500 to-amber-600'][i % 4]}`}>
+                    <FiShoppingCart className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{order.orderNumber}</p>
+                    <p className="text-sm text-gray-600">${order.total.toFixed(2)} • {order.customerName}</p>
+                  </div>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusColors[order.status.toLowerCase() as keyof typeof statusColors] || statusColors.pending}`}>
+                    {order.status}
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Order #{1000 + item}</p>
-                  <p className="text-sm text-gray-600">$299.00 • 2 items</p>
-                </div>
-                <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusColors.completed}`}>Completed</span>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No recent orders found
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -301,16 +391,22 @@ const AdminPage = () => {
             Top Products
           </h3>
           <div className="space-y-4">
-            {[1, 2, 3, 4].map((item, i) => (
-              <div key={item} className="flex items-center space-x-4 p-3 bg-white/50 rounded-xl backdrop-blur-sm">
-                <div className={`w-10 h-10 rounded-lg ${['bg-gradient-to-br from-pink-500 to-pink-600','bg-gradient-to-br from-blue-500 to-blue-600','bg-gradient-to-br from-emerald-500 to-emerald-600','bg-gradient-to-br from-amber-500 to-amber-600'][i]}`}></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Product {item}</p>
-                  <p className="text-sm text-gray-600">{100 + item * 10} sales</p>
+            {stats?.topProducts.length ? (
+              stats.topProducts.map((product, i) => (
+                <div key={product.id} className="flex items-center space-x-4 p-3 bg-white/50 rounded-xl backdrop-blur-sm">
+                  <div className={`w-10 h-10 rounded-lg ${['bg-gradient-to-br from-pink-500 to-pink-600','bg-gradient-to-br from-blue-500 to-blue-600','bg-gradient-to-br from-emerald-500 to-emerald-600','bg-gradient-to-br from-amber-500 to-amber-600'][i % 4]}`}></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{product.name}</p>
+                    <p className="text-sm text-gray-600">{product.sales} sales</p>
+                  </div>
+                  <span className={`text-sm font-medium ${['text-pink-600','text-blue-600','text-emerald-600','text-amber-600'][i % 4]}`}>${product.revenue.toFixed(2)}</span>
                 </div>
-                <span className={`text-sm font-medium ${['text-pink-600','text-blue-600','text-emerald-600','text-amber-600'][i]}`}>${(item * 25 + 50).toFixed(2)}</span>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No products found
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

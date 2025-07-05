@@ -14,7 +14,9 @@ import {
   FiMenu,
   FiX,
   FiBell,
-  FiSearch
+  FiSearch,
+  FiImage,
+  FiGrid
 } from 'react-icons/fi';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -41,10 +43,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
     { icon: FiHome, label: 'Dashboard', href: '/admin', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
     { icon: FiPackage, label: 'Products', href: '/admin/add-product', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
     { icon: FiShoppingCart, label: 'Orders', href: '/admin/manage-order', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiUsers, label: 'Customers', href: '/admin/customers', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiTruck, label: 'Shipping', href: '/admin/shipping', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiGrid, label: 'Categories', href: '/admin/manage-category', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    // { icon: FiUsers, label: 'Customers', href: '/admin/customers', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    // { icon: FiTruck, label: 'Shipping', href: '/admin/shipping', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
     { icon: FiTag, label: 'Coupons', href: '/admin/manage-coupon', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiBarChart, label: 'Analytics', href: '/admin/analytics', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiImage, label: 'Banners', href: '/admin/manage-banner', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    // { icon: FiBarChart, label: 'Analytics', href: '/admin/analytics', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
     { icon: FiLogOut, label: 'Logout', onClick: handleLogout, color: 'bg-gradient-to-br from-red-500 to-red-600', hover: 'hover:bg-red-50', textColor: 'text-red-600', isLogout: true },
   ];
 
@@ -127,7 +131,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
               <FiMenu className="w-5 h-5" />
             </button>
             <div className="flex items-center space-x-4">
-              <div className="relative">
+              {/* <div className="relative">
                 <input
                   type="text"
                   placeholder="Search..."
@@ -136,8 +140,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiSearch className="h-5 w-5 text-gray-400" />
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
+              </div> */}
+              {/* <div className="flex items-center space-x-3">
                 <div className="relative">
                   <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors relative">
                     <FiBell className="w-6 h-6" />
@@ -147,7 +151,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
                 <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
                   <span className="text-sm font-bold text-white">A</span>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </header>

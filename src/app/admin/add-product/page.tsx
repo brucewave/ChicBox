@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FiUpload, FiX, FiFileText, FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { FiUpload, FiX, FiFileText, FiDownload, FiEdit, FiTrash2, FiStar } from 'react-icons/fi';
 import AdminLayout from '../../../components/Admin/AdminLayout';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { productService } from '../../../services/productService';
 
 const AddProductPage = () => {
   const [images, setImages] = useState<string[]>([]);
@@ -64,6 +65,8 @@ const AddProductPage = () => {
   const [editAdditionalImages, setEditAdditionalImages] = useState<File[]>([]);
   const [editImagePreviews, setEditImagePreviews] = useState<string[]>([]);
 
+
+
   // Delete confirmation modal
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<any | null>(null);
@@ -77,15 +80,12 @@ const AddProductPage = () => {
     setLoadingProducts(true);
     setErrorProducts('');
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products?page=${page}&size=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(response.data.content || []);
-      setTotalPages(response.data.totalPages || 1);
+      const response = await productService.getProducts(page, pageSize, sortBy, sortDir);
+      setProducts(response.content || []);
+      setTotalPages(response.totalPages || 1);
     } catch (err: any) {
       console.error('Fetch products error:', err);
-      setErrorProducts(err.response?.data?.message || 'Failed to fetch products');
+      setErrorProducts(err.message || 'Failed to fetch products');
       toast.error('Failed to fetch products');
     } finally {
       setLoadingProducts(false);
@@ -162,6 +162,8 @@ const AddProductPage = () => {
     }
   };
 
+
+
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
@@ -225,7 +227,6 @@ const AddProductPage = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
       const formDataToSend = new FormData();
       
       // Add all form fields
@@ -240,24 +241,17 @@ const AddProductPage = () => {
         }
       });
       
-      // Add primary image
-      formDataToSend.append('primaryImage', primaryImage);
-      
-      // Add additional images
-      additionalImages.forEach((image, index) => {
-        formDataToSend.append('additionalImages', image);
+      // Add all images (primary + additional) as a single array
+      const allImages = [primaryImage, ...additionalImages];
+      allImages.forEach((image, index) => {
+        formDataToSend.append('images', image);
       });
       
       console.log('Form data being sent:', Object.fromEntries(formDataToSend.entries()));
       
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`, formDataToSend, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await productService.createProduct(formDataToSend);
       
-      console.log('Product created:', response.data);
+      console.log('Product created:', response);
       
       // Reset form
       setFormData({
@@ -297,8 +291,7 @@ const AddProductPage = () => {
       
     } catch (err: any) {
       console.error('Create error:', err);
-      console.error('Error response:', err.response?.data);
-      toast.error(`Failed to create product: ${err.response?.data?.message || err.message}`);
+      toast.error(`Failed to create product: ${err.message}`);
     }
   };
 
@@ -492,10 +485,9 @@ const AddProductPage = () => {
     if (!editProduct) return;
     
     try {
-      const token = localStorage.getItem('token');
       const form = new FormData();
       
-      // Add all the form fields with the correct API field names
+      // Add all the form fields
       form.append('name', editForm.name || '');
       form.append('description', editForm.description || '');
       form.append('price', editForm.price?.toString() || '');
@@ -521,58 +513,19 @@ const AddProductPage = () => {
       form.append('fault', editForm.fault || '');
       form.append('code', editForm.code || '');
       
-      // Add the image file if a new one is selected
-      if (editImage) {
-        form.append('primaryImage', editImage);
-        console.log('✅ Added primary image:', editImage.name, 'Size:', editImage.size, 'Type:', editImage.type);
-      }
-      
-      // Add additional images (try different field names the backend might expect)
-      editAdditionalImages.slice(1).forEach((image, index) => {
-        // Try multiple field names that the backend might expect
-        form.append(`additionalImages`, image);
-        form.append(`images`, image);
-        form.append(`imageFiles`, image);
-        console.log(`✅ Added additional image ${index + 1}:`, image.name, 'Size:', image.size, 'Type:', image.type);
+      // Add all images (primary + additional) as a single array
+      const allImages = [editImage, ...editAdditionalImages].filter(Boolean) as File[];
+      allImages.forEach((image, index) => {
+        form.append('images', image);
       });
       
       console.log('📊 Image Summary:');
-      console.log('- Primary image:', editImage?.name || 'None');
-      console.log('- Additional images count:', editAdditionalImages.slice(1).length);
-      console.log('- Total images to send:', editAdditionalImages.length);
-      console.log('- editImage exists:', !!editImage);
-      console.log('- editAdditionalImages length:', editAdditionalImages.length);
+      console.log('- Total images to send:', allImages.length);
+      console.log('- Images:', allImages.map(img => img.name));
       
-      console.log('🔍 FormData contents:');
-      Array.from(form.entries()).forEach(([key, value]) => {
-        if (value instanceof File) {
-          console.log(`  ${key}:`, value.name, 'Size:', value.size, 'Type:', value.type);
-        } else {
-          console.log(`  ${key}:`, value);
-        }
-      });
+      const response = await productService.updateProduct(editProduct.id, form);
       
-      console.log('📤 Sending request to:', `${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${editProduct.id}`);
-      console.log('📋 Request headers:', { Authorization: `Bearer ${token}` });
-      
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${editProduct.id}`, form, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          // Don't set Content-Type - let axios set it automatically for FormData
-        },
-      });
-      
-      console.log('✅ Server response received:');
-      console.log('- Status:', response.status);
-      console.log('- Response data:', response.data);
-      console.log('- Response headers:', response.headers);
-      
-      if (response.data.primaryImageUrl) {
-        console.log('✅ Primary image URL returned:', response.data.primaryImageUrl);
-      }
-      if (response.data.imageUrls) {
-        console.log('✅ Additional image URLs returned:', response.data.imageUrls);
-      }
+      console.log('✅ Product updated:', response);
       
       // Update the local state immediately with the updated product data
       setProducts(prevProducts => 
@@ -582,7 +535,7 @@ const AddProductPage = () => {
                 ...product, 
                 ...editForm,
                 // Update the image URL if a new image was uploaded
-                primaryImageUrl: editImage ? response.data.primaryImageUrl || product.primaryImageUrl : product.primaryImageUrl
+                primaryImageUrl: editImage ? response.primaryImageUrl || product.primaryImageUrl : product.primaryImageUrl
               }
             : product
         )
@@ -597,7 +550,7 @@ const AddProductPage = () => {
                   ...product, 
                   ...editForm,
                   // Update the image URL if a new image was uploaded
-                  primaryImageUrl: editImage ? response.data.primaryImageUrl || product.primaryImageUrl : product.primaryImageUrl
+                  primaryImageUrl: editImage ? response.primaryImageUrl || product.primaryImageUrl : product.primaryImageUrl
                 }
               : product
           )
@@ -608,24 +561,18 @@ const AddProductPage = () => {
       closeEditModal();
     } catch (err: any) {
       console.error('Update error:', err);
-      console.error('Error response:', err.response?.data);
-      toast.error(`Failed to update product: ${err.response?.data?.message || err.message}`);
+      toast.error(`Failed to update product: ${err.message}`);
     }
   };
 
   // Separate function to handle status updates
   const handleStatusUpdate = async (productId: number, newStatus: string) => {
     try {
-      const token = localStorage.getItem('token');
       console.log(`Updating status for product ${productId} to ${newStatus}`);
       
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${productId}/status?status=${newStatus}`, {}, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await productService.updateProductStatus(productId, newStatus);
       
-      console.log('Status update response:', response.data);
+      console.log('Status update response:', response);
       
       // Update the local state immediately
       setProducts(prevProducts => 
@@ -656,12 +603,12 @@ const AddProductPage = () => {
       
     } catch (err: any) {
       console.error('Status update error:', err);
-      console.error('Error response:', err.response?.data);
-      toast.error(`Failed to update status: ${err.response?.data?.message || err.message}`);
+      toast.error(`Failed to update status: ${err.message}`);
     }
   };
 
-  // Function to open delete confirmation modal
+
+
   const openDeleteModal = (product: any) => {
     setProductToDelete(product);
     setDeleteModalOpen(true);
@@ -672,10 +619,7 @@ const AddProductPage = () => {
     if (!productToDelete) return;
     
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${productToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await productService.deleteProduct(productToDelete.id);
       
       // Remove from local state
       setProducts(products.filter(p => p.id !== productToDelete.id));
@@ -688,7 +632,7 @@ const AddProductPage = () => {
       setProductToDelete(null);
     } catch (err: any) {
       console.error('Delete error:', err);
-      toast.error(`Failed to delete product: ${err.response?.data?.message || err.message}`);
+      toast.error(`Failed to delete product: ${err.message}`);
     }
   };
 
@@ -838,7 +782,7 @@ const AddProductPage = () => {
       </div>
 
       {/* XLSX Import Section */}
-      <div className="max-w-4xl mx-auto mb-12">
+      {/* <div className="max-w-4xl mx-auto mb-12">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Import Products from Excel</h3>
@@ -930,7 +874,7 @@ const AddProductPage = () => {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Add Product Form Section */}
       <div className="max-w-4xl mx-auto">
@@ -1313,6 +1257,8 @@ const AddProductPage = () => {
           </div>
         </div>
       )}
+
+
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (

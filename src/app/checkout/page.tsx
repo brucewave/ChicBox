@@ -22,10 +22,10 @@ function formatPrice(amount: number) {
 const Checkout = () => {
     const searchParams = useSearchParams()
     const router = useRouter()
-    let discount = searchParams.get('discount')
-    let ship = searchParams.get('ship')
+    let discount = searchParams?.get('discount') || '0'
+    let ship = searchParams?.get('ship') || '0'
 
-    const { cartState } = useCart();
+    const { cartState, clearCart } = useCart();
     let [totalCart, setTotalCart] = useState<number>(0)
     const [activePayment, setActivePayment] = useState<string>('credit-card')
     const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -39,14 +39,16 @@ const Checkout = () => {
     const [selectedProvince, setSelectedProvince] = useState('default')
     const [selectedDistrict, setSelectedDistrict] = useState('default')
     const [selectedWard, setSelectedWard] = useState('default')
-    const [provinces, setProvinces] = useState([])
-    const [districts, setDistricts] = useState([])
-    const [wards, setWards] = useState([])
+    const [provinces, setProvinces] = useState<any[]>([])
+    const [districts, setDistricts] = useState<any[]>([])
+    const [wards, setWards] = useState<any[]>([])
     const [isProcessing, setIsProcessing] = useState(false)
     const [paymentError, setPaymentError] = useState('')
     const [paymentType, setPaymentType] = useState<'full' | 'deposit'>('full');
     const [paymentInfo, setPaymentInfo] = useState<any>(null);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success' | 'failed'>('pending');
+    const [isCheckingPayment, setIsCheckingPayment] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -120,6 +122,62 @@ const Checkout = () => {
         }
     }, [selectedDistrict])
 
+    // Check payment status periodically when payment modal is open
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        
+        if (showPaymentModal && paymentInfo?.paymentLinkId && paymentStatus === 'pending') {
+            interval = setInterval(async () => {
+                await checkPaymentStatus();
+            }, 5000); // Check every 5 seconds
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [showPaymentModal, paymentInfo, paymentStatus]);
+
+    const checkPaymentStatus = async () => {
+        if (!paymentInfo?.paymentLinkId) return;
+        
+        try {
+            setIsCheckingPayment(true);
+            const token = localStorage.getItem('token');
+            
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/v1/payments/status/${paymentInfo.paymentLinkId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            console.log('Payment Status Response:', response.data);
+
+            if (response.data.isSuccess) {
+                setPaymentStatus('success');
+                setShowPaymentModal(false);
+                
+                // Clear cart after successful payment
+                clearCart();
+                
+                // Show success message and redirect
+                alert('Payment successful! Your order has been placed.');
+                router.push('/my-account');
+            } else if (response.data.status === 'FAILED') {
+                setPaymentStatus('failed');
+                setPaymentError('Payment failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error checking payment status:', error);
+        } finally {
+            setIsCheckingPayment(false);
+        }
+    };
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
@@ -151,6 +209,7 @@ const Checkout = () => {
         try {
             setIsProcessing(true)
             setPaymentError('')
+            setPaymentStatus('pending')
 
             // Get selected province, district, ward names
             const selectedProvinceData = provinces.find((p: any) => p.code === selectedProvince)
@@ -179,7 +238,7 @@ const Checkout = () => {
                     fullName: `${(document.getElementById('firstName') as HTMLInputElement).value} ${(document.getElementById('lastName') as HTMLInputElement).value}`,
                     orderOption: paymentType === 'full' ? "FULL_PAYMENT" : "PART_DEPOSIT",
                     notes: (document.getElementById('note') as HTMLTextAreaElement).value,
-                    couponId: discount ? 1 : null
+                    couponId: Number(discount) > 0 ? 1 : null
                 }
             }
 
@@ -274,7 +333,7 @@ const Checkout = () => {
 
     return (
         <>
-            <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
+            <TopNavOne props="style-one bg-black" />
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
                 <Breadcrumb heading='Shopping cart' subHeading='Shopping cart' />
@@ -810,6 +869,28 @@ const Checkout = () => {
                                 <p><span className="font-medium">Order Code:</span> {paymentInfo.orderCode}</p>
                                 <p><span className="font-medium">Expires At:</span> {new Date(paymentInfo.expiresAt).toLocaleString()}</p>
                             </div>
+                            
+                            {/* Payment Status */}
+                            <div className="mt-4 p-3 rounded-lg bg-gray-50">
+                                <div className="flex items-center justify-between">
+                                    <span className="font-medium">Payment Status:</span>
+                                    <span className={`px-2 py-1 rounded text-sm ${
+                                        paymentStatus === 'success' ? 'bg-green-100 text-green-800' :
+                                        paymentStatus === 'failed' ? 'bg-red-100 text-red-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {paymentStatus === 'success' ? 'Success' :
+                                         paymentStatus === 'failed' ? 'Failed' :
+                                         isCheckingPayment ? 'Checking...' : 'Pending'}
+                                    </span>
+                                </div>
+                                {paymentStatus === 'pending' && (
+                                    <p className="text-sm text-gray-600 mt-2">
+                                        Please complete the payment using the QR code above. We'll automatically check the payment status.
+                                    </p>
+                                )}
+                            </div>
+                            
                             <div className="flex justify-end space-x-4 mt-6">
                                 <button
                                     onClick={() => setShowPaymentModal(false)}

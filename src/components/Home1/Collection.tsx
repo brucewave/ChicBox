@@ -80,7 +80,7 @@ const Collection = () => {
 
     return (
         <>
-            <div className="collection-block md:pt-20 pt-10">
+            <div className="collection-block md:pt-10 pt-10">
                 <div className="container">
                     <div className="heading3 text-center">Explore Collections</div>
                 </div>

@@ -1,8 +1,10 @@
 import React from 'react'
 import TopNavOne from '@/components/Header/TopNav/TopNavOne'
 import MenuOne from '@/components/Header/Menu/MenuOne'
+import HeroBanner from '@/components/Home1/HeroBanner'
 import SliderOne from '@/components/Slider/SliderOne'
 import WhatNewOne from '@/components/Home1/WhatNewOne'
+import CategoryMarquee from '@/components/Home1/CategoryMarquee'
 import productData from '@/data/Product.json'
 import Collection from '@/components/Home1/Collection'
 import TabFeatures from '@/components/Home1/TabFeatures'
@@ -23,8 +25,10 @@ export default function Home() {
         <MenuOne props="bg-transparent" />
       </div>
       <div className="mt-[74px] md:mt-[74px] h-0"></div>
+      <HeroBanner />
       <SliderOne />
       <WhatNewOne data={productData} start={0} limit={4} />
+      <CategoryMarquee />
       <Collection />
       <TabFeatures data={productData} start={0} limit={6} />
       <Banner />

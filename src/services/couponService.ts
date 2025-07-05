@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.roomily.tech';
+
 export interface Coupon {
     id: number;
     name: string;
@@ -10,7 +12,7 @@ export interface Coupon {
     isCurrentlyValid: boolean;
     validFrom: string;
     validUntil: string;
-    status: string;
+    status: 'ACTIVE' | 'INACTIVE';
 }
 
 const getAuthHeader = () => {
@@ -30,7 +32,7 @@ export const couponService = {
                 console.warn('Skipping getAllCoupons: No authentication token');
                 return [];
             }
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/coupons`, {
+            const response = await axios.get(`${baseUrl}/api/coupons`, {
                 headers
             });
             return response.data;
@@ -47,7 +49,7 @@ export const couponService = {
                 console.warn('Skipping getActiveCoupons: No authentication token');
                 return [];
             }
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/coupons/active`, {
+            const response = await axios.get(`${baseUrl}/api/coupons/active`, {
                 headers
             });
             console.log('Active coupons response:', response.data);
@@ -65,7 +67,7 @@ export const couponService = {
                 console.warn('Skipping getCouponByCode: No authentication token');
                 return null;
             }
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/coupons/code/${code}`, {
+            const response = await axios.get(`${baseUrl}/api/coupons/code/${code}`, {
                 headers
             });
             return response.data;
@@ -115,7 +117,7 @@ export const couponService = {
                 return [];
             }
 
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/coupons/user`, {
+            const response = await axios.get(`${baseUrl}/api/coupons/user`, {
                 headers
             });
             console.log('User coupons response:', response.data);
@@ -143,7 +145,7 @@ export const couponService = {
             }
 
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/coupons/${couponId}`,
+                `${baseUrl}/api/coupons/${couponId}`,
                 {
                     status: "INACTIVE"
                 },
@@ -166,7 +168,7 @@ export const couponService = {
 
             // First get the current coupon data
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/coupons/${couponId}`,
+                `${baseUrl}/api/coupons/${couponId}`,
                 { headers }
             );
             
@@ -198,7 +200,7 @@ export const couponService = {
             console.log('Sending update data:', updateData);
 
             const updateResponse = await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/coupons/${couponId}`,
+                `${baseUrl}/api/coupons/${couponId}`,
                 updateData,
                 { headers }
             );
@@ -210,6 +212,107 @@ export const couponService = {
                 console.error('Error updating coupon uses:', error);
             }
             return false;
+        }
+    },
+
+    createCoupon: async (couponData: {
+        name: string;
+        couponCode: string;
+        couponPercentage: number;
+        remainingUses: number;
+        validFrom: string;
+        validUntil: string;
+        status?: 'ACTIVE' | 'INACTIVE';
+    }): Promise<Coupon> => {
+        try {
+            const headers = getAuthHeader();
+            if (!headers) {
+                throw new Error('No authentication token');
+            }
+            
+            // Log the data being sent for debugging
+            console.log('Creating coupon with data:', couponData);
+            
+            const response = await axios.post(`${baseUrl}/api/coupons`, couponData, {
+                headers: {
+                    ...headers,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error('Error creating coupon:', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message
+                });
+            } else {
+                console.error('Error creating coupon:', error);
+            }
+            throw error;
+        }
+    },
+
+    updateCoupon: async (id: number, couponData: Partial<Coupon>): Promise<Coupon> => {
+        try {
+            const headers = getAuthHeader();
+            if (!headers) {
+                throw new Error('No authentication token');
+            }
+            
+            // Log the data being sent for debugging
+            console.log('Updating coupon with data:', { id, couponData });
+            
+            const response = await axios.put(`${baseUrl}/api/coupons/${id}`, couponData, {
+                headers: {
+                    ...headers,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error('Error updating coupon:', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message
+                });
+            } else {
+                console.error('Error updating coupon:', error);
+            }
+            throw error;
+        }
+    },
+
+    deleteCoupon: async (id: number): Promise<void> => {
+        try {
+            const headers = getAuthHeader();
+            if (!headers) {
+                throw new Error('No authentication token');
+            }
+            await axios.delete(`${baseUrl}/api/coupons/${id}`, {
+                headers
+            });
+        } catch (error) {
+            console.error('Error deleting coupon:', error);
+            throw error;
+        }
+    },
+
+    toggleCouponStatus: async (id: number): Promise<Coupon> => {
+        try {
+            const headers = getAuthHeader();
+            if (!headers) {
+                throw new Error('No authentication token');
+            }
+            const response = await axios.patch(`${baseUrl}/api/coupons/${id}/toggle-status`, {}, {
+                headers
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error toggling coupon status:', error);
+            throw error;
         }
     }
 }; 

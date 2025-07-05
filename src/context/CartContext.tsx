@@ -40,6 +40,7 @@ interface CartContextProps {
     syncCartWithServer: () => Promise<void>;
     refreshCart: () => Promise<void>;
     getCartCount: () => number;
+    clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
@@ -320,6 +321,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getCartCount();
     }, [cartState.cartArray]);
 
+    const clearCart = () => {
+        dispatch({ type: 'RESET_CART' });
+    };
+
     return (
         <CartContext.Provider value={{ 
             cartState, 
@@ -328,7 +333,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             updateCart, 
             syncCartWithServer,
             refreshCart,
-            getCartCount
+            getCartCount,
+            clearCart
         }}>
             {children}
         </CartContext.Provider>
