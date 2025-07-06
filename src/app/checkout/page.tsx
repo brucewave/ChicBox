@@ -223,10 +223,16 @@ const Checkout = () => {
                 return
             }
 
+            // Calculate payment amount based on payment type
+            const paymentAmount = paymentType === 'full' 
+                ? totalCart - Number(discount) + Number(ship)
+                : 50000; // Fixed deposit amount
+
             // Prepare order data
             const orderData = {
                 isLoggedInUser: isLoggedIn,
                 clientId: userData?.id || "guest",
+                amount: paymentAmount, // Add explicit amount
                 orderInfoDto: {
                     productIds: cartState.cartArray.map(item => item.id),
                     shippingAddress: (document.getElementById('address') as HTMLInputElement).value,
@@ -286,7 +292,9 @@ const Checkout = () => {
                 subtotal: totalCart,
                 discount: Number(discount) || 0,
                 shipping: Number(ship) || 0,
-                total: totalCart - Number(discount) + Number(ship)
+                fullTotal: totalCart - Number(discount) + Number(ship),
+                paymentType: paymentType,
+                paymentAmount: paymentAmount
             }, null, 2))
             
             console.log('\n6. AUTH INFO:')
@@ -309,6 +317,8 @@ const Checkout = () => {
                 }
             )
             console.log('Payment Create Response:', response.data)
+            console.log('Payment Amount Sent:', paymentAmount)
+            console.log('Payment Amount Received:', response.data.amount)
 
             // Show payment modal with QR code
             setPaymentInfo(response.data);
@@ -751,12 +761,12 @@ const Checkout = () => {
                                                                 onChange={(e) => setPaymentType('deposit')}
                                                             />
                                                             <div>
-                                                                <label className="text-button cursor-pointer" htmlFor="deposit">Deposit (30%)</label>
-                                                                <p className="text-sm text-gray-500 mt-1">Pay 30% now, remaining amount later</p>
+                                                                <label className="text-button cursor-pointer" htmlFor="deposit">Deposit (50,000 VND)</label>
+                                                                <p className="text-sm text-gray-500 mt-1">Pay 50,000 VND now, remaining amount later</p>
                                                             </div>
                                                         </div>
                                                         <div className="text-lg font-semibold text-primary">
-                                                            ${((totalCart - Number(discount) + Number(ship)) * 0.3).toFixed(2)}
+                                                            ${formatPrice(50000)}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -840,72 +850,124 @@ const Checkout = () => {
 
             {/* Payment Modal */}
             {showPaymentModal && paymentInfo && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg max-w-md w-full relative">
-                        {/* Close (X) button */}
-                        <button
-                            onClick={() => setShowPaymentModal(false)}
-                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
-                            aria-label="Close"
-                        >
-                            ×
-                        </button>
-                        <h3 className="text-xl font-semibold mb-4">Payment Information</h3>
-                        <div className="space-y-4">
-                            <div className="flex justify-center mb-4">
-                                <div className="bg-white p-4 rounded-lg">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden max-h-[90vh] overflow-y-auto">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                            <button
+                                onClick={() => setShowPaymentModal(false)}
+                                className="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl font-bold focus:outline-none transition-colors"
+                                aria-label="Close"
+                            >
+                                ×
+                            </button>
+                            <div className="text-center">
+                                <h3 className="text-2xl font-bold mb-2">Payment Details</h3>
+                                <p className="text-blue-100">Complete your payment securely</p>
+                            </div>
+                        </div>
+
+                        <div className="p-4 space-y-4">
+                            {/* Payment Amount Highlight */}
+                            <div className="text-center bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-xl border border-green-200">
+                                <p className="text-sm text-gray-600 mb-1">Payment Amount</p>
+                                <p className="text-2xl font-bold text-green-600">
+                                    {formatPrice(paymentType === 'deposit' ? 50000 : paymentInfo.amount)}
+                                </p>
+                                {paymentType === 'deposit' && (
+                                    <p className="text-sm text-gray-500 mt-1">Deposit Payment</p>
+                                )}
+                            </div>
+
+                            {/* QR Code */}
+                            <div className="text-center">
+                                <div className="bg-white p-3 rounded-xl border-2 border-gray-200 inline-block">
                                     <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentInfo.qrCode)}`}
+                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(paymentInfo.qrCode)}`}
                                         alt="Payment QR Code"
-                                        className="w-48 h-48"
+                                        className="w-36 h-36 rounded-lg"
                                     />
                                 </div>
+                                <p className="text-sm text-gray-600 mt-2">Scan QR code to pay</p>
                             </div>
-                            <div className="space-y-2">
-                                <p><span className="font-medium">Account Number:</span> {paymentInfo.accountNumber}</p>
-                                <p><span className="font-medium">Account Name:</span> {paymentInfo.accountName}</p>
-                                <p><span className="font-medium">Amount:</span> {formatPrice(paymentInfo.amount)}</p>
-                                <p><span className="font-medium">Description:</span> {paymentInfo.description}</p>
-                                <p><span className="font-medium">Order Code:</span> {paymentInfo.orderCode}</p>
-                                <p><span className="font-medium">Expires At:</span> {new Date(paymentInfo.expiresAt).toLocaleString()}</p>
+
+                            {/* Payment Information */}
+                            <div className="bg-gray-50 rounded-xl p-3 space-y-2">
+                                <h4 className="font-semibold text-gray-800 mb-3">Bank Transfer Details</h4>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Account Number:</span>
+                                        <span className="font-mono font-semibold text-gray-800">{paymentInfo.accountNumber}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Account Name:</span>
+                                        <span className="font-semibold text-gray-800">{paymentInfo.accountName}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Order Code:</span>
+                                        <span className="font-mono text-sm text-gray-800">{paymentInfo.orderCode}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600">Description:</span>
+                                        <span className="text-sm text-gray-800 truncate max-w-32">{paymentInfo.description}</span>
+                                    </div>
+                                </div>
                             </div>
-                            
+
                             {/* Payment Status */}
-                            <div className="mt-4 p-3 rounded-lg bg-gray-50">
+                            <div className={`p-3 rounded-xl border ${
+                                paymentStatus === 'success' ? 'bg-green-50 border-green-200' :
+                                paymentStatus === 'failed' ? 'bg-red-50 border-red-200' :
+                                'bg-yellow-50 border-yellow-200'
+                            }`}>
                                 <div className="flex items-center justify-between">
-                                    <span className="font-medium">Payment Status:</span>
-                                    <span className={`px-2 py-1 rounded text-sm ${
+                                    <span className="font-medium text-gray-800">Payment Status:</span>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                         paymentStatus === 'success' ? 'bg-green-100 text-green-800' :
                                         paymentStatus === 'failed' ? 'bg-red-100 text-red-800' :
                                         'bg-yellow-100 text-yellow-800'
                                     }`}>
-                                        {paymentStatus === 'success' ? 'Success' :
-                                         paymentStatus === 'failed' ? 'Failed' :
-                                         isCheckingPayment ? 'Checking...' : 'Pending'}
+                                        {paymentStatus === 'success' ? '✓ Success' :
+                                         paymentStatus === 'failed' ? '✗ Failed' :
+                                         isCheckingPayment ? '⏳ Checking...' : '⏳ Pending'}
                                     </span>
                                 </div>
                                 {paymentStatus === 'pending' && (
                                     <p className="text-sm text-gray-600 mt-2">
-                                        Please complete the payment using the QR code above. We'll automatically check the payment status.
+                                        Please complete the payment using the QR code above. We'll automatically check the payment status every 5 seconds.
                                     </p>
                                 )}
                             </div>
-                            
-                            <div className="flex justify-end space-x-4 mt-6">
+
+                            {/* Expiry Info */}
+                            <div className="bg-orange-50 border border-orange-200 rounded-xl p-2">
+                                <div className="flex items-center text-orange-800">
+                                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm font-medium">Expires at: {new Date(paymentInfo.expiresAt).toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex space-x-3 pt-2">
                                 <button
                                     onClick={() => setShowPaymentModal(false)}
-                                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                                    className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                                 >
                                     Close
                                 </button>
-                                <a
-                                    href={paymentInfo.checkoutUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                                <button
+                                    onClick={() => {
+                                        // Copy payment details to clipboard
+                                        const paymentDetails = `Account: ${paymentInfo.accountNumber}\nName: ${paymentInfo.accountName}\nAmount: ${formatPrice(paymentType === 'deposit' ? 50000 : paymentInfo.amount)}\nDescription: ${paymentInfo.description}`;
+                                        navigator.clipboard.writeText(paymentDetails);
+                                        alert('Payment details copied to clipboard!');
+                                    }}
+                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
                                 >
-                                    Pay Now
-                                </a>
+                                    Copy Details
+                                </button>
                             </div>
                         </div>
                     </div>

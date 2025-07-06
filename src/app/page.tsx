@@ -26,7 +26,7 @@ export default function Home() {
       </div>
       <div className="mt-[74px] md:mt-[74px] h-0"></div>
       <HeroBanner />
-      <SliderOne />
+      {/* <SliderOne /> */}
       <WhatNewOne data={productData} start={0} limit={4} />
       <CategoryMarquee />
       <Collection />

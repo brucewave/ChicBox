@@ -27,15 +27,14 @@ const HeroBanner = () => {
   }, []);
 
   return (
-    <section className="relative bg-[#fcf8f3] py-20 md:py-32 overflow-hidden w-full">
+    <section className="relative bg-[#fcf8f3] py-32 md:py-32 overflow-hidden w-full">
       <div className="w-full px-4 md:px-8">
         <Swiper
           spaceBetween={0}
           slidesPerView={1}
           loop={true}
           autoplay={{ delay: 5000, disableOnInteraction: false }}
-          navigation
-          modules={[Autoplay, Navigation]}
+          modules={[Autoplay]}
           className="w-full"
         >
           {products.length > 0 ? products.map((product, idx) => {
@@ -44,7 +43,7 @@ const HeroBanner = () => {
               : fallbackImageUrl;
             return (
               <SwiperSlide key={product.id || idx}>
-                <div className="flex flex-col md:flex-row items-center gap-12">
+                <div className="flex flex-col md:flex-row items-center gap-6">
                   {/* Left: Text Content */}
                   <div className="flex-1 space-y-8">
                     <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-black">
@@ -125,17 +124,17 @@ const HeroBanner = () => {
                         <path d="M20 5V35M5 20H35M10.6 10.6L29.4 29.4M10.6 29.4L29.4 10.6" stroke="black" strokeWidth="3" />
                       </svg>
                     </div>
-                    {/* Rotating Circular Badge */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-                      <RotatingBadge />
-                    </div>
                   </div>
+                </div>
+                {/* Rotating Circular Badge - positioned between text and image */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+                  <RotatingBadge />
                 </div>
               </SwiperSlide>
             );
           }) : (
-            <SwiperSlide>
-              <div className="flex flex-col md:flex-row items-center gap-12">
+                          <SwiperSlide>
+                <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1 space-y-8">
                   <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-black">Product Name</h1>
                   <div className="flex gap-12 flex-wrap">
@@ -200,14 +199,17 @@ const HeroBanner = () => {
                       <path d="M20 5V35M5 20H35M10.6 10.6L29.4 29.4M10.6 29.4L29.4 10.6" stroke="black" strokeWidth="3" />
                     </svg>
                   </div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-                    <RotatingBadge />
-                  </div>
                 </div>
+              </div>
+              {/* Rotating Circular Badge - positioned between text and image */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+                <RotatingBadge />
               </div>
             </SwiperSlide>
           )}
         </Swiper>
+        
+
       </div>
     </section>
   );

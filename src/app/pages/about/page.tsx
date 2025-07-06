@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image';
 import TopNavOne from '@/components/Header/TopNav/TopNavOne'
 import MenuOne from '@/components/Header/Menu/MenuOne'
@@ -10,7 +10,27 @@ import Instagram from '@/components/Home6/Instagram'
 import Brand from '@/components/Home1/Brand'
 import Footer from '@/components/Footer/Footer'
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.roomily.tech';
+
 const AboutUs = () => {
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch(`${baseUrl}/api/v1/products`);
+                const data = await res.json();
+                setProducts(Array.isArray(data.content) ? data.content.slice(0, 3) : []);
+            } catch (e) {
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
     return (
         <>
             <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
@@ -28,33 +48,85 @@ const AboutUs = () => {
                             </div>
                         </div>
                         <div className="list-img grid sm:grid-cols-3 gap-[30px] md:pt-20 pt-10">
-                            <div className="bg-img">
-                                <Image
-                                    src={'/images/other/about-us1.png'}
-                                    width={2000}
-                                    height={3000}
-                                    alt='bg-img'
-                                    className='w-full rounded-[30px]'
-                                />
-                            </div>
-                            <div className="bg-img">
-                                <Image
-                                    src={'/images/other/about-us2.png'}
-                                    width={2000}
-                                    height={3000}
-                                    alt='bg-img'
-                                    className='w-full rounded-[30px]'
-                                />
-                            </div>
-                            <div className="bg-img">
-                                <Image
-                                    src={'/images/other/about-us3.png'}
-                                    width={2000}
-                                    height={3000}
-                                    alt='bg-img'
-                                    className='w-full rounded-[30px]'
-                                />
-                            </div>
+                            {loading ? (
+                                // Loading skeleton
+                                <>
+                                    <div className="bg-img bg-gray-200 animate-pulse rounded-[30px] h-96"></div>
+                                    <div className="bg-img bg-gray-200 animate-pulse rounded-[30px] h-96"></div>
+                                    <div className="bg-img bg-gray-200 animate-pulse rounded-[30px] h-96"></div>
+                                </>
+                            ) : products.length > 0 ? (
+                                // Dynamic product images
+                                <>
+                                    <div className="bg-img">
+                                        <Image
+                                            src={products[0]?.primaryImageUrl 
+                                                ? `${baseUrl}/api/v1/images/${products[0].primaryImageUrl}`
+                                                : '/images/other/about-us1.png'
+                                            }
+                                            width={2000}
+                                            height={3000}
+                                            alt={products[0]?.name || 'about-us1'}
+                                            className='w-full rounded-[30px]'
+                                        />
+                                    </div>
+                                    <div className="bg-img">
+                                        <Image
+                                            src={products[1]?.primaryImageUrl 
+                                                ? `${baseUrl}/api/v1/images/${products[1].primaryImageUrl}`
+                                                : '/images/other/about-us2.png'
+                                            }
+                                            width={2000}
+                                            height={3000}
+                                            alt={products[1]?.name || 'about-us2'}
+                                            className='w-full rounded-[30px]'
+                                        />
+                                    </div>
+                                    <div className="bg-img">
+                                        <Image
+                                            src={products[2]?.primaryImageUrl 
+                                                ? `${baseUrl}/api/v1/images/${products[2].primaryImageUrl}`
+                                                : '/images/other/about-us3.png'
+                                            }
+                                            width={2000}
+                                            height={3000}
+                                            alt={products[2]?.name || 'about-us3'}
+                                            className='w-full rounded-[30px]'
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                // Fallback static images
+                                <>
+                                    <div className="bg-img">
+                                        <Image
+                                            src={'/images/other/about-us1.png'}
+                                            width={2000}
+                                            height={3000}
+                                            alt='bg-img'
+                                            className='w-full rounded-[30px]'
+                                        />
+                                    </div>
+                                    <div className="bg-img">
+                                        <Image
+                                            src={'/images/other/about-us2.png'}
+                                            width={2000}
+                                            height={3000}
+                                            alt='bg-img'
+                                            className='w-full rounded-[30px]'
+                                        />
+                                    </div>
+                                    <div className="bg-img">
+                                        <Image
+                                            src={'/images/other/about-us3.png'}
+                                            width={2000}
+                                            height={3000}
+                                            alt='bg-img'
+                                            className='w-full rounded-[30px]'
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

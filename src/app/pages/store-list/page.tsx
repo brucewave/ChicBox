@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image';
 import Link from 'next/link';
 import TopNavOne from '@/components/Header/TopNav/TopNavOne'
@@ -7,7 +7,27 @@ import MenuOne from '@/components/Header/Menu/MenuOne'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import Footer from '@/components/Footer/Footer'
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.roomily.tech';
+
 const StoreList = () => {
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch(`${baseUrl}/api/v1/products`);
+                const data = await res.json();
+                setProducts(Array.isArray(data.content) ? data.content.slice(0, 3) : []);
+            } catch (e) {
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
     return (
         <>
             <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
@@ -19,13 +39,20 @@ const StoreList = () => {
                 <div className="container">
                     <div className="item bg-surface overflow-hidden rounded-[20px]">
                         <div className="flex items-center lg:justify-end relative max-lg:flex-col">
-                            <Image
-                                src={'/images/other/store-list-office1.png'}
-                                width={3000}
-                                height={2000}
-                                alt='bg-img'
-                                className='lg:absolute relative top-0 left-0 lg:bottom-0 lg:w-1/2 w-full h-full object-cover'
-                            />
+                            {loading ? (
+                                <div className="lg:absolute relative top-0 left-0 lg:bottom-0 lg:w-1/2 w-full h-64 bg-gray-200 animate-pulse"></div>
+                            ) : (
+                                <Image
+                                    src={products[0]?.primaryImageUrl 
+                                        ? `${baseUrl}/api/v1/images/${products[0].primaryImageUrl}`
+                                        : '/images/other/store-list-office1.png'
+                                    }
+                                    width={3000}
+                                    height={2000}
+                                    alt={products[0]?.name || 'New York Office'}
+                                    className='lg:absolute relative top-0 left-0 lg:bottom-0 lg:w-1/2 w-full h-full object-cover'
+                                />
+                            )}
                             <div className="text-content lg:w-1/2 lg:pr-20 lg:pl-[100px] lg:py-14 sm:py-10 py-6 max-lg:px-6">
                                 <div className="heading3">New York Office</div>
                                 <div className="list-featrue lg:mt-10 mt-6">
@@ -112,24 +139,38 @@ const StoreList = () => {
                                     </div>
                                 </div>
                             </div>
-                            <Image
-                                src={'/images/other/store-list-office2.png'}
-                                width={3000}
-                                height={2000}
-                                alt='bg-img'
-                                className='lg:absolute relative top-0 right-0 bottom-0 lg:bottom-0 lg:w-1/2 w-full h-full object-cover'
-                            />
+                            {loading ? (
+                                <div className="lg:absolute relative top-0 right-0 bottom-0 lg:bottom-0 lg:w-1/2 w-full h-64 bg-gray-200 animate-pulse"></div>
+                            ) : (
+                                <Image
+                                    src={products[1]?.primaryImageUrl 
+                                        ? `${baseUrl}/api/v1/images/${products[1].primaryImageUrl}`
+                                        : '/images/other/store-list-office2.png'
+                                    }
+                                    width={3000}
+                                    height={2000}
+                                    alt={products[1]?.name || 'Chicago Office'}
+                                    className='lg:absolute relative top-0 right-0 bottom-0 lg:bottom-0 lg:w-1/2 w-full h-full object-cover'
+                                />
+                            )}
                         </div>
                     </div>
                     <div className="item bg-surface overflow-hidden rounded-[20px] md:mt-20 mt-10">
                         <div className="flex items-center lg:justify-end relative max-lg:flex-col">
-                            <Image
-                                src={'/images/other/store-list-office3.png'}
-                                width={3000}
-                                height={2000}
-                                alt='bg-img'
-                                className='lg:absolute relative top-0 left-0 lg:bottom-0 lg:w-1/2 w-full h-full object-cover'
-                            />
+                            {loading ? (
+                                <div className="lg:absolute relative top-0 left-0 lg:bottom-0 lg:w-1/2 w-full h-64 bg-gray-200 animate-pulse"></div>
+                            ) : (
+                                <Image
+                                    src={products[2]?.primaryImageUrl 
+                                        ? `${baseUrl}/api/v1/images/${products[2].primaryImageUrl}`
+                                        : '/images/other/store-list-office3.png'
+                                    }
+                                    width={3000}
+                                    height={2000}
+                                    alt={products[2]?.name || 'San Francisco Office'}
+                                    className='lg:absolute relative top-0 left-0 lg:bottom-0 lg:w-1/2 w-full h-full object-cover'
+                                />
+                            )}
                             <div className="text-content lg:w-1/2 lg:pr-20 lg:pl-[100px] lg:py-14 sm:py-10 py-6 max-lg:px-6">
                                 <div className="heading3">San Francisco Office</div>
                                 <div className="list-featrue lg:mt-10 mt-6">
