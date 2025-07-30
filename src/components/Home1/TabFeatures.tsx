@@ -95,7 +95,7 @@ const TabFeatures: React.FC = () => {
                 <div className="container">
                     <div className="heading flex flex-col items-center text-center">
                         <div className="menu-tab flex items-center gap-2 p-1 bg-surface rounded-2xl">
-                            {['on sale', 'new arrivals'].map((item, index) => (
+                            {['Đang giảm giá', 'Hàng mới về'].map((item, index) => (
                                 <div
                                     key={index}
                                     className={`tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black ${activeTab === item ? 'active' : ''}`}
@@ -114,7 +114,7 @@ const TabFeatures: React.FC = () => {
 
                     <div className="list-product hide-product-sold section-swiper-navigation style-outline style-border md:mt-10 mt-6">
                         {loading ? (
-                            <div className="text-center py-10">Loading...</div>
+                            <div className="text-center py-10">Đang tải...</div>
                         ) : (
                             <Swiper
                                 spaceBetween={12}

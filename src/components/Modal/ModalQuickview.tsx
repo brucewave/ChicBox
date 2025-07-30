@@ -97,7 +97,7 @@ const ModalQuickview = () => {
                     addToCompare(selectedProduct);
                 }
             } else {
-                alert('Compare up to 3 products')
+                alert('Chỉ so sánh tối đa 3 sản phẩm!')
             }
         }
         openModalCompare();
@@ -129,7 +129,7 @@ const ModalQuickview = () => {
                         </div>
                         <div className="right w-full px-4">
                             <div className="heading pb-6 px-4 flex items-center justify-between relative">
-                                <div className="heading5">Quick View</div>
+                                <div className="heading5">Xem nhanh</div>
                                 <div
                                     className="close-btn absolute right-0 top-0 w-6 h-6 rounded-full bg-surface flex items-center justify-center duration-300 cursor-pointer hover:bg-black hover:text-white"
                                     onClick={closeQuickview}
@@ -146,14 +146,14 @@ const ModalQuickview = () => {
                                 </div>
                                 <div className="flex items-center mt-3">
                                     <Rate currentRate={selectedProduct?.rate} size={14} />
-                                    <span className='caption1 text-secondary'>({selectedProduct?.sold || 0} reviews)</span>
+                                    {/* <span className='caption1 text-secondary'>({selectedProduct?.sold || 0} đánh giá)</span> */}
                                 </div>
                                 <div className="flex items-center gap-3 flex-wrap mt-3 pb-6 border-b border-line">
-                                    <div className="product-price heading5">${selectedProduct?.price}.00</div>
+                                    <div className="product-price heading5">{Math.round(selectedProduct?.price || 0).toLocaleString('vi-VN')} VNĐ</div>
                                     {selectedProduct?.originPrice && selectedProduct?.originPrice > selectedProduct?.price && (
                                         <>
                                             <div className='w-px h-4 bg-line'></div>
-                                            <div className="product-origin-price font-normal text-secondary2"><del>${selectedProduct?.originPrice}.00</del></div>
+                                            <div className="product-origin-price font-normal text-secondary2"><del>{Math.round(selectedProduct?.originPrice).toLocaleString('vi-VN')} VNĐ</del></div>
                                             <div className="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">
                                                 -{Math.floor(100 - ((selectedProduct?.price / selectedProduct?.originPrice) * 100))}%
                                             </div>
@@ -162,7 +162,7 @@ const ModalQuickview = () => {
                                 </div>
                                 <div className="list-action mt-6">
                                     <div className="choose-color">
-                                        <div className="text-title">Colors: <span className='text-title color'>{activeColor}</span></div>
+                                        <div className="text-title">Màu sắc: <span className='text-title color'>{activeColor}</span></div>
                                         <div className="list-color flex items-center gap-2 flex-wrap mt-3">
                                             {selectedProduct?.variation.map((item, index) => (
                                                 <div
@@ -185,12 +185,12 @@ const ModalQuickview = () => {
                                     </div>
                                     <div className="choose-size mt-5">
                                         <div className="heading flex items-center justify-between">
-                                            <div className="text-title">Size: <span className='text-title size'>{activeSize}</span></div>
+                                            <div className="text-title">Kích cỡ: <span className='text-title size'>{activeSize}</span></div>
                                             <div
                                                 className="caption1 size-guide text-red underline cursor-pointer"
                                                 onClick={handleOpenSizeGuide}
                                             >
-                                                Size Guide
+                                                Hướng dẫn chọn size
                                             </div>
                                             <ModalSizeguide data={selectedProduct} isOpen={openSizeGuide} onClose={handleCloseSizeGuide} />
                                         </div>
@@ -206,7 +206,7 @@ const ModalQuickview = () => {
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="text-title mt-5">Quantity:</div>
+                                    <div className="text-title mt-5">Số lượng:</div>
                                     <div className="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
                                         <div className="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
                                             <Icon.Minus
@@ -219,7 +219,7 @@ const ModalQuickview = () => {
                                                 className='cursor-pointer body1'
                                             />
                                         </div>
-                                        <div onClick={handleAddToCart} className="button-main w-full text-center bg-white text-black border border-black">Add To Cart</div>
+                                        <div onClick={handleAddToCart} className="button-main w-full text-center bg-white text-black border border-black">Thêm vào giỏ hàng</div>
                                     </div>
                                 </div>
                             </div>

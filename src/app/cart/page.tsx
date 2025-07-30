@@ -313,7 +313,7 @@ const Cart = () => {
             <TopNavOne props="style-one bg-black"/>
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
-                <Breadcrumb heading='Shopping cart' subHeading='Shopping cart' />
+                <Breadcrumb heading='Giỏ hàng' subHeading='Giỏ hàng' />
             </div>
             <div className="cart-block md:py-20 py-10">
                 <div className="container">
@@ -321,16 +321,16 @@ const Cart = () => {
                         <div className="xl:w-2/3 xl:pr-3 w-full">
                             <div className="time bg-green py-3 px-5 flex items-center rounded-lg">
                                 <div className="heding5">🔥</div>
-                                <div className="caption1 pl-2">Your cart will expire in
+                                <div className="caption1 pl-2">Giỏ hàng của bạn sẽ hết hạn sau
                                     <span className="min text-red text-button fw-700"> {timeLeft.minutes}:{timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds}</span>
-                                    <span> minutes! Please checkout now before your items sell out!</span>
+                                    <span> phút! Vui lòng thanh toán ngay để giữ sản phẩm.</span>
                                 </div>
                             </div>
                             <div className="heading banner mt-5">
-                                <div className="text">Buy
-                                    <span className="text-button"> $<span className="more-price">{moneyForFreeship - totalCart > 0 ? (<>{moneyForFreeship - totalCart}</>) : (0)}</span>.00 </span>
-                                    <span>more to get </span>
-                                    <span className="text-button">freeship</span>
+                                <div className="text">Mua thêm
+                                    <span className="text-button"> {moneyForFreeship - totalCart > 0 ? (<>{Math.round(moneyForFreeship - totalCart).toLocaleString('vi-VN')}</>) : (0)} VNĐ </span>
+                                    <span>để được </span>
+                                    <span className="text-button">miễn phí vận chuyển</span>
                                 </div>
                                 <div className="tow-bar-block mt-4">
                                     <div
@@ -344,22 +344,22 @@ const Cart = () => {
                                     <div className="heading bg-surface bora-4 pt-4 pb-4">
                                         <div className="flex">
                                             <div className="w-1/2">
-                                                <div className="text-button text-center">Products</div>
+                                                <div className="text-button text-center">Sản phẩm</div>
                                             </div>
                                             <div className="w-1/12">
-                                                <div className="text-button text-center">Price</div>
+                                                <div className="text-button text-center">Đơn giá</div>
                                             </div>
                                             <div className="w-1/6">
-                                                <div className="text-button text-center">Quantity</div>
+                                                <div className="text-button text-center">Số lượng</div>
                                             </div>
                                             <div className="w-1/6">
-                                                <div className="text-button text-center">Total Price</div>
+                                                <div className="text-button text-center">Thành tiền</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="list-product-main w-full mt-3">
                                         {cartState.cartArray.length < 1 ? (
-                                            <p className='text-button pt-3'>No product in cart</p>
+                                            <p className='text-button pt-3'>Không có sản phẩm nào trong giỏ hàng</p>
                                         ) : (
                                             cartState.cartArray.map((product) => (
                                                 <div className="item flex md:mt-7 md:pb-7 mt-5 pb-5 border-b border-line w-full" key={product.id}>
@@ -381,7 +381,7 @@ const Cart = () => {
                                                         </div>
                                                     </div>
                                                     <div className="w-1/12 price flex items-center justify-center">
-                                                        <div className="text-title text-center">${product.price}</div>
+                                                        <div className="text-title text-center">{Math.round(product.price).toLocaleString('vi-VN')} VNĐ</div>
                                                     </div>
                                                     <div className="w-1/6 flex items-center justify-center">
                                                         <div className="quantity-block bg-surface md:p-3 p-2 flex items-center justify-between rounded-lg border border-line md:w-[100px] flex-shrink-0 w-20">
@@ -401,7 +401,7 @@ const Cart = () => {
                                                         </div>
                                                     </div>
                                                     <div className="w-1/6 flex total-price items-center justify-center">
-                                                        <div className="text-title text-center">${product.quantity * product.price}</div>
+                                                        <div className="text-title text-center">{Math.round(product.quantity * product.price).toLocaleString('vi-VN')} VNĐ</div>
                                                     </div>
                                                     <div className="w-1/12 flex items-center justify-center">
                                                         <Icon.XCircle
@@ -425,7 +425,7 @@ const Cart = () => {
                                 >
                                     <input 
                                         type="text" 
-                                        placeholder='Add voucher discount' 
+                                        placeholder='Nhập mã giảm giá' 
                                         className={`w-full h-full bg-surface pl-4 pr-14 rounded-lg border border-line ${
                                             selectedCoupon ? 'bg-gray-100 cursor-not-allowed' : ''
                                         }`}
@@ -440,7 +440,7 @@ const Cart = () => {
                                         }`}
                                         disabled={!!selectedCoupon}
                                     >
-                                        {selectedCoupon ? 'Applied' : 'Apply Code'}
+                                        {selectedCoupon ? 'Đã áp dụng' : 'Áp dụng mã'}
                                     </button>
                                 </form>
                                 {couponError && <div className="text-red-500 text-sm mt-2">{couponError}</div>}
@@ -449,20 +449,20 @@ const Cart = () => {
                                 <div className={`item ${freeItemApplied ? 'bg-green' : ''} border border-line rounded-lg py-2`}>
                                     <div className="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
                                         <div className="left">
-                                            <div className="caption1">Special Offer</div>
-                                            <div className="caption1 font-bold">Buy 5 Get 1 Free</div>
+                                            <div className="caption1">Ưu đãi đặc biệt</div>
+                                            <div className="caption1 font-bold">Mua 5 tặng 1</div>
                                         </div>
                                         <div className="right">
-                                            <div className="caption1">Get your cheapest item free when you buy 5 or more items</div>
+                                            <div className="caption1">Tặng sản phẩm rẻ nhất khi mua từ 5 sản phẩm trở lên</div>
                                         </div>
                                     </div>
                                     <div className="bottom gap-6 items-center flex justify-between px-3 pt-2">
-                                        <div className="text-button-uppercase">Auto Applied</div>
+                                        <div className="text-button-uppercase">Tự động áp dụng</div>
                                         <div
                                             className="button-main py-1 px-2.5 capitalize text-xs"
                                             onClick={handleApplyFreeItem}
                                         >
-                                            {freeItemApplied ? 'Applied' : 'Apply Offer'}
+                                            {freeItemApplied ? 'Đã áp dụng' : 'Áp dụng ưu đãi'}
                                         </div>
                                     </div>
                                 </div>
@@ -472,7 +472,7 @@ const Cart = () => {
                                     <>
                                         {userCoupons.length > 0 && (
                                             <div className="w-full mt-4">
-                                                <div className="text-button mb-3">Your Coupons</div>
+                                                <div className="text-button mb-3">Mã giảm giá của bạn</div>
                                                 {userCoupons
                                                     .filter(coupon => 
                                                         coupon.remainingUses > 0 && 
@@ -484,21 +484,21 @@ const Cart = () => {
                                                         <div className="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
                                                             <div className="left">
                                                                 <div className="caption1">{coupon.name}</div>
-                                                                <div className="caption1 font-bold">{coupon.couponPercentage}% OFF</div>
+                                                                <div className="caption1 font-bold">Giảm {coupon.couponPercentage}%</div>
                                                             </div>
                                                             <div className="right">
-                                                                <div className="caption1">Valid until<br />{new Date(coupon.validUntil).toLocaleDateString()}</div>
+                                                                <div className="caption1">Có hiệu lực đến<br />{new Date(coupon.validUntil).toLocaleDateString()}</div>
                                                             </div>
                                                         </div>
                                                         <div className="bottom gap-6 items-center flex justify-between px-3 pt-2">
-                                                            <div className="text-button-uppercase">Code: {coupon.couponCode}</div>
+                                                            <div className="text-button-uppercase">Mã: {coupon.couponCode}</div>
                                                             <div
                                                                 className={`button-main py-1 px-2.5 capitalize text-xs ${
                                                                     selectedCoupon?.id === coupon.id ? 'bg-gray-400 cursor-not-allowed' : ''
                                                                 }`}
                                                                 onClick={() => selectedCoupon?.id !== coupon.id && handleDirectApplyCoupon(coupon)}
                                                             >
-                                                                {selectedCoupon?.id === coupon.id ? 'Applied' : 'Apply Code'}
+                                                                {selectedCoupon?.id === coupon.id ? 'Đã áp dụng' : 'Áp dụng mã'}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -506,9 +506,9 @@ const Cart = () => {
                                             </div>
                                         )}
                                         <div className="w-full mt-4">
-                                            <div className="text-button mb-3">Available Coupons</div>
+                                            <div className="text-button mb-3">Mã giảm giá khả dụng</div>
                                             {coupons.length === 0 ? (
-                                                <div className="text-center py-4 text-gray-500">No available coupons at the moment</div>
+                                                <div className="text-center py-4 text-gray-500">Hiện không có mã giảm giá nào</div>
                                             ) : (
                                                 coupons
                                                     .filter(coupon => 
@@ -521,21 +521,21 @@ const Cart = () => {
                                                         <div className="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
                                                             <div className="left">
                                                                 <div className="caption1">{coupon.name}</div>
-                                                                <div className="caption1 font-bold">{coupon.couponPercentage}% OFF</div>
+                                                                <div className="caption1 font-bold">Giảm {coupon.couponPercentage}%</div>
                                                             </div>
                                                             <div className="right">
-                                                                <div className="caption1">Valid until<br />{new Date(coupon.validUntil).toLocaleDateString()}</div>
+                                                                <div className="caption1">Có hiệu lực đến<br />{new Date(coupon.validUntil).toLocaleDateString()}</div>
                                                             </div>
                                                         </div>
                                                         <div className="bottom gap-6 items-center flex justify-between px-3 pt-2">
-                                                            <div className="text-button-uppercase">Code: {coupon.couponCode}</div>
+                                                            <div className="text-button-uppercase">Mã: {coupon.couponCode}</div>
                                                             <div
                                                                 className={`button-main py-1 px-2.5 capitalize text-xs ${
                                                                     selectedCoupon?.id === coupon.id ? 'bg-gray-400 cursor-not-allowed' : ''
                                                                 }`}
                                                                 onClick={() => selectedCoupon?.id !== coupon.id && handleDirectApplyCoupon(coupon)}
                                                             >
-                                                                {selectedCoupon?.id === coupon.id ? 'Applied' : 'Apply Code'}
+                                                                {selectedCoupon?.id === coupon.id ? 'Đã áp dụng' : 'Áp dụng mã'}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -548,17 +548,17 @@ const Cart = () => {
                         </div>
                         <div className="xl:w-1/3 xl:pl-12 w-full">
                             <div className="checkout-block bg-surface p-6 rounded-2xl">
-                                <div className="heading5">Order Summary</div>
+                                <div className="heading5">Tóm tắt đơn hàng</div>
                                 <div className="total-block py-5 flex justify-between border-b border-line">
-                                    <div className="text-title">Subtotal</div>
-                                    <div className="text-title">$<span className="total-product">{totalCart}</span><span></span></div>
+                                    <div className="text-title">Tạm tính</div>
+                                    <div className="text-title"><span className="total-product">{Math.round(totalCart).toLocaleString('vi-VN')}</span> VNĐ<span></span></div>
                                 </div>
                                 <div className="discount-block py-5 flex justify-between border-b border-line">
-                                    <div className="text-title">Discounts</div>
-                                    <div className="text-title"> <span>-$</span><span className="discount">{discountCart}</span><span></span></div>
+                                    <div className="text-title">Giảm giá</div>
+                                    <div className="text-title"> <span>-</span><span className="discount">{Math.round(discountCart).toLocaleString('vi-VN')}</span> VNĐ<span></span></div>
                                 </div>
                                 <div className="ship-block py-5 flex justify-between border-b border-line">
-                                    <div className="text-title">Shipping</div>
+                                    <div className="text-title">Vận chuyển</div>
                                     <div className="choose-type flex gap-12">
                                         <div className="left">
                                             <div className="type">
@@ -579,7 +579,7 @@ const Cart = () => {
                                                             onChange={() => setShipCart(0)}
                                                         />
                                                     )}
-                                                < label className="pl-1" htmlFor="shipping">Free Shipping:</label>
+                                                < label className="pl-1" htmlFor="shipping">Miễn phí vận chuyển:</label>
                                             </div>
                                             <div className="type mt-1">
                                                 <input
@@ -590,7 +590,7 @@ const Cart = () => {
                                                     checked={shipCart === 30}
                                                     onChange={() => setShipCart(30)}
                                                 />
-                                                <label className="text-on-surface-variant1 pl-1" htmlFor="local">Local:</label>
+                                                <label className="text-on-surface-variant1 pl-1" htmlFor="local">Nội thành:</label>
                                             </div>
                                             <div className="type mt-1">
                                                 <input
@@ -601,27 +601,27 @@ const Cart = () => {
                                                     checked={shipCart === 40}
                                                     onChange={() => setShipCart(40)}
                                                 />
-                                                <label className="text-on-surface-variant1 pl-1" htmlFor="flat">Flat Rate:</label>
+                                                <label className="text-on-surface-variant1 pl-1" htmlFor="flat">Giao tiêu chuẩn:</label>
                                             </div>
                                         </div>
                                         <div className="right">
-                                            <div className="ship">$0</div>
-                                            <div className="local text-on-surface-variant1 mt-1">$30</div>
-                                            <div className="flat text-on-surface-variant1 mt-1">$40</div>
+                                            <div className="ship">0 VNĐ</div>
+                                            <div className="local text-on-surface-variant1 mt-1">30.000 VNĐ</div>
+                                            <div className="flat text-on-surface-variant1 mt-1">40.000 VNĐ</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="total-cart-block pt-4 pb-4 flex justify-between">
-                                    <div className="heading5">Total</div>
-                                    <div className="heading5">$
+                                    <div className="heading5">Tổng cộng</div>
+                                    <div className="heading5">
                                         <span className="total-cart heading5">
-                                            {selectedCoupon ? (totalCart - discountCart + shipCart).toFixed(2) : (totalCart + shipCart).toFixed(2)}
-                                        </span>
+                                            {selectedCoupon ? Math.round(totalCart - discountCart + shipCart).toLocaleString('vi-VN') : Math.round(totalCart + shipCart).toLocaleString('vi-VN')}
+                                        </span> VNĐ
                                     </div>
                                 </div>
                                 <div className="block-button flex flex-col items-center gap-y-4 mt-5">
-                                    <div className="checkout-btn button-main text-center w-full" onClick={redirectToCheckout}>Process To Checkout</div>
-                                    <Link className="text-button hover-underline" href={"/shop/breadcrumb1"}>Continue shopping</Link>
+                                    <div className="checkout-btn button-main text-center w-full" onClick={redirectToCheckout}>Tiến hành thanh toán</div>
+                                    <Link className="text-button hover-underline" href={"/shop/breadcrumb1"}>Tiếp tục mua sắm</Link>
                                 </div>
                             </div>
                         </div>

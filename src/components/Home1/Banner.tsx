@@ -58,8 +58,8 @@ const Banner = () => {
                                 />
                             </div>
                             <div className="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                                <div className="heading2 text-white">{products[0]?.name || 'Best Seller'}</div>
-                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
+                                <div className="heading2 text-white">{products[0]?.name || 'Bán chạy nhất'}</div>
+                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Mua ngay</div>
                             </div>
                         </Link>
                         <Link href={`/product/default?id=${products[1]?.id}`} className="banner-item relative block overflow-hidden duration-500">
@@ -77,8 +77,8 @@ const Banner = () => {
                                 />
                             </div>
                             <div className="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                                <div className="heading2 text-white">{products[1]?.name || 'New Arrivals'}</div>
-                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
+                                <div className="heading2 text-white">{products[1]?.name || 'Hàng mới về'}</div>
+                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Mua ngay</div>
                             </div>
                         </Link>
                     </>
@@ -96,8 +96,8 @@ const Banner = () => {
                                 />
                             </div>
                             <div className="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                                <div className="heading2 text-white">Best Seller</div>
-                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
+                                <div className="heading2 text-white">Bán chạy nhất</div>
+                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Mua ngay</div>
                             </div>
                         </Link>
                         <Link href={'/shop/default-grid'} className="banner-item relative block overflow-hidden duration-500">
@@ -112,8 +112,8 @@ const Banner = () => {
                                 />
                             </div>
                             <div className="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                                <div className="heading2 text-white">New Arrivals</div>
-                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
+                                <div className="heading2 text-white">Hàng mới về</div>
+                                <div className="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Mua ngay</div>
                             </div>
                         </Link>
                     </>

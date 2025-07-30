@@ -61,14 +61,14 @@ const ModalSizeguide: React.FC<Props> = ({ data, isOpen, onClose }) => {
                     >
                         <Icon.X size={14} />
                     </div>
-                    <div className="heading3">Size guide</div>
+                    <div className="heading3">Hướng dẫn chọn size</div>
                     <div className="md:mt-8 mt-6 progress">
                         <div className="flex imd:items-center gap-10 justify-between max-md:flex-col gap-y-5 max-md:pr-3">
                             <div className="flex items-center flex-shrink-0 gap-8">
-                                <span className='flex-shrink-0 md:w-14'>Height</span>
+                                <span className='flex-shrink-0 md:w-14'>Chiều cao</span>
                                 <div className="flex items-center justify-center w-20 gap-1 py-2 border border-line rounded-lg flex-shrink-0">
                                     <span>{heightRange.max}</span>
-                                    <span className='caption1 text-secondary'>Cm</span>
+                                    <span className='caption1 text-secondary'>cm</span>
                                 </div>
                             </div>
                             <Slider
@@ -81,10 +81,10 @@ const ModalSizeguide: React.FC<Props> = ({ data, isOpen, onClose }) => {
                         </div>
                         <div className="flex md:items-center gap-10 justify-between max-md:flex-col gap-y-5 max-md:pr-3 mt-5">
                             <div className="flex items-center gap-8 flex-shrink-0">
-                                <span className='flex-shrink-0 md:w-14'>Weight</span>
+                                <span className='flex-shrink-0 md:w-14'>Cân nặng</span>
                                 <div className="flex items-center justify-center w-20 gap-1 py-2 border border-line rounded-lg flex-shrink-0">
                                     <span>{weightRange.max}</span>
-                                    <span className='caption1 text-secondary'>Kg</span>
+                                    <span className='caption1 text-secondary'>kg</span>
                                 </div>
                             </div>
                             <Slider
@@ -96,7 +96,7 @@ const ModalSizeguide: React.FC<Props> = ({ data, isOpen, onClose }) => {
                             />
                         </div>
                     </div>
-                    <div className="heading6 mt-8">suggests for you:</div>
+                    <div className="heading6 mt-8">Gợi ý cho bạn:</div>
                     <div className="list-size flex items-center gap-2 flex-wrap mt-3">
                         {data?.sizes.map((item, index) => (
                             <div
@@ -111,9 +111,9 @@ const ModalSizeguide: React.FC<Props> = ({ data, isOpen, onClose }) => {
                         <thead>
                             <tr>
                                 <th>Size</th>
-                                <th>Bust</th>
-                                <th>Waist</th>
-                                <th>Low Hip</th>
+                                <th>Vòng ngực</th>
+                                <th>Vòng eo</th>
+                                <th>Vòng mông</th>
                             </tr>
                         </thead>
                         <tbody>

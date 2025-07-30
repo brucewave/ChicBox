@@ -220,78 +220,212 @@ const AddProductPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!primaryImage) {
-      toast.error('Please select a primary image');
+      toast.error('Vui lòng chọn ảnh đại diện');
       return;
     }
-
+    // Validation categoryId bắt buộc
+    if (!formData.categoryId) {
+      toast.error('Vui lòng chọn danh mục sản phẩm');
+      return;
+    }
+    // Validation conditionPoints <= 10
+    if (Number(formData.conditionPoints) > 10) {
+      toast.error('Điểm chất lượng không được vượt quá 10');
+      return;
+    }
     try {
+      // 1. Gửi thông tin sản phẩm (không gửi ảnh)
       const formDataToSend = new FormData();
-      
-      // Add all form fields
+      const numberFields = [
+        'price', 'stockQuantity', 'discount', 'categoryId', 'interest', 'lifetime', 'capitalPrice', 'conditionPoints', 'shoulder', 'width', 'length', 'arm'
+      ];
+      const booleanFields = ['isIncluded', 'tag'];
       Object.keys(formData).forEach(key => {
-        const value = formData[key as keyof typeof formData];
+        let value = formData[key as keyof typeof formData];
         if (value !== '' && value !== null && value !== undefined) {
-          if (typeof value === 'boolean') {
-            formDataToSend.append(key, value.toString());
+          if (numberFields.includes(key)) {
+            const num = Number(value);
+            if (!isNaN(num)) {
+              formDataToSend.append(key, num.toString());
+            }
+          } else if (booleanFields.includes(key)) {
+            formDataToSend.append(key, value ? 'true' : 'false');
           } else {
             formDataToSend.append(key, value.toString());
           }
         }
       });
+      // Backend vẫn yêu cầu primaryImage trong request tạo sản phẩm
+      formDataToSend.append('primaryImage', primaryImage);
+      // Gửi request tạo sản phẩm (không gửi ảnh)
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      // Log FormData trước khi gửi
+      console.log('=== DEBUG: FormData trước khi gửi ===');
+      formDataToSend.forEach((value, key) => {
+        console.log(key, value);
+      });
+      console.log('=== END DEBUG ===');
+      const createRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataToSend
+      });
+      console.log('=== DEBUG: Response tạo sản phẩm ===');
+      console.log('Status:', createRes.status);
+      console.log('StatusText:', createRes.statusText);
+      if (!createRes.ok) {
+        const errData = await createRes.json().catch(() => ({}));
+        console.log('Error data:', errData);
+        throw new Error(errData.message || 'Không thể tạo sản phẩm');
+      }
+      // Kiểm tra response có content không trước khi parse JSON
+      const responseText = await createRes.text();
+      console.log('Response text:', responseText);
+      let productId = null;
+      if (responseText && responseText.trim()) {
+        try {
+          const createdProduct = JSON.parse(responseText);
+          console.log('Created product:', createdProduct);
+          productId = createdProduct.id || createdProduct.productId || createdProduct.data?.id;
+        } catch (e) {
+          console.log('Failed to parse JSON:', e);
+        }
+      }
+      // Nếu không lấy được productId từ response, thử lấy từ Location header
+      if (!productId) {
+        const locationHeader = createRes.headers.get('Location');
+        if (locationHeader) {
+          const match = locationHeader.match(/\/products\/(\d+)/);
+          if (match) {
+            productId = match[1];
+            console.log('Product ID from Location header:', productId);
+          }
+        }
+      }
+      console.log('Product ID:', productId);
+      if (!productId) {
+        // Thử lấy productId bằng cách gọi API lấy danh sách sản phẩm
+        console.log('Trying to get product ID from product list...');
+        try {
+          const listRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products?size=100`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (listRes.ok) {
+            const listData = await listRes.json();
+            const products = listData.content || [];
+            // Tìm sản phẩm vừa tạo dựa trên name và brandName
+            const newProduct = products.find((p: any) => 
+              p.name === formData.name && p.brandName === formData.brandName
+            );
+            if (newProduct) {
+              productId = newProduct.id;
+              console.log('Found product ID from list:', productId);
+            }
+          }
+        } catch (e) {
+          console.log('Failed to get product ID from list:', e);
+        }
+      }
+      if (!productId) throw new Error('Không lấy được ID sản phẩm sau khi tạo');
+      // 2. Upload tất cả ảnh (primary + bổ sung)
+      console.log('=== DEBUG: Upload ảnh ===');
+      console.log('Product ID:', productId);
+      console.log('Primary image:', primaryImage.name);
+      console.log('Additional images count:', additionalImages.length);
       
-      // Add all images (primary + additional) as a single array
-      const allImages = [primaryImage, ...additionalImages];
-      allImages.forEach((image, index) => {
-        formDataToSend.append('images', image);
+      // Upload primary image trước
+      const primaryFormData = new FormData();
+      primaryFormData.append('images', primaryImage);
+      
+      const primaryUploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${productId}/images?is_primary=true`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: primaryFormData
       });
       
-      console.log('Form data being sent:', Object.fromEntries(formDataToSend.entries()));
+      console.log('=== DEBUG: Response upload ảnh ===');
+      console.log('Primary upload Status:', primaryUploadRes.status);
+      console.log('Primary upload StatusText:', primaryUploadRes.statusText);
       
-      const response = await productService.createProduct(formDataToSend);
+      if (!primaryUploadRes.ok) {
+        const uploadErrData = await primaryUploadRes.json().catch(() => ({}));
+        console.log('Primary upload error data:', uploadErrData);
+        throw new Error(uploadErrData.message || 'Không thể upload ảnh chính');
+      }
       
-      console.log('Product created:', response);
-      
+      // Upload additional images (nếu có)
+      if (additionalImages.length > 0) {
+        console.log('Uploading additional images...');
+        for (const img of additionalImages) {
+          const additionalFormData = new FormData();
+          additionalFormData.append('images', img);
+          
+          const additionalUploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${productId}/images?is_primary=false`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: additionalFormData
+          });
+          
+          if (!additionalUploadRes.ok) {
+            const additionalErrData = await additionalUploadRes.json().catch(() => ({}));
+            console.log('Additional upload error data:', additionalErrData);
+            // Không throw error, chỉ log vì ảnh phụ không quan trọng bằng ảnh chính
+          }
+        }
+      }
+      // 3. Set ảnh đại diện (primary)
+      // Tìm imageId của ảnh đại diện vừa upload
+      let primaryImageId = null;
+      try {
+        const primaryUploadData = await primaryUploadRes.json();
+        console.log('Primary upload data:', primaryUploadData);
+        if (primaryUploadData && Array.isArray(primaryUploadData) && primaryUploadData.length > 0) {
+          // Nếu API trả về mảng image object
+          primaryImageId = primaryUploadData[0]?.id || primaryUploadData[0]?.imageId;
+        } else if (primaryUploadData && primaryUploadData.images && Array.isArray(primaryUploadData.images)) {
+          primaryImageId = primaryUploadData.images[0]?.id || primaryUploadData.images[0]?.imageId;
+        }
+      } catch (e) {
+        console.log('Failed to parse primary upload response:', e);
+      }
+      console.log('Primary image ID:', primaryImageId);
+      if (!primaryImageId) throw new Error('Không lấy được ID ảnh đại diện sau khi upload');
+      const setPrimaryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/${productId}/primary-image/${primaryImageId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log('=== DEBUG: Response set primary image ===');
+      console.log('Status:', setPrimaryRes.status);
+      console.log('StatusText:', setPrimaryRes.statusText);
+      if (!setPrimaryRes.ok) {
+        const errData = await setPrimaryRes.json().catch(() => ({}));
+        console.log('Set primary error data:', errData);
+        throw new Error(errData.message || 'Không thể đặt ảnh đại diện');
+      }
+      const setPrimaryData = await setPrimaryRes.json();
+      console.log('Set primary data:', setPrimaryData);
+      toast.success('Đăng sản phẩm thành công!');
       // Reset form
       setFormData({
-        name: '',
-        description: '',
-        price: '',
-        brandName: '',
-        productSize: '',
-        color: '',
-        conditionPoints: '',
-        stockQuantity: '',
-        isIncluded: false,
-        status: 'AVAILABLE',
-        discount: '',
-        categoryId: '',
-        tag: false,
-        interest: '',
-        lifetime: '',
-        capitalPrice: '',
-        material: '',
-        shoulder: '',
-        width: '',
-        length: '',
-        arm: '',
-        form: '',
-        fault: '',
-        code: '',
+        name: '', description: '', price: '', brandName: '', productSize: '', color: '', conditionPoints: '', stockQuantity: '', isIncluded: false, status: 'AVAILABLE', discount: '', categoryId: '', tag: false, interest: '', lifetime: '', capitalPrice: '', material: '', shoulder: '', width: '', length: '', arm: '', form: '', fault: '', code: ''
       });
       setPrimaryImage(null);
       setAdditionalImages([]);
       setImagePreviews([]);
-      
-      toast.success('Product created successfully!');
-      
-      // Refresh products list
-      fetchProducts();
-      
     } catch (err: any) {
       console.error('Create error:', err);
-      toast.error(`Failed to create product: ${err.message}`);
+      toast.error(`Không thể đăng sản phẩm: ${err.message}`);
     }
   };
 
@@ -301,7 +435,7 @@ const AddProductPage = () => {
     if (!file) return;
 
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-      toast.error('Please upload an Excel file (.xlsx or .xls)');
+      toast.error('Vui lòng tải lên file Excel (.xlsx hoặc .xls)');
       return;
     }
 
@@ -318,10 +452,10 @@ const AddProductPage = () => {
         setExcelData(jsonData);
         setShowPreview(true);
         setImportError('');
-        toast.success(`Successfully loaded ${jsonData.length} rows from Excel file`);
+        toast.success(`Đã tải lên thành công ${jsonData.length} dòng từ file Excel`);
       } catch (error) {
         console.error('Error reading Excel file:', error);
-        toast.error('Failed to read Excel file. Please check the file format.');
+        toast.error('Không thể đọc file Excel. Vui lòng kiểm tra định dạng file.');
       }
     };
     reader.readAsArrayBuffer(file);
@@ -329,7 +463,7 @@ const AddProductPage = () => {
 
   const handleImport = async () => {
     if (excelData.length === 0) {
-      toast.error('Please upload an Excel file first');
+      toast.error('Vui lòng tải lên file Excel trước');
       return;
     }
 
@@ -347,7 +481,7 @@ const AddProductPage = () => {
       });
       
       console.log('Import response:', response.data);
-      toast.success(`Successfully imported ${mappedData.length} products!`);
+      toast.success(`Đã nhập thành công ${mappedData.length} sản phẩm!`);
       
       // Reset import state
       setExcelData([]);
@@ -359,7 +493,7 @@ const AddProductPage = () => {
     } catch (err: any) {
       console.error('Import error:', err);
       setImportError(err.response?.data?.message || 'Failed to import products');
-      toast.error(`Import failed: ${err.response?.data?.message || err.message}`);
+      toast.error(`Nhập không thành công: ${err.response?.data?.message || err.message}`);
     } finally {
       setImporting(false);
     }
@@ -368,23 +502,23 @@ const AddProductPage = () => {
   const downloadTemplate = () => {
     const template = [
       {
-        name: 'Product Name',
-        description: 'Product Description',
+        name: 'Tên sản phẩm',
+        description: 'Mô tả sản phẩm',
         price: 0.00,
-        brandName: 'Brand Name',
-        categoryName: 'Category',
+        brandName: 'Thương hiệu',
+        categoryName: 'Danh mục',
         stockQuantity: 1,
-        status: 'AVAILABLE',
-        material: 'MATERIAL',
-        color: 'Color',
-        productSize: 'Size',
+        status: 'ĐANG BÁN',
+        material: 'CHẤT LIỆU',
+        color: 'MÀU SẮC',
+        productSize: 'SIZE',
         conditionPoints: 10,
         discount: 0.00,
         capitalPrice: 0.00,
         interest: 0.00,
         lifetime: 12.0,
         form: 'CLASSIC_FIT',
-        fault: 'No faults',
+        fault: 'Không lỗi',
         shoulder: 0.0,
         width: 0.0,
         length: 0.0,
@@ -397,10 +531,10 @@ const AddProductPage = () => {
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Products Template');
       XLSX.writeFile(wb, 'products_template.xlsx');
-      toast.success('Template downloaded successfully!');
+      toast.success('Mẫu tải về thành công!');
     } catch (error) {
       console.error('Download error:', error);
-      toast.error('Failed to download template');
+      toast.error('Không thể tải mẫu');
     }
   };
 
@@ -557,11 +691,11 @@ const AddProductPage = () => {
         );
       }
       
-      toast.success('Product updated successfully!');
+      toast.success('Đã cập nhật sản phẩm thành công!');
       closeEditModal();
     } catch (err: any) {
       console.error('Update error:', err);
-      toast.error(`Failed to update product: ${err.message}`);
+      toast.error(`Không thể cập nhật sản phẩm: ${err.message}`);
     }
   };
 
@@ -599,11 +733,11 @@ const AddProductPage = () => {
         setEditForm((prev: any) => ({ ...prev, status: newStatus }));
       }
       
-      toast.success(`Product status updated to ${newStatus}`);
+      toast.success(`Trạng thái sản phẩm đã được cập nhật thành ${newStatus}`);
       
     } catch (err: any) {
       console.error('Status update error:', err);
-      toast.error(`Failed to update status: ${err.message}`);
+      toast.error(`Không thể cập nhật trạng thái: ${err.message}`);
     }
   };
 
@@ -627,332 +761,97 @@ const AddProductPage = () => {
         setFilteredProducts(prev => prev.filter(p => p.id !== productToDelete.id));
       }
       
-      toast.success('Product deleted successfully!');
+      toast.success('Đã xóa sản phẩm thành công!');
       setDeleteModalOpen(false);
       setProductToDelete(null);
     } catch (err: any) {
       console.error('Delete error:', err);
-      toast.error(`Failed to delete product: ${err.message}`);
+      toast.error(`Không thể xóa sản phẩm: ${err.message}`);
     }
   };
 
   return (
     <AdminLayout 
-      title="Add Product" 
-      subtitle="Create a new product for your store"
+      title="Thêm Sản Phẩm" 
+      subtitle="Tạo sản phẩm mới cho cửa hàng của bạn"
     >
-      {/* Product List Section (moved above form) */}
-      <div className="max-w-6xl mx-auto mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">All Products</h2>
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700 mr-2">Sort by:</label>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="border rounded px-2 py-1">
-              <option value="createdAt">Created Date</option>
-              <option value="updatedAt">Updated Date</option>
-              <option value="price">Price</option>
-              <option value="name">Name</option>
-            </select>
-            <select value={sortDir} onChange={e => setSortDir(e.target.value)} className="border rounded px-2 py-1">
-              <option value="desc">Descending</option>
-              <option value="asc">Ascending</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Search Input */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <input
-              type="text"
-              placeholder="Search products by name, brand, category, color, or size..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-          {searchTerm && (
-            <p className="text-sm text-gray-600 mt-2">
-              Found {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} matching "{searchTerm}"
-            </p>
-          )}
-        </div>
-
-        {loadingProducts ? (
-          <div className="text-center py-8">Loading products...</div>
-        ) : errorProducts ? (
-          <div className="text-center text-red-500 py-8">{errorProducts}</div>
-        ) : (
-          <>
-            <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td className="px-4 py-3">
-                        {product.primaryImageUrl ? (
-                          <img src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${product.primaryImageUrl}`} alt={product.name} className="w-16 h-16 object-cover rounded" />
-                        ) : (
-                          <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400">No Image</div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 font-medium">{product.name}</td>
-                      <td className="px-4 py-3">{product.brandName}</td>
-                      <td className="px-4 py-3">{product.categoryName}</td>
-                      <td className="px-4 py-3">${product.price}</td>
-                      <td className="px-4 py-3">{product.stockQuantity}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${product.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{product.status}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            onClick={() => openEditModal(product)}
-                            type="button"
-                            title="Edit product"
-                          >
-                            <FiEdit className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            onClick={() => openDeleteModal(product)}
-                            type="button"
-                            title="Delete product"
-                          >
-                            <FiTrash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredProducts.length === 0 && (
-                <div className="text-center py-8 text-gray-500">No products found.</div>
-              )}
-            </div>
-            {/* Pagination Controls */}
-            <div className="flex justify-between items-center mt-4">
-              <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="text-gray-700">Page {page + 1} of {totalPages}</span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={page >= totalPages - 1}
-                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* XLSX Import Section */}
-      {/* <div className="max-w-4xl mx-auto mb-12">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Import Products from Excel</h3>
-            <button
-              onClick={downloadTemplate}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <FiDownload className="w-4 h-4 mr-2" />
-              Download Template
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <FiFileText className="mx-auto h-12 w-12 text-gray-400" />
-              <div className="mt-4">
-                <label htmlFor="excel-upload" className="cursor-pointer">
-                  <span className="text-blue-600 hover:text-blue-500 font-medium">
-                    Click to upload Excel file
-                  </span>
-                  <span className="text-gray-500"> or drag and drop</span>
-                </label>
-                <input
-                  id="excel-upload"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <p className="text-sm text-gray-500 mt-2">XLSX, XLS files only</p>
-              </div>
-            </div>
-
-            {importError && (
-              <div className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">
-                {importError}
-              </div>
-            )}
-
-            {showPreview && excelData.length > 0 && (
-              <div className="mt-6">
-                <h4 className="text-md font-semibold mb-4">Preview ({excelData.length} products)</h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        {Object.keys(excelData[0]).map((key) => (
-                          <th key={key} className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                            {key}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {excelData.slice(0, 5).map((row, index) => (
-                        <tr key={index}>
-                          {Object.values(row).map((value: any, cellIndex) => (
-                            <td key={cellIndex} className="px-3 py-2 text-sm text-gray-900">
-                              {String(value)}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {excelData.length > 5 && (
-                    <p className="text-sm text-gray-500 mt-2">Showing first 5 rows of {excelData.length} total</p>
-                  )}
-                </div>
-                <div className="mt-4 flex space-x-3">
-                  <button
-                    onClick={handleImport}
-                    disabled={importing}
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                  >
-                    {importing ? 'Importing...' : `Import ${excelData.length} Products`}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setExcelData([]);
-                      setShowPreview(false);
-                    }}
-                    className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div> */}
-
-      {/* Add Product Form Section */}
+      {/* Ẩn danh sách All Product, chỉ giữ lại form thêm sản phẩm */}
       <div className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Thông tin cơ bản</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                <input type="text" name="name" value={formData.name} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tên sản phẩm *</label>
+                <input type="text" name="name" value={formData.name} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập tên sản phẩm" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Price *</label>
-                <input type="number" name="price" value={formData.price} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Giá *</label>
+                <input type="number" name="price" value={formData.price} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập giá" />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-                <textarea name="description" value={formData.description} onChange={handleFormChange} required rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả *</label>
+                <textarea name="description" value={formData.description} onChange={handleFormChange} required rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập mô tả sản phẩm" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Brand Name *</label>
-                <input type="text" name="brandName" value={formData.brandName} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Thương hiệu *</label>
+                <input type="text" name="brandName" value={formData.brandName} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập thương hiệu" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Size *</label>
-                <input type="text" name="productSize" value={formData.productSize} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Size *</label>
+                <input type="text" name="productSize" value={formData.productSize} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập size" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Color *</label>
-                <input type="text" name="color" value={formData.color} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Màu sắc *</label>
+                <input type="text" name="color" value={formData.color} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập màu sắc" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Condition Points *</label>
-                <input type="number" name="conditionPoints" value={formData.conditionPoints} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Điểm chất lượng *</label>
+                <input type="number" name="conditionPoints" value={formData.conditionPoints} onChange={handleFormChange} required max="10" className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập điểm chất lượng (tối đa 10)" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity *</label>
-                <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tồn kho *</label>
+                <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập số lượng tồn kho" />
               </div>
               <div className="flex items-center mt-6">
                 <input type="checkbox" name="isIncluded" checked={formData.isIncluded} onChange={handleFormChange} className="mr-2" />
-                <label className="text-sm font-medium text-gray-700">Is Included</label>
+                <label className="text-sm font-medium text-gray-700">Đã đăng</label>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái *</label>
                 <select name="status" value={formData.status} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg">
-                  <option value="AVAILABLE">AVAILABLE</option>
-                  <option value="INACTIVE">INACTIVE</option>
+                  <option value="AVAILABLE">ĐANG BÁN</option>
+                  <option value="INACTIVE">ẨN</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Discount (%)</label>
-                <input type="number" name="discount" value={formData.discount} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Giảm giá (%)</label>
+                <input type="number" name="discount" value={formData.discount} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập % giảm giá" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category ID *</label>
-                <input type="number" name="categoryId" value={formData.categoryId} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">ID danh mục</label>
+                <input type="number" name="categoryId" value={formData.categoryId} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập ID danh mục (nếu có)" />
               </div>
               <div className="flex items-center mt-6">
                 <input type="checkbox" name="tag" checked={formData.tag} onChange={handleFormChange} className="mr-2" />
                 <label className="text-sm font-medium text-gray-700">Tag</label>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Interest</label>
-                <input type="number" name="interest" value={formData.interest} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Lãi suất</label>
+                <input type="number" name="interest" value={formData.interest} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập lãi suất" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Lifetime</label>
-                <input type="number" name="lifetime" value={formData.lifetime} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tuổi thọ</label>
+                <input type="number" name="lifetime" value={formData.lifetime} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập tuổi thọ" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Capital Price</label>
-                <input type="number" name="capitalPrice" value={formData.capitalPrice} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Giá vốn</label>
+                <input type="number" name="capitalPrice" value={formData.capitalPrice} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập giá vốn" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Material *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Chất liệu *</label>
                 <select name="material" value={formData.material} onChange={handleFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg">
-                  <option value="">Select Material</option>
+                  <option value="">Chọn chất liệu</option>
                   <option value="COTTON">COTTON</option>
                   <option value="OXFORD">OXFORD</option>
                   <option value="KAKI">KAKI</option>
@@ -966,78 +865,63 @@ const AddProductPage = () => {
                   <option value="THUN">THUN</option>
                 </select>
               </div>
+              {/* Form áo dạng dropdown */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Shoulder</label>
-                <input type="number" name="shoulder" value={formData.shoulder} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Form áo</label>
+                <select name="form" value={formData.form} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                  <option value="">Chọn form áo</option>
+                  <option value="SLIM_FIT">SLIM_FIT</option>
+                  <option value="CUSTOM_FIT">CUSTOM_FIT</option>
+                  <option value="CLASSIC_FIT">CLASSIC_FIT</option>
+                </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Width</label>
-                <input type="number" name="width" value={formData.width} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Lỗi</label>
+                <input type="text" name="fault" value={formData.fault} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập lỗi (nếu có)" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Length</label>
-                <input type="number" name="length" value={formData.length} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mã sản phẩm</label>
+                <input type="text" name="code" value={formData.code} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Nhập mã sản phẩm" />
               </div>
+              {/* Ảnh đại diện (primary image) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Arm</label>
-                <input type="number" name="arm" value={formData.arm} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh đại diện *</label>
+                <input type="file" accept="image/*" onChange={handleImageChange} className="w-full" />
+                {imagePreviews.length > 0 && (
+                  <div className="mt-2">
+                    <img src={imagePreviews[0]} alt="Ảnh đại diện" className="w-32 h-32 object-cover rounded border" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Form</label>
-                <input type="text" name="form" value={formData.form} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Fault</label>
-                <input type="text" name="fault" value={formData.fault} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Code</label>
-                <input type="text" name="code" value={formData.code} onChange={handleFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Images *</label>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  multiple
-                  onChange={handleMultipleImagesChange} 
-                  className="w-full" 
-                />
-                <p className="text-sm text-gray-500 mt-1">First image will be used as thumbnail. You can upload multiple images.</p>
-              </div>
-              
-              {/* Image Previews */}
-              {imagePreviews.length > 0 && (
+              {/* Ảnh bổ sung (dropzone) */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Image Previews</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {imagePreviews.map((preview, index) => (
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh bổ sung</label>
+                <input type="file" accept="image/*" multiple onChange={handleMultipleImagesChange} className="w-full" />
+                <p className="text-sm text-gray-500 mt-1">Có thể chọn nhiều ảnh bổ sung.</p>
+                {imagePreviews.length > 1 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-2">
+                    {imagePreviews.slice(1).map((preview, index) => (
                       <div key={index} className="relative group">
                         <img 
                           src={preview} 
-                          alt={`Product image ${index + 1}`} 
+                          alt={`Ảnh bổ sung ${index + 1}`} 
                           className="w-full h-24 object-cover rounded-lg border border-gray-300"
                         />
                         <button
                           type="button"
-                          onClick={() => removeImage(index)}
+                          onClick={() => removeImage(index + 1)}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
                         >
                           ×
                         </button>
-                        {index === 0 && (
-                          <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                            Thumbnail
-                          </div>
-                        )}
                       </div>
                     ))}
-                  </div>
                 </div>
               )}
+              </div>
             </div>
             <div className="flex justify-end space-x-4 mt-6">
-              <button type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Publish Product</button>
+              <button type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Đăng sản phẩm</button>
             </div>
           </div>
         </form>
@@ -1048,49 +932,49 @@ const AddProductPage = () => {
           <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl relative max-h-[90vh] flex flex-col">
             <div className="p-6 border-b border-gray-200">
               <button onClick={closeEditModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-              <h2 className="text-xl font-bold">Edit Product</h2>
+              <h2 className="text-xl font-bold">Chỉnh sửa sản phẩm</h2>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <form onSubmit={handleEditSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên sản phẩm *</label>
                     <input type="text" name="name" value={editForm.name || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Price *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Giá *</label>
                     <input type="number" name="price" value={editForm.price || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả *</label>
                     <textarea name="description" value={editForm.description || ''} onChange={handleEditFormChange} required rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Brand Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thương hiệu *</label>
                     <input type="text" name="brandName" value={editForm.brandName || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Size *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Size *</label>
                     <input type="text" name="productSize" value={editForm.productSize || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Color *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Màu sắc *</label>
                     <input type="text" name="color" value={editForm.color || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Condition Points *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Điểm chất lượng *</label>
                     <input type="number" name="conditionPoints" value={editForm.conditionPoints || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tồn kho *</label>
                     <input type="number" name="stockQuantity" value={editForm.stockQuantity || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div className="flex items-center mt-6">
                     <input type="checkbox" name="isIncluded" checked={!!editForm.isIncluded} onChange={handleEditFormChange} className="mr-2" />
-                    <label className="text-sm font-medium text-gray-700">Is Included</label>
+                    <label className="text-sm font-medium text-gray-700">Đã đăng</label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái *</label>
                     <select 
                       name="status" 
                       value={editForm.status || 'AVAILABLE'} 
@@ -1105,16 +989,16 @@ const AddProductPage = () => {
                       required 
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                     >
-                      <option value="AVAILABLE">AVAILABLE</option>
-                      <option value="INACTIVE">INACTIVE</option>
+                      <option value="AVAILABLE">ĐANG BÁN</option>
+                      <option value="INACTIVE">ẨN</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Discount (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Giảm giá (%)</label>
                     <input type="number" name="discount" value={editForm.discount || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category ID *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">ID danh mục</label>
                     <input type="number" name="categoryId" value={editForm.categoryId || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div className="flex items-center mt-6">
@@ -1122,21 +1006,21 @@ const AddProductPage = () => {
                     <label className="text-sm font-medium text-gray-700">Tag</label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Interest</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Lãi suất</label>
                     <input type="number" name="interest" value={editForm.interest || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Lifetime</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tuổi thọ</label>
                     <input type="number" name="lifetime" value={editForm.lifetime || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Capital Price</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Giá vốn</label>
                     <input type="number" name="capitalPrice" value={editForm.capitalPrice || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Material *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Chất liệu *</label>
                     <select name="material" value={editForm.material || ''} onChange={handleEditFormChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg">
-                      <option value="">Select Material</option>
+                      <option value="">Chọn chất liệu</option>
                       <option value="COTTON">COTTON</option>
                       <option value="OXFORD">OXFORD</option>
                       <option value="KAKI">KAKI</option>
@@ -1151,35 +1035,24 @@ const AddProductPage = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Shoulder</label>
-                    <input type="number" name="shoulder" value={editForm.shoulder || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Form áo</label>
+                    <select name="form" value={editForm.form || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                      <option value="">Chọn form áo</option>
+                      <option value="SLIM_FIT">SLIM_FIT</option>
+                      <option value="CUSTOM_FIT">CUSTOM_FIT</option>
+                      <option value="CLASSIC_FIT">CLASSIC_FIT</option>
+                    </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Width</label>
-                    <input type="number" name="width" value={editForm.width || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Length</label>
-                    <input type="number" name="length" value={editForm.length || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Arm</label>
-                    <input type="number" name="arm" value={editForm.arm || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Form</label>
-                    <input type="text" name="form" value={editForm.form || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Fault</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Lỗi</label>
                     <input type="text" name="fault" value={editForm.fault || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Code</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Mã sản phẩm</label>
                     <input type="text" name="code" value={editForm.code || ''} onChange={handleEditFormChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh sản phẩm</label>
                     <input 
                       type="file" 
                       accept="image/*" 
@@ -1187,28 +1060,23 @@ const AddProductPage = () => {
                       onChange={handleEditMultipleImagesChange} 
                       className="w-full mb-2" 
                     />
-                    <p className="text-sm text-gray-500 mb-2">First image will be used as thumbnail. You can upload multiple images.</p>
+                    <p className="text-sm text-gray-500 mb-2">Ảnh đầu tiên sẽ được sử dụng làm ảnh đại diện. Bạn có thể tải lên nhiều ảnh.</p>
                     
                     {/* Current Images */}
                     {editProduct?.imageUrls && editProduct.imageUrls.length > 0 && editImagePreviews.length === 0 && (
                       <div className="mb-4">
-                        <p className="text-sm text-gray-600 mb-2">Current Images:</p>
+                        <p className="text-sm text-gray-600 mb-2">Ảnh hiện tại:</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                           {editProduct.imageUrls.map((imageUrl: string, index: number) => (
                             <div key={index} className="relative group">
                               <img 
                                 src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${imageUrl}`} 
-                                alt={`Current product image ${index + 1}`} 
+                                alt={`Ảnh sản phẩm hiện tại ${index + 1}`} 
                                 className="w-full h-24 object-cover rounded-lg border border-gray-300"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).style.display = 'none';
                                 }}
                               />
-                              {index === 0 && (
-                                <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                                  Thumbnail
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
@@ -1218,13 +1086,13 @@ const AddProductPage = () => {
                     {/* New Image Previews */}
                     {editImagePreviews.length > 0 && (
                       <div className="mb-4">
-                        <p className="text-sm text-gray-600 mb-2">New Image Previews:</p>
+                        <p className="text-sm text-gray-600 mb-2">Ảnh dự kiến:</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                           {editImagePreviews.map((preview, index) => (
                             <div key={index} className="relative group">
                               <img 
                                 src={preview} 
-                                alt={`New product image ${index + 1}`} 
+                                alt={`Ảnh sản phẩm dự kiến ${index + 1}`} 
                                 className="w-full h-24 object-cover rounded-lg border border-gray-300"
                               />
                               <button
@@ -1234,11 +1102,6 @@ const AddProductPage = () => {
                               >
                                 ×
                               </button>
-                              {index === 0 && (
-                                <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                                  Thumbnail
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
@@ -1250,8 +1113,8 @@ const AddProductPage = () => {
             </div>
             <div className="p-6 border-t border-gray-200">
               <div className="flex justify-end space-x-4">
-                <button type="button" onClick={closeEditModal} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="button" onClick={handleEditSubmit} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Save Changes</button>
+                <button type="button" onClick={closeEditModal} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Hủy</button>
+                <button type="button" onClick={handleEditSubmit} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Lưu thay đổi</button>
               </div>
             </div>
           </div>
@@ -1270,25 +1133,25 @@ const AddProductPage = () => {
                   <FiTrash2 className="w-8 h-8 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Delete Product</h3>
-                  <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                  <h3 className="text-lg font-medium text-gray-900">Xóa sản phẩm</h3>
+                  <p className="text-sm text-gray-500">Hành động này không thể hoàn tác.</p>
                 </div>
               </div>
               <p className="text-gray-700 mb-6">
-                Are you sure you want to delete <strong>"{productToDelete?.name}"</strong>? This will permanently remove the product from your store.
+                Bạn có chắc chắn muốn xóa <strong>"{productToDelete?.name}"</strong>? Điều này sẽ xóa sản phẩm vĩnh viễn khỏi cửa hàng của bạn.
               </p>
               <div className="flex justify-end space-x-3 mt-2">
                 <button
                   onClick={() => setDeleteModalOpen(false)}
                   className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white font-medium hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   onClick={handleDeleteProduct}
                   className="px-6 py-2 bg-red text-white rounded-lg border-2 border-red-700 font-bold shadow-md hover:bg-red-700 hover:border-red-800 transition-colors"
                 >
-                  Delete Product
+                  Xóa sản phẩm
                 </button>
               </div>
             </div>

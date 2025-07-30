@@ -47,7 +47,7 @@ const RotatingBadge: React.FC = () => {
               startOffset="0%"
               className="fill-black drop-shadow-xl"
             >
-              EXPLORE MORE COLLECTION • EXPLORE MORE COLLECTION •
+              KHÁM PHÁ THÊM BỘ SƯU TẬP  KHÁM PHÁ THÊM BỘ SƯU TẬP 
             </textPath>
           </text>
         </svg>

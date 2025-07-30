@@ -16,9 +16,9 @@ const Footer = () => {
                                 </Link>
                                 <div className='flex gap-3 mt-3'>
                                     <div className="flex flex-col ">
-                                        <span className="text-button">Mail:</span>
-                                        <span className="text-button mt-3">Phone:</span>
-                                        <span className="text-button mt-3">Address:</span>
+                                        <span className="text-button">Email:</span>
+                                        <span className="text-button mt-3">Điện thoại:</span>
+                                        <span className="text-button mt-3">Địa chỉ:</span>
                                     </div>
                                     <div className="flex flex-col ">    
                                         <span className=''>info@chicbox.com</span>
@@ -30,35 +30,35 @@ const Footer = () => {
                             <div className="right-content flex flex-wrap gap-y-8 basis-3/4 max-lg:basis-full">
                                 <div className="list-nav flex justify-between basis-2/3 max-md:basis-full gap-4">
                                     <div className="item flex flex-col basis-1/3 ">
-                                        <div className="text-button-uppercase pb-3">Infomation</div>
-                                        <Link className='caption1 has-line-before duration-300 w-fit' href={'/pages/contact'}>Contact us</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'#!'}>Career</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/my-account'}>My Account</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/order-tracking'}>Order  & Returns</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/pages/faqs'}>FAQs</Link>
+                                        <div className="text-button-uppercase pb-3">Thông tin</div>
+                                        <Link className='caption1 has-line-before duration-300 w-fit' href={'/pages/contact'}>Liên hệ</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'#!'}>Tuyển dụng</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/my-account'}>Tài khoản của tôi</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/order-tracking'}>Đơn hàng & Trả hàng</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/pages/faqs'}>Câu hỏi thường gặp</Link>
                                     </div>
                                     <div className="item flex flex-col basis-1/3 ">
-                                        <div className="text-button-uppercase pb-3">Quick Shop</div>
-                                        <Link className='caption1 has-line-before duration-300 w-fit' href={'/shop/breadcrumb1'}>Women</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/shop/breadcrumb1'}>Men</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/shop/breadcrumb1'}>Clothes</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/shop/breadcrumb1'}>Accessories</Link>
+                                        <div className="text-button-uppercase pb-3">Mua nhanh</div>
+                                        <Link className='caption1 has-line-before duration-300 w-fit' href={'/shop/breadcrumb1'}>Nữ</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/shop/breadcrumb1'}>Nam</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/shop/breadcrumb1'}>Quần áo</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/shop/breadcrumb1'}>Phụ kiện</Link>
                                         <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/blog'}>Blog</Link>
                                     </div>
                                     <div className="item flex flex-col basis-1/3 ">
-                                        <div className="text-button-uppercase pb-3">Customer Services</div>
-                                        <Link className='caption1 has-line-before duration-300 w-fit' href={'/pages/faqs'}>Orders FAQs</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/pages/faqs'}>Shipping</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/pages/faqs'}>Privacy Policy</Link>
-                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/order-tracking'}>Return & Refund</Link>
+                                        <div className="text-button-uppercase pb-3">Dịch vụ khách hàng</div>
+                                        <Link className='caption1 has-line-before duration-300 w-fit' href={'/pages/faqs'}>Câu hỏi về đơn hàng</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/pages/faqs'}>Vận chuyển</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/pages/faqs'}>Chính sách bảo mật</Link>
+                                        <Link className='caption1 has-line-before duration-300 w-fit pt-2' href={'/order-tracking'}>Trả hàng & Hoàn tiền</Link>
                                     </div>
                                 </div>
                                 <div className="newsletter basis-1/3 pl-7 max-md:basis-full max-md:pl-0">
-                                    <div className="text-button-uppercase">Newletter</div>
-                                    <div className="caption1 mt-3">Sign up for our newsletter and get 10% off your first purchase</div>
+                                    <div className="text-button-uppercase">Bản tin</div>
+                                    <div className="caption1 mt-3">Đăng ký nhận bản tin và nhận giảm giá 10% cho đơn hàng đầu tiên</div>
                                     <div className="input-block w-full h-[52px] mt-4">
                                         <form className='w-full h-full relative' action="post">
-                                            <input type="email" placeholder='Enter your e-mail' className='caption1 w-full h-full pl-4 pr-14 rounded-xl border border-line' required />
+                                            <input type="email" placeholder='Nhập email của bạn' className='caption1 w-full h-full pl-4 pr-14 rounded-xl border border-line' required />
                                             <button className='w-[44px] h-[44px] bg-black flex items-center justify-center rounded-xl absolute top-1 right-1'>
                                                 <Icon.ArrowRight size={24} color='#fff' />
                                             </button>

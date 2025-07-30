@@ -33,7 +33,7 @@ const StoreList = () => {
             <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
-                <Breadcrumb heading='Store list' subHeading='Store list' />
+                <Breadcrumb heading='Danh sách cửa hàng' subHeading='Danh sách cửa hàng' />
             </div>
             <div className='store-list md:py-20 py-10'>
                 <div className="container">
@@ -54,18 +54,18 @@ const StoreList = () => {
                                 />
                             )}
                             <div className="text-content lg:w-1/2 lg:pr-20 lg:pl-[100px] lg:py-14 sm:py-10 py-6 max-lg:px-6">
-                                <div className="heading3">New York Office</div>
+                                <div className="heading3">Cửa hàng Hà Nội</div>
                                 <div className="list-featrue lg:mt-10 mt-6">
                                     <div className="item flex lg:gap-10 gap-6">
                                         <div className='w-1/2'>
-                                            <div className="heading6">Address:</div>
-                                            <div className="text-secondary mt-2">2163 Phillips Gap Rd West Jefferson, North Carolina</div>
+                                            <div className="heading6">Địa chỉ:</div>
+                                            <div className="text-secondary mt-2">123 Đường Láng, Đống Đa, Hà Nội</div>
                                         </div>
                                         <div className='w-1/2'>
-                                            <div className="heading6">Opentime:</div>
-                                            <div className="text-secondary mt-2 whitespace-nowrap">Monay - Friday:</div>
+                                            <div className="heading6">Giờ mở cửa:</div>
+                                            <div className="text-secondary mt-2 whitespace-nowrap">Thứ 2 - Thứ 6:</div>
                                             <div className='text-title text-black whitespace-nowrap'>08:00 - 20:00</div>
-                                            <div className="text-secondary whitespace-nowrap">Saturday - Sunday:</div>
+                                            <div className="text-secondary whitespace-nowrap">Thứ 7 - Chủ nhật:</div>
                                             <div className='text-title text-black whitespace-nowrap'>10:00 - 18:00</div>
                                         </div>
                                     </div>
@@ -73,12 +73,11 @@ const StoreList = () => {
                                 <div className="list-featrue mt-5">
                                     <div className="item flex lg:gap-10 gap-6">
                                         <div className='w-1/2'>
-                                            <div className="heading6">Infomation:</div>
-                                            <div className="text-secondary mt-2">+1 666 234 8888<br />
-                                                hi.avitex@gmail.com</div>
+                                            <div className="heading6">Thông tin:</div>
+                                            <div className="text-secondary mt-2">+84 24 1234 5678<br />chicbox.hn@gmail.com</div>
                                         </div>
                                         <div className='w-1/2'>
-                                            <div className="heading6">Our social media:</div>
+                                            <div className="heading6">Mạng xã hội:</div>
                                             <div className="flex items-center sm:gap-4 gap-2 mt-2">
                                                 <Link href={'https://www.facebook.com/'} target='_blank' className="item bg-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black hover:text-white duration-300">
                                                     <div className="icon-facebook"></div>
@@ -99,18 +98,18 @@ const StoreList = () => {
                     <div className="item bg-surface overflow-hidden rounded-[20px] md:mt-20 mt-10">
                         <div className="flex items-center justify-start relative max-lg:flex-col-reverse">
                             <div className="text-content lg:w-1/2 w-full lg:pl-20 lg:pr-[100px] lg:py-14 sm:py-10 py-6 max-lg:px-6">
-                                <div className="heading3">Chicago Office</div>
+                                <div className="heading3">Cửa hàng TP. Hồ Chí Minh</div>
                                 <div className="list-featrue lg:mt-10 mt-6">
                                     <div className="item flex lg:gap-10 gap-6">
                                         <div className='w-1/2'>
-                                            <div className="heading6">Address:</div>
-                                            <div className="text-secondary mt-2">2163 Phillips Gap Rd West Jefferson, North Carolina</div>
+                                            <div className="heading6">Địa chỉ:</div>
+                                            <div className="text-secondary mt-2">456 Nguyễn Trãi, Quận 5, TP. Hồ Chí Minh</div>
                                         </div>
                                         <div className='w-1/2'>
-                                            <div className="heading6">Opentime:</div>
-                                            <div className="text-secondary mt-2 whitespace-nowrap">Monay - Friday:</div>
+                                            <div className="heading6">Giờ mở cửa:</div>
+                                            <div className="text-secondary mt-2 whitespace-nowrap">Thứ 2 - Thứ 6:</div>
                                             <div className='text-title text-black whitespace-nowrap'>08:00 - 20:00</div>
-                                            <div className="text-secondary whitespace-nowrap">Saturday - Sunday:</div>
+                                            <div className="text-secondary whitespace-nowrap">Thứ 7 - Chủ nhật:</div>
                                             <div className='text-title text-black whitespace-nowrap'>10:00 - 18:00</div>
                                         </div>
                                     </div>
@@ -118,12 +117,11 @@ const StoreList = () => {
                                 <div className="list-featrue mt-5">
                                     <div className="item flex lg:gap-10 gap-6">
                                         <div className='w-1/2'>
-                                            <div className="heading6">Infomation:</div>
-                                            <div className="text-secondary mt-2">+1 666 234 8888<br />
-                                                hi.avitex@gmail.com</div>
+                                            <div className="heading6">Thông tin:</div>
+                                            <div className="text-secondary mt-2">+84 28 8765 4321<br />chicbox.hcm@gmail.com</div>
                                         </div>
                                         <div className='w-1/2'>
-                                            <div className="heading6">Our social media:</div>
+                                            <div className="heading6">Mạng xã hội:</div>
                                             <div className="flex items-center sm:gap-4 gap-2 mt-2">
                                                 <Link href={'https://www.facebook.com/'} target='_blank' className="item bg-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black hover:text-white duration-300">
                                                     <div className="icon-facebook"></div>
@@ -172,18 +170,18 @@ const StoreList = () => {
                                 />
                             )}
                             <div className="text-content lg:w-1/2 lg:pr-20 lg:pl-[100px] lg:py-14 sm:py-10 py-6 max-lg:px-6">
-                                <div className="heading3">San Francisco Office</div>
+                                <div className="heading3">Cửa hàng Đà Nẵng</div>
                                 <div className="list-featrue lg:mt-10 mt-6">
                                     <div className="item flex lg:gap-10 gap-6">
                                         <div className='w-1/2'>
-                                            <div className="heading6">Address:</div>
-                                            <div className="text-secondary mt-2">2163 Phillips Gap Rd West Jefferson, North Carolina</div>
+                                            <div className="heading6">Địa chỉ:</div>
+                                            <div className="text-secondary mt-2">789 Bạch Đằng, Hải Châu, Đà Nẵng</div>
                                         </div>
                                         <div className='w-1/2'>
-                                            <div className="heading6">Opentime:</div>
-                                            <div className="text-secondary mt-2 whitespace-nowrap">Monay - Friday:</div>
+                                            <div className="heading6">Giờ mở cửa:</div>
+                                            <div className="text-secondary mt-2 whitespace-nowrap">Thứ 2 - Thứ 6:</div>
                                             <div className='text-title text-black whitespace-nowrap'>08:00 - 20:00</div>
-                                            <div className="text-secondary whitespace-nowrap">Saturday - Sunday:</div>
+                                            <div className="text-secondary whitespace-nowrap">Thứ 7 - Chủ nhật:</div>
                                             <div className='text-title text-black whitespace-nowrap'>10:00 - 18:00</div>
                                         </div>
                                     </div>
@@ -191,12 +189,11 @@ const StoreList = () => {
                                 <div className="list-featrue mt-5">
                                     <div className="item flex lg:gap-10 gap-6">
                                         <div className='w-1/2'>
-                                            <div className="heading6">Infomation:</div>
-                                            <div className="text-secondary mt-2">+1 666 234 8888<br />
-                                                hi.avitex@gmail.com</div>
+                                            <div className="heading6">Thông tin:</div>
+                                            <div className="text-secondary mt-2">+84 236 1122 3344<br />chicbox.dn@gmail.com</div>
                                         </div>
                                         <div className='w-1/2'>
-                                            <div className="heading6">Our social media:</div>
+                                            <div className="heading6">Mạng xã hội:</div>
                                             <div className="flex items-center sm:gap-4 gap-2 mt-2">
                                                 <Link href={'https://www.facebook.com/'} target='_blank' className="item bg-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black hover:text-white duration-300">
                                                     <div className="icon-facebook"></div>

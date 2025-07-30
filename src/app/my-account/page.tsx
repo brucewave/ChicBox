@@ -62,10 +62,10 @@ const MyAccount = () => {
                 <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
                 <div id="header" className='relative w-full'>
                     <MenuOne props="bg-transparent" />
-                    <Breadcrumb heading='My Account' subHeading='My Account' />
+                    <Breadcrumb heading='Tài khoản của tôi' subHeading='Tài khoản của tôi' />
                 </div>
                 <div className="container py-20">
-                    <div className="text-center">Loading...</div>
+                    <div className="text-center">Đang tải...</div>
                 </div>
                 <Footer />
             </>
@@ -78,7 +78,7 @@ const MyAccount = () => {
                 <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
                 <div id="header" className='relative w-full'>
                     <MenuOne props="bg-transparent" />
-                    <Breadcrumb heading='My Account' subHeading='My Account' />
+                    <Breadcrumb heading='Tài khoản của tôi' subHeading='Tài khoản của tôi' />
                 </div>
                 <div className="container py-20">
                     <div className="text-center text-red-500">{error}</div>
@@ -93,7 +93,7 @@ const MyAccount = () => {
             <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
-                <Breadcrumb heading='My Account' subHeading='My Account' />
+                <Breadcrumb heading='Tài khoản của tôi' subHeading='Tài khoản của tôi' />
             </div>
             <div className="cart-block md:py-20 py-10">
                 <div className="container">
@@ -116,21 +116,21 @@ const MyAccount = () => {
                                 <div className="menu-tab lg:mt-10 mt-6">
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer">
                                         <Icon.User size={20} weight='bold' />
-                                        <div className="heading6">Account Details</div>
+                                        <div className="heading6">Chi tiết tài khoản</div>
                                     </div>
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2">
                                         <Icon.Bag size={20} weight='bold' />
-                                        <div className="heading6">Your Orders</div>
+                                        <div className="heading6">Đơn hàng của bạn</div>
                                     </div>
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2">
                                         <Icon.MapPin size={20} weight='bold' />
-                                        <div className="heading6">My Address</div>
+                                        <div className="heading6">Địa chỉ của tôi</div>
                                     </div>
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2">
                                         <Icon.Gift size={20} weight='bold' />
-                                        <div className="heading6">Rewards Program</div>
+                                        <div className="heading6">Chương trình thưởng</div>
                                         <div className="ml-auto text-sm">
-                                            {userInfo?.totalPurchasedItems || 0}/5 items
+                                            {userInfo?.totalPurchasedItems || 0}/5 sản phẩm
                                         </div>
                                     </div>
                                     <div className="item px-5 py-4 flex items-center gap-3 cursor-pointer mt-2" onClick={() => {
@@ -138,7 +138,7 @@ const MyAccount = () => {
                                         router.push('/login')
                                     }}>
                                         <Icon.SignOut size={20} weight='bold' />
-                                        <div className="heading6">Logout</div>
+                                        <div className="heading6">Đăng xuất</div>
                                     </div>
                                 </div>
                             </div>
@@ -146,36 +146,36 @@ const MyAccount = () => {
                         <div className="right xl:w-2/3 md:w-7/12 w-full xl:pl-[40px] lg:pl-[28px] md:pl-[16px] flex items-center">
                             <div className="text-content w-full">
                                 <form className="">
-                                    <div className="heading5 pb-4">Information</div>
+                                    <div className="heading5 pb-4">Thông tin cá nhân</div>
                                     <div className='grid sm:grid-cols-2 gap-4 gap-y-5'>
                                         <div className="first-name ">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="firstName" type="text" defaultValue={userInfo?.firstName} placeholder='First name' required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="firstName" type="text" defaultValue={userInfo?.firstName} placeholder='Họ' required />
                                         </div>
                                         <div className="last-name">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="lastName" type="text" defaultValue={userInfo?.lastName} placeholder='Last name' required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="lastName" type="text" defaultValue={userInfo?.lastName} placeholder='Tên' required />
                                         </div>
                                         <div className="email ">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" defaultValue={userInfo?.email} placeholder="Email address" required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" defaultValue={userInfo?.email} placeholder="Địa chỉ email" required />
                                         </div>
                                         <div className="phone-number">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="phoneNumber" type="text" defaultValue={userInfo?.phoneNumber} placeholder="Phone number" required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="phoneNumber" type="text" defaultValue={userInfo?.phoneNumber} placeholder="Số điện thoại" required />
                                         </div>
                                         <div className="col-span-full">
-                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="address" type="text" defaultValue={userInfo?.address} placeholder="Address" required />
+                                            <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="address" type="text" defaultValue={userInfo?.address} placeholder="Địa chỉ" required />
                                         </div>
                                     </div>
-                                    <div className="heading5 pb-4 lg:mt-10 mt-6">Change Password</div>
+                                    <div className="heading5 pb-4 lg:mt-10 mt-6">Đổi mật khẩu</div>
                                     <div className="pass">
-                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password" type="password" placeholder="Current Password *" required />
+                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password" type="password" placeholder="Mật khẩu hiện tại *" required />
                                     </div>
                                     <div className="new-pass mt-5">
-                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="newPassword" type="password" placeholder="New Password *" required />
+                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="newPassword" type="password" placeholder="Mật khẩu mới *" required />
                                     </div>
                                     <div className="confirm-pass mt-5">
-                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="confirmPassword" type="password" placeholder="Confirm Password *" required />
+                                        <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="confirmPassword" type="password" placeholder="Xác nhận mật khẩu *" required />
                                     </div>
                                     <div className="block-button lg:mt-10 mt-6">
-                                        <button className="button-main">Update Account</button>
+                                        <button className="button-main">Cập nhật tài khoản</button>
                                     </div>
                                 </form>
                             </div>

@@ -51,11 +51,11 @@ const HeroBanner = () => {
                     </h1>
                     <div className="flex gap-12 flex-wrap">
                       <div>
-                        <div className="text-gray-500 font-medium">Price</div>
+                        <div className="text-gray-500 font-medium">Giá</div>
                         <div className="text-3xl font-bold">${product.price?.toLocaleString()}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500 font-medium">Available Size</div>
+                        <div className="text-gray-500 font-medium">Kích cỡ có sẵn</div>
                         <div className="flex gap-2 mt-1">
                           {product.sizeList && product.sizeList.length > 0
                             ? product.sizeList.map((size: string) => (
@@ -67,7 +67,7 @@ const HeroBanner = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="text-gray-500 font-medium">Available Color</div>
+                        <div className="text-gray-500 font-medium">Màu sắc có sẵn</div>
                         <div className="flex gap-2 mt-1">
                           {product.colorList && product.colorList.length > 0
                             ? product.colorList.map((color: string) => (
@@ -84,13 +84,13 @@ const HeroBanner = () => {
                         href={`/product/default?id=${product.id}`}
                         className="bg-black text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-900 transition-colors"
                       >
-                        VIEW DETAILS
+                        XEM CHI TIẾT
                       </a>
                       <a
                         href="/shop/default-grid"
                         className="border-2 border-black text-black px-8 py-4 rounded-xl font-bold text-lg bg-white/80 hover:bg-gray-100 transition-colors"
                       >
-                        VIEW COLLECTION
+                        XEM BỘ SƯU TẬP
                       </a>
                     </div>
                     {/* Collection Badge */}
@@ -99,8 +99,8 @@ const HeroBanner = () => {
                         <path d="M20 5V35M5 20H35M10.6 10.6L29.4 29.4M10.6 29.4L29.4 10.6" stroke="black" strokeWidth="3" />
                       </svg>
                       <div>
-                        <div className="font-bold">Summer Collection</div>
-                        <div className="text-black text-sm">TRENDY AND CLASSIC FOR THE NEW SEASON</div>
+                        <div className="font-bold">Bộ sưu tập mùa hè</div>
+                        <div className="text-black text-sm">Thời thượng và cổ điển cho mùa mới</div>
                       </div>
                     </div>
                   </div>
@@ -117,7 +117,7 @@ const HeroBanner = () => {
                     {/* Vertical Label */}
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col items-center">
                       <span className="text-5xl font-extrabold tracking-widest text-black" style={{ writingMode: 'vertical-rl', letterSpacing: '0.1em' }}>
-                        SUMMER
+                        MÙA HÈ
                       </span>
                       {/* Decorative Black Star */}
                       <svg className="mt-4 w-10 h-10" viewBox="0 0 40 40" fill="none">
@@ -136,14 +136,14 @@ const HeroBanner = () => {
                           <SwiperSlide>
                 <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1 space-y-8">
-                  <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-black">Product Name</h1>
+                  <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-black">Tên sản phẩm</h1>
                   <div className="flex gap-12 flex-wrap">
                     <div>
-                      <div className="text-gray-500 font-medium">Price</div>
+                      <div className="text-gray-500 font-medium">Giá</div>
                       <div className="text-3xl font-bold">$0.00</div>
                     </div>
                     <div>
-                      <div className="text-gray-500 font-medium">Available Size</div>
+                      <div className="text-gray-500 font-medium">Kích cỡ có sẵn</div>
                       <div className="flex gap-2 mt-1">
                         {['Small', 'Medium', 'Large'].map(size => (
                           <span key={size} className="px-3 py-1 border rounded-lg text-black text-base font-medium bg-white/80">{size}</span>
@@ -151,7 +151,7 @@ const HeroBanner = () => {
                       </div>
                     </div>
                     <div>
-                      <div className="text-gray-500 font-medium">Available Color</div>
+                      <div className="text-gray-500 font-medium">Màu sắc có sẵn</div>
                       <div className="flex gap-2 mt-1">
                         {['Black', 'Pink', 'White', 'Rose'].map(color => (
                           <span key={color} className="px-3 py-1 border rounded-lg text-black text-base font-medium bg-white/80">{color}</span>
@@ -164,13 +164,13 @@ const HeroBanner = () => {
                       href="/product/default?id=1"
                       className="bg-black text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-900 transition-colors"
                     >
-                      VIEW DETAILS
+                      XEM CHI TIẾT
                     </a>
                     <a
                       href="/shop/default-grid"
                       className="border-2 border-black text-black px-8 py-4 rounded-xl font-bold text-lg bg-white/80 hover:bg-gray-100 transition-colors"
                     >
-                      VIEW COLLECTION
+                      XEM BỘ SƯU TẬP
                     </a>
                   </div>
                   {/* Collection Badge */}
@@ -179,8 +179,8 @@ const HeroBanner = () => {
                       <path d="M20 5V35M5 20H35M10.6 10.6L29.4 29.4M10.6 29.4L29.4 10.6" stroke="black" strokeWidth="3" />
                     </svg>
                     <div>
-                      <div className="font-bold">Summer Collection</div>
-                      <div className="text-black text-sm">TRENDY AND CLASSIC FOR THE NEW SEASON</div>
+                      <div className="font-bold">Bộ sưu tập mùa hè</div>
+                      <div className="text-black text-sm">Thời thượng và cổ điển cho mùa mới</div>
                     </div>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ const HeroBanner = () => {
                   </div>
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col items-center">
                     <span className="text-5xl font-extrabold tracking-widest text-black" style={{ writingMode: 'vertical-rl', letterSpacing: '0.1em' }}>
-                      SUMMER
+                      MÙA HÈ
                     </span>
                     <svg className="mt-4 w-10 h-10" viewBox="0 0 40 40" fill="none">
                       <path d="M20 5V35M5 20H35M10.6 10.6L29.4 29.4M10.6 29.4L29.4 10.6" stroke="black" strokeWidth="3" />

@@ -329,10 +329,10 @@ const Product: React.FC<ProductProps> = ({ data, type }) => {
                             )}
 
                             <div className="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                <div className="product-price text-title">${data.price}</div>
+                                <div className="product-price text-title">{data.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
                                 {percentSale > 0 && (
                                     <>
-                                        <div className="product-origin-price caption1 text-secondary2"><del>${data.originPrice}</del></div>
+                                        <div className="product-origin-price caption1 text-secondary2"><del>{data.originPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del></div>
                                         <div className="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">
                                             -{percentSale}%
                                         </div>
@@ -406,8 +406,8 @@ const Product: React.FC<ProductProps> = ({ data, type }) => {
                                         <div className="product-infor max-sm:w-full">
                                             <div onClick={() => handleDetailProduct(data.id)} className="product-name heading6 inline-block duration-300">{data.name}</div>
                                             <div className="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
-                                                <div className="product-price text-title">${data.price}</div>
-                                                <div className="product-origin-price caption1 text-secondary2"><del>${data.originPrice}</del></div>
+                                                <div className="product-price text-title">{data.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
+                                                <div className="product-origin-price caption1 text-secondary2"><del>{data.originPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del></div>
                                                 {data.originPrice && (
                                                     <div className="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">
                                                         -{percentSale}%
@@ -575,7 +575,7 @@ const Product: React.FC<ProductProps> = ({ data, type }) => {
                         <div className="flex gap-0.5 mt-1">
                             <Rate currentRate={data.rate} size={16} />
                         </div>
-                        <span className="text-title inline-block mt-1">${data.price}</span>
+                        <span className="text-title inline-block mt-1">{data.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                     </div>
                 </div>
             ) : (

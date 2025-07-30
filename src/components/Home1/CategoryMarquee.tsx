@@ -3,21 +3,21 @@
 import React from 'react';
 
 const categories = [
-  'SHORTS',
-  'T-SHIRT',
-  'BLAZER',
-  'MATE',
-  'BALL',
-  'DRESS',
-  'JEANS',
-  'JACKET',
-  'HOODIE',
-  'SWEATER',
-  'SKIRT',
-  'PANTS',
-  'SHOES',
-  'BAG',
-  'ACCESSORIES',
+  'QUẦN SHORT',
+  'ÁO THUN',
+  'ÁO BLAZER',
+  'BẠN ĐỒNG HÀNH',
+  'BÓNG',
+  'ĐẦM',
+  'QUẦN JEANS',
+  'ÁO KHOÁC',
+  'ÁO HOODIE',
+  'ÁO LEN',
+  'CHÂN VÁY',
+  'QUẦN DÀI',
+  'GIÀY',
+  'TÚI XÁCH',
+  'PHỤ KIỆN',
 ];
 
 // Duplicate for seamless loop

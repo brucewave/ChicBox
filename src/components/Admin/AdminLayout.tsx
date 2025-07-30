@@ -40,16 +40,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, subtitle }) 
   };
 
   const menuItems = [
-    { icon: FiHome, label: 'Dashboard', href: '/admin', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiPackage, label: 'Products', href: '/admin/add-product', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiShoppingCart, label: 'Orders', href: '/admin/manage-order', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiGrid, label: 'Categories', href: '/admin/manage-category', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    // { icon: FiUsers, label: 'Customers', href: '/admin/customers', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    // { icon: FiTruck, label: 'Shipping', href: '/admin/shipping', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiTag, label: 'Coupons', href: '/admin/manage-coupon', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiImage, label: 'Banners', href: '/admin/manage-banner', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    // { icon: FiBarChart, label: 'Analytics', href: '/admin/analytics', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
-    { icon: FiLogOut, label: 'Logout', onClick: handleLogout, color: 'bg-gradient-to-br from-red-500 to-red-600', hover: 'hover:bg-red-50', textColor: 'text-red-600', isLogout: true },
+    { icon: FiHome, label: 'Bảng điều khiển', href: '/admin', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiPackage, label: 'Sản phẩm', href: '/admin/all-product', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiPackage, label: 'Thêm Sản Phẩm', href: '/admin/add-product', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiShoppingCart, label: 'Đơn hàng', href: '/admin/manage-order', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiGrid, label: 'Danh mục', href: '/admin/manage-category', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    // { icon: FiUsers, label: 'Khách hàng', href: '/admin/customers', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    // { icon: FiTruck, label: 'Vận chuyển', href: '/admin/shipping', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiTag, label: 'Mã giảm giá', href: '/admin/manage-coupon', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiImage, label: 'Banner', href: '/admin/manage-banner', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    // { icon: FiBarChart, label: 'Phân tích', href: '/admin/analytics', color: 'bg-gradient-to-br from-green-500 to-green-600', hover: 'hover:bg-green-50', textColor: 'text-green-600' },
+    { icon: FiLogOut, label: 'Đăng xuất', onClick: handleLogout, color: 'bg-gradient-to-br from-red-500 to-red-600', hover: 'hover:bg-red-50', textColor: 'text-red-600', isLogout: true },
   ];
 
   return (

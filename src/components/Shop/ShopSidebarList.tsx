@@ -26,6 +26,23 @@ const ShopSidebarList: React.FC<Props> = ({ data, productPerPage, dataType }) =>
     const [currentPage, setCurrentPage] = useState(0);
     const productsPerPage = productPerPage;
     const offset = currentPage * productsPerPage;
+    const [sliderMin, setSliderMin] = useState(0);
+    const [sliderMax, setSliderMax] = useState(100);
+
+    useEffect(() => {
+        if (data && data.length > 0) {
+            const prices = data.map(item => item.price).filter(price => typeof price === 'number');
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            setSliderMin(min);
+            setSliderMax(max);
+            setPriceRange({ min, max });
+        } else {
+            setSliderMin(0);
+            setSliderMax(100);
+            setPriceRange({ min: 0, max: 100 });
+        }
+    }, [data]);
 
     const handleType = (type: string) => {
         setType((prevType) => (prevType === type ? null : type))
@@ -272,25 +289,17 @@ const ShopSidebarList: React.FC<Props> = ({ data, productPerPage, dataType }) =>
                                 <div className="heading6">Price Range</div>
                                 <Slider
                                     range
-                                    defaultValue={[0, 100]}
-                                    min={0}
-                                    max={100}
+                                    defaultValue={[sliderMin, sliderMax]}
+                                    min={sliderMin}
+                                    max={sliderMax}
                                     onChange={handlePriceChange}
                                     className='mt-5'
                                 />
-                                <div className="price-block flex items-center justify-between flex-wrap mt-4">
-                                    <div className="min flex items-center gap-1">
-                                        <div>Min price:</div>
-                                        <div className='price-min'>$
-                                            <span>{priceRange.min}</span>
-                                        </div>
-                                    </div>
-                                    <div className="min flex items-center gap-1">
-                                        <div>Max price:</div>
-                                        <div className='price-max'>$
-                                            <span>{priceRange.max}</span>
-                                        </div>
-                                    </div>
+                                <div className="mt-2 text-sm text-secondary">
+                                    Giá thấp nhất: <b>{sliderMin.toLocaleString('vi-VN')} VNĐ</b>
+                                </div>
+                                <div className="mb-2 text-sm text-secondary">
+                                    Giá cao nhất: <b>{sliderMax.toLocaleString('vi-VN')} VNĐ</b>
                                 </div>
                             </div>
                             <div className="filter-color pb-8 border-b border-line mt-8">

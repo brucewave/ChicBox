@@ -173,8 +173,8 @@ const AdminPage = () => {
 
   return (
     <AdminLayout 
-      title={<span className="bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 bg-clip-text text-transparent">Dashboard</span>} 
-      subtitle={<span className="text-gray-600">Welcome back! Here's what's happening with your store today.</span>}
+      title={<span className="bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 bg-clip-text text-transparent">Bảng điều khiển</span>} 
+      subtitle={<span className="text-gray-600">Chào mừng bạn trở lại! Dưới đây là tổng quan hoạt động cửa hàng hôm nay.</span>}
     >
       {loading ? (
         <div className="flex items-center justify-center h-64">
@@ -191,9 +191,21 @@ const AdminPage = () => {
             {getMainStats().map((stat: any, index: number) => (
               <StatCard
                 key={index}
-                title={stat.title}
-                value={stat.value}
-                change={stat.change}
+                title={
+                  stat.title === 'Total Revenue' ? 'Tổng doanh thu' :
+                  stat.title === 'Total Orders' ? 'Tổng đơn hàng' :
+                  stat.title === 'Products' ? 'Sản phẩm' :
+                  stat.title === 'Categories' ? 'Danh mục' :
+                  stat.title
+                }
+                value={stat.title === 'Total Revenue' ? `${Math.round(stats.orders.totalRevenue).toLocaleString('vi-VN')} VNĐ` : stat.value}
+                change={
+                  stat.title === 'Total Revenue' ? 'Tổng doanh thu' :
+                  stat.title === 'Total Orders' ? `${stats.orders.totalItems} sản phẩm` :
+                  stat.title === 'Products' ? `${stats.products.active} đang bán` :
+                  stat.title === 'Categories' ? 'Tổng danh mục' :
+                  stat.change
+                }
                 icon={stat.icon}
                 gradient={statGradients[index % statGradients.length]}
               />
@@ -205,9 +217,21 @@ const AdminPage = () => {
             {getAdditionalStats().map((stat: any, index: number) => (
               <StatCard
                 key={index}
-                title={stat.title}
+                title={
+                  stat.title === 'Coupons' ? 'Mã giảm giá' :
+                  stat.title === 'Pending' ? 'Chờ xác nhận' :
+                  stat.title === 'Confirmed' ? 'Đã xác nhận' :
+                  stat.title === 'Delivered' ? 'Đã giao' :
+                  stat.title
+                }
                 value={stat.value}
-                change={stat.change}
+                change={
+                  stat.title === 'Coupons' ? `${stats.coupons.active} đang hoạt động` :
+                  stat.title === 'Pending' ? 'Chờ xác nhận' :
+                  stat.title === 'Confirmed' ? 'Đơn đã xác nhận' :
+                  stat.title === 'Delivered' ? 'Đơn đã hoàn thành' :
+                  stat.change
+                }
                 icon={stat.icon}
                 gradient={additionalStatGradients[index % additionalStatGradients.length]}
               />
@@ -222,7 +246,7 @@ const AdminPage = () => {
         <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 rounded-2xl shadow-lg p-6 border border-blue-200">
           <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
             <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-            Sales Analytics
+            Phân tích doanh số
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={salesData}>
@@ -258,7 +282,7 @@ const AdminPage = () => {
         <div className="bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200 rounded-2xl shadow-lg p-6 border border-purple-200">
           <h3 className="text-lg font-semibold text-purple-800 mb-4 flex items-center">
             <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-            Category Distribution
+            Tỉ lệ danh mục
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -321,7 +345,15 @@ const AdminPage = () => {
                     }`} />
                   </div>
                   <div className="text-2xl font-bold text-gray-900">{count}</div>
-                  <div className="text-sm text-gray-600 capitalize">{status.toLowerCase()}</div>
+                  <div className="text-sm text-gray-600 capitalize">{
+                    status === 'PENDING' ? 'Chờ xác nhận' :
+                    status === 'CONFIRMED' ? 'Đã xác nhận' :
+                    status === 'PROCESSING' ? 'Đang xử lý' :
+                    status === 'DELIVERED' ? 'Đã giao' :
+                    status === 'CANCELLED' ? 'Đã huỷ' :
+                    status === 'REFUNDED' ? 'Đã hoàn tiền' :
+                    status
+                  }</div>
                 </div>
               ))}
           </div>
@@ -332,7 +364,7 @@ const AdminPage = () => {
       <div className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 rounded-2xl shadow-lg p-6 border border-emerald-200 mb-8">
         <h3 className="text-lg font-semibold text-emerald-800 mb-4 flex items-center">
           <div className="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div>
-          Monthly Performance
+          Hiệu suất theo tháng
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={salesData}>
@@ -359,7 +391,7 @@ const AdminPage = () => {
         <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 rounded-2xl shadow-lg p-6 border border-blue-200">
           <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
             <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-            Recent Orders
+            Đơn hàng gần đây
           </h3>
           <div className="space-y-4">
             {stats?.recentOrders.length ? (
@@ -370,7 +402,7 @@ const AdminPage = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{order.orderNumber}</p>
-                    <p className="text-sm text-gray-600">${order.total.toFixed(2)} • {order.customerName}</p>
+                    <p className="text-sm text-gray-600">{Math.round(order.total).toLocaleString('vi-VN')} VNĐ • {order.customerName}</p>
                   </div>
                   <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusColors[order.status.toLowerCase() as keyof typeof statusColors] || statusColors.pending}`}>
                     {order.status}
@@ -379,7 +411,7 @@ const AdminPage = () => {
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">
-                No recent orders found
+                Không có đơn hàng gần đây
               </div>
             )}
           </div>
@@ -388,7 +420,7 @@ const AdminPage = () => {
         <div className="bg-gradient-to-br from-pink-50 via-pink-100 to-pink-200 rounded-2xl shadow-lg p-6 border border-pink-200">
           <h3 className="text-lg font-semibold text-pink-800 mb-4 flex items-center">
             <div className="w-3 h-3 bg-pink-500 rounded-full mr-2"></div>
-            Top Products
+            Sản phẩm bán chạy
           </h3>
           <div className="space-y-4">
             {stats?.topProducts.length ? (
@@ -397,14 +429,14 @@ const AdminPage = () => {
                   <div className={`w-10 h-10 rounded-lg ${['bg-gradient-to-br from-pink-500 to-pink-600','bg-gradient-to-br from-blue-500 to-blue-600','bg-gradient-to-br from-emerald-500 to-emerald-600','bg-gradient-to-br from-amber-500 to-amber-600'][i % 4]}`}></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{product.name}</p>
-                    <p className="text-sm text-gray-600">{product.sales} sales</p>
+                    <p className="text-sm text-gray-600">{product.sales} lượt bán</p>
                   </div>
-                  <span className={`text-sm font-medium ${['text-pink-600','text-blue-600','text-emerald-600','text-amber-600'][i % 4]}`}>${product.revenue.toFixed(2)}</span>
+                  <span className={`text-sm font-medium ${['text-pink-600','text-blue-600','text-emerald-600','text-amber-600'][i % 4]}`}>{Math.round(product.revenue).toLocaleString('vi-VN')} VNĐ</span>
                 </div>
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">
-                No products found
+                Không có sản phẩm nào
               </div>
             )}
           </div>

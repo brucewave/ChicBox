@@ -36,15 +36,15 @@ const AboutUs = () => {
             <TopNavOne props="style-one bg-black" slogan="New customers save 10% with the code GET10" />
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
-                <Breadcrumb heading='About Us' subHeading='About Us' />
+                <Breadcrumb heading='Về chúng tôi' subHeading='Về chúng tôi' />
             </div>
             <div className='about md:pt-20 pt-10'>
                 <div className="about-us-block">
                     <div className="container">
                         <div className="text flex items-center justify-center">
                             <div className="content md:w-5/6 w-full">
-                                <div className="heading3 text-center">I{String.raw`'m`} obsessed with the dress Pippa Middleton wore to her brother{String.raw`'s`} wedding.</div>
-                                <div className="body1 text-center md:mt-7 mt-5">Kim Kardashian West needs no introduction. In the 14 years since she first graced our screens in Keeping Up With The Kardashians, she has built her KKW beauty empire, filmed her show, wrapped her show, become a billionaire, studied law, campaigned for the rights of death row inmates, travelled the world to attend events such as Paris Fashion Week, raised four children and launched her wildly successful shapewear brand SKIMS.</div>
+                                <div className="heading3 text-center">Tôi bị ám ảnh bởi chiếc váy mà Pippa Middleton mặc trong đám cưới của anh trai cô ấy.</div>
+                                <div className="body1 text-center md:mt-7 mt-5">Kim Kardashian West không cần giới thiệu. Trong 14 năm kể từ khi cô ấy xuất hiện lần đầu trên màn ảnh với chương trình Keeping Up With The Kardashians, cô đã xây dựng đế chế làm đẹp KKW, quay chương trình, kết thúc chương trình, trở thành tỷ phú, học luật, vận động cho quyền lợi của các tử tù, đi khắp thế giới tham dự các sự kiện như Paris Fashion Week, nuôi dạy bốn đứa con và ra mắt thương hiệu đồ định hình SKIMS cực kỳ thành công.</div>
                             </div>
                         </div>
                         <div className="list-img grid sm:grid-cols-3 gap-[30px] md:pt-20 pt-10">

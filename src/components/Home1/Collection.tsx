@@ -82,11 +82,11 @@ const Collection = () => {
         <>
             <div className="collection-block md:pt-10 pt-10">
                 <div className="container">
-                    <div className="heading3 text-center">Explore Collections</div>
+                    <div className="heading3 text-center">Khám phá bộ sưu tập</div>
                 </div>
                 <div className="list-collection section-swiper-navigation md:mt-10 mt-6 sm:px-5 px-4">
                     {loading ? (
-                        <div className="text-center py-10">Loading...</div>
+                        <div className="text-center py-10">Đang tải...</div>
                     ) : (
                         <Swiper
                             spaceBetween={12}
@@ -124,7 +124,7 @@ const Collection = () => {
                                                         alt={category.name}
                                                     />
                                                 ) : (
-                                                    <div className="w-full h-[200px] bg-gray-100 flex items-center justify-center text-gray-400">No Image</div>
+                                                    <div className="w-full h-[200px] bg-gray-100 flex items-center justify-center text-gray-400">Không có hình ảnh</div>
                                                 )}
                                             </div>
                                             <div className="collection-name heading5 text-center sm:bottom-8 bottom-4 lg:w-[200px] md:w-[160px] w-[100px] md:py-3 py-1.5 bg-white rounded-xl duration-500">

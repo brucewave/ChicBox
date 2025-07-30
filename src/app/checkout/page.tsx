@@ -165,11 +165,11 @@ const Checkout = () => {
                 clearCart();
                 
                 // Show success message and redirect
-                alert('Payment successful! Your order has been placed.');
+                alert('Thanh toán thành công! Đơn hàng của bạn đã được đặt.');
                 router.push('/my-account');
             } else if (response.data.status === 'FAILED') {
                 setPaymentStatus('failed');
-                setPaymentError('Payment failed. Please try again.');
+                setPaymentError('Thanh toán thất bại. Vui lòng thử lại.');
             }
         } catch (error) {
             console.error('Error checking payment status:', error);
@@ -199,7 +199,7 @@ const Checkout = () => {
             setUserData(userResponse.data)
             setIsLoggedIn(true)
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Login failed')
+            alert(err.response?.data?.message || 'Đăng nhập thất bại')
         }
     }
 
@@ -219,7 +219,7 @@ const Checkout = () => {
             // Get auth token
             const token = localStorage.getItem('token')
             if (!token) {
-                setPaymentError('Please login to continue')
+                setPaymentError('Vui lòng đăng nhập để tiếp tục')
                 return
             }
 
@@ -327,10 +327,10 @@ const Checkout = () => {
         } catch (error: any) {
             console.error('Payment Error:', error.response?.data || error)
             if (error.response?.status === 401) {
-                setPaymentError('Please login to continue')
+                setPaymentError('Vui lòng đăng nhập để tiếp tục')
                 router.push('/login')
             } else {
-                setPaymentError(error.response?.data?.message || 'Payment failed. Please try again.')
+                setPaymentError(error.response?.data?.message || 'Thanh toán thất bại. Vui lòng thử lại.')
             }
         } finally {
             setIsProcessing(false)
@@ -346,7 +346,7 @@ const Checkout = () => {
             <TopNavOne props="style-one bg-black" />
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
-                <Breadcrumb heading='Shopping cart' subHeading='Shopping cart' />
+                <Breadcrumb heading='Thanh toán' subHeading='Thanh toán' />
             </div>
             <div className="cart-block md:py-20 py-10">
                 <div className="container">
@@ -356,8 +356,8 @@ const Checkout = () => {
                                 <>
                                     <div className="login bg-surface py-3 px-4 flex justify-between rounded-lg">
                                         <div className="left flex items-center">
-                                            <span className="text-on-surface-variant1 pr-4">Already have an account? </span>
-                                            <span className="text-button text-on-surface hover-underline cursor-pointer">Login</span>
+                                            <span className="text-on-surface-variant1 pr-4">Bạn đã có tài khoản?</span>
+                                            <span className="text-button text-on-surface hover-underline cursor-pointer">Đăng nhập</span>
                                         </div>
                                         <div className="right"><i className="ph ph-caret-down fs-20 d-block cursor-pointer"></i></div>
                                     </div>
@@ -368,7 +368,7 @@ const Checkout = () => {
                                                     <input 
                                                         className="border-line px-4 pt-3 pb-3 w-full rounded-lg" 
                                                         type="text" 
-                                                        placeholder="Username or email" 
+                                                        placeholder="Tên đăng nhập hoặc email" 
                                                         value={loginForm.usernameOrEmail}
                                                         onChange={(e) => setLoginForm({...loginForm, usernameOrEmail: e.target.value})}
                                                         required 
@@ -378,7 +378,7 @@ const Checkout = () => {
                                                     <input 
                                                         className="border-line px-4 pt-3 pb-3 w-full rounded-lg" 
                                                         type="password" 
-                                                        placeholder="Password" 
+                                                        placeholder="Mật khẩu" 
                                                         value={loginForm.password}
                                                         onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
                                                         required 
@@ -386,14 +386,14 @@ const Checkout = () => {
                                                 </div>
                                             </div>
                                             <div className="block-button mt-3">
-                                                <button type="submit" className="button-main button-blue-hover">Login</button>
+                                                <button type="submit" className="button-main button-blue-hover">Đăng nhập</button>
                                             </div>
                                         </form>
                                     </div>
                                 </>
                             )}
                             <div className="information mt-5">
-                                <div className="heading5">Information</div>
+                                <div className="heading5">Thông tin giao hàng</div>
                                 <div className="form-checkout mt-5">
                                     <form>
                                         <div className="grid sm:grid-cols-2 gap-4 gap-y-5 flex-wrap">
@@ -402,7 +402,7 @@ const Checkout = () => {
                                                     className="border-line px-4 py-3 w-full rounded-lg" 
                                                     id="firstName" 
                                                     type="text" 
-                                                    placeholder="First Name *" 
+                                                    placeholder="Họ *" 
                                                     defaultValue={userData?.firstName || ''}
                                                     required 
                                                 />
@@ -412,7 +412,7 @@ const Checkout = () => {
                                                     className="border-line px-4 py-3 w-full rounded-lg" 
                                                     id="lastName" 
                                                     type="text" 
-                                                    placeholder="Last Name *" 
+                                                    placeholder="Tên *" 
                                                     defaultValue={userData?.lastName || ''}
                                                     required 
                                                 />
@@ -422,7 +422,7 @@ const Checkout = () => {
                                                     className="border-line px-4 py-3 w-full rounded-lg" 
                                                     id="email" 
                                                     type="email" 
-                                                    placeholder="Email Address *" 
+                                                    placeholder="Email *" 
                                                     defaultValue={userData?.email || ''}
                                                     required 
                                                 />
@@ -432,7 +432,7 @@ const Checkout = () => {
                                                     className="border-line px-4 py-3 w-full rounded-lg" 
                                                     id="phoneNumber" 
                                                     type="text" 
-                                                    placeholder="Phone Numbers *" 
+                                                    placeholder="Số điện thoại *" 
                                                     defaultValue={userData?.phoneNumber || ''}
                                                     required 
                                                 />
@@ -445,7 +445,7 @@ const Checkout = () => {
                                                     value={selectedCountry}
                                                     onChange={(e) => setSelectedCountry(e.target.value)}
                                                 >
-                                                    <option value="default" disabled>Choose Country/Region</option>
+                                                    <option value="default" disabled>Chọn quốc gia/khu vực</option>
                                                     <option value="Afghanistan">Afghanistan</option>
                                                     <option value="Albania">Albania</option>
                                                     <option value="Algeria">Algeria</option>
@@ -708,7 +708,7 @@ const Checkout = () => {
                                                     className="border-line px-4 py-3 w-full rounded-lg" 
                                                     id="address" 
                                                     type="text" 
-                                                    placeholder={selectedCountry === 'Vietnam' ? "Số nhà, tên đường *" : "Address *"} 
+                                                    placeholder={selectedCountry === 'Vietnam' ? "Số nhà, tên đường *" : "Địa chỉ *"} 
                                                     defaultValue={userData?.address || ''}
                                                     required 
                                                 />
@@ -723,7 +723,7 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                         <div className="payment-block md:mt-10 mt-6">
-                                            <div className="heading5">Choose payment Option:</div>
+                                            <div className="heading5">Chọn phương thức thanh toán:</div>
                                             <div className="list-payment mt-5">
                                                 <div className={`type bg-surface p-5 border border-line rounded-lg ${paymentType === 'full' ? 'border-primary bg-primary/5' : ''}`}>
                                                     <div className="flex items-center justify-between">
@@ -738,12 +738,12 @@ const Checkout = () => {
                                                                 onChange={(e) => setPaymentType('full')}
                                                             />
                                                             <div>
-                                                                <label className="text-button cursor-pointer" htmlFor="full_payment">Full Payment</label>
-                                                                <p className="text-sm text-gray-500 mt-1">Pay the full amount now</p>
+                                                                <label className="text-button cursor-pointer" htmlFor="full_payment">Thanh toán toàn bộ</label>
+                                                                <p className="text-sm text-gray-500 mt-1">Thanh toán toàn bộ đơn hàng ngay</p>
                                                             </div>
                                                         </div>
                                                         <div className="text-lg font-semibold text-primary">
-                                                            ${totalCart - Number(discount) + Number(ship)}.00
+                                                            {Math.round(totalCart - Number(discount) + Number(ship)).toLocaleString('vi-VN')} VNĐ
                                                         </div>
                                                     </div>
                                                 </div>
@@ -761,12 +761,12 @@ const Checkout = () => {
                                                                 onChange={(e) => setPaymentType('deposit')}
                                                             />
                                                             <div>
-                                                                <label className="text-button cursor-pointer" htmlFor="deposit">Deposit (50,000 VND)</label>
-                                                                <p className="text-sm text-gray-500 mt-1">Pay 50,000 VND now, remaining amount later</p>
+                                                                <label className="text-button cursor-pointer" htmlFor="deposit">Đặt cọc (50.000 VNĐ)</label>
+                                                                <p className="text-sm text-gray-500 mt-1">Thanh toán trước 50.000 VNĐ, phần còn lại trả sau</p>
                                                             </div>
                                                         </div>
                                                         <div className="text-lg font-semibold text-primary">
-                                                            ${formatPrice(50000)}
+                                                            {Math.round(50000).toLocaleString('vi-VN')} VNĐ
                                                         </div>
                                                     </div>
                                                 </div>
@@ -778,7 +778,7 @@ const Checkout = () => {
                                                 onClick={handlePayment}
                                                 disabled={isProcessing}
                                             >
-                                                {isProcessing ? 'Processing...' : 'Payment'}
+                                                {isProcessing ? 'Đang xử lý...' : 'Thanh toán'}
                                             </button>
                                             {paymentError && (
                                                 <div className="text-red-500 mt-2 text-center">{paymentError}</div>
@@ -790,10 +790,10 @@ const Checkout = () => {
                         </div>
                         <div className="w-full lg:w-5/12 order-1 lg:order-2">
                             <div className="checkout-block">
-                                <div className="heading5 pb-3">Your Order</div>
+                                <div className="heading5 pb-3">Đơn hàng của bạn</div>
                                 <div className="list-product-checkout">
                                     {cartState.cartArray.length < 1 ? (
-                                        <p className='text-button pt-3'>No product in cart</p>
+                                        <p className='text-button pt-3'>Không có sản phẩm nào trong giỏ hàng</p>
                                     ) : (
                                         cartState.cartArray.map((product) => (
                                             <>
@@ -820,7 +820,7 @@ const Checkout = () => {
                                                             <span className='quantity'>{product.quantity}</span>
                                                             <span className='px-1'>x</span>
                                                             <span>
-                                                                ${product.price}.00
+                                                                {Math.round(product.price).toLocaleString('vi-VN')} VNĐ
                                                             </span>
                                                         </div>
                                                     </div>
@@ -830,16 +830,16 @@ const Checkout = () => {
                                     )}
                                 </div>
                                 <div className="discount-block py-5 flex justify-between border-b border-line">
-                                    <div className="text-title">Discounts</div>
-                                    <div className="text-title">-$<span className="discount">{discount}</span><span>.00</span></div>
+                                    <div className="text-title">Giảm giá</div>
+                                    <div className="text-title">-<span className="discount">{Math.round(Number(discount)).toLocaleString('vi-VN')}</span> VNĐ</div>
                                 </div>
                                 <div className="ship-block py-5 flex justify-between border-b border-line">
-                                    <div className="text-title">Shipping</div>
-                                    <div className="text-title">{Number(ship) === 0 ? 'Free' : `$${ship}.00`}</div>
+                                    <div className="text-title">Vận chuyển</div>
+                                    <div className="text-title">{Number(ship) === 0 ? 'Miễn phí' : `${Math.round(Number(ship)).toLocaleString('vi-VN')} VNĐ`}</div>
                                 </div>
                                 <div className="total-cart-block pt-5 flex justify-between">
-                                    <div className="heading5">Total</div>
-                                    <div className="heading5 total-cart">${totalCart - Number(discount) + Number(ship)}.00</div>
+                                    <div className="heading5">Tổng cộng</div>
+                                    <div className="heading5 total-cart">{Math.round(totalCart - Number(discount) + Number(ship)).toLocaleString('vi-VN')} VNĐ</div>
                                 </div>
                             </div>
                         </div>
@@ -862,20 +862,20 @@ const Checkout = () => {
                                 ×
                             </button>
                             <div className="text-center">
-                                <h3 className="text-2xl font-bold mb-2">Payment Details</h3>
-                                <p className="text-blue-100">Complete your payment securely</p>
+                                <h3 className="text-2xl font-bold mb-2">Chi tiết thanh toán</h3>
+                                <p className="text-blue-100">Hoàn tất thanh toán an toàn</p>
                             </div>
                         </div>
 
                         <div className="p-4 space-y-4">
                             {/* Payment Amount Highlight */}
                             <div className="text-center bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-xl border border-green-200">
-                                <p className="text-sm text-gray-600 mb-1">Payment Amount</p>
+                                <p className="text-sm text-gray-600 mb-1">Số tiền thanh toán</p>
                                 <p className="text-2xl font-bold text-green-600">
-                                    {formatPrice(paymentType === 'deposit' ? 50000 : paymentInfo.amount)}
+                                    {Math.round(paymentType === 'deposit' ? 50000 : paymentInfo.amount).toLocaleString('vi-VN')} VNĐ
                                 </p>
                                 {paymentType === 'deposit' && (
-                                    <p className="text-sm text-gray-500 mt-1">Deposit Payment</p>
+                                    <p className="text-sm text-gray-500 mt-1">Thanh toán đặt cọc</p>
                                 )}
                             </div>
 
@@ -888,27 +888,27 @@ const Checkout = () => {
                                         className="w-36 h-36 rounded-lg"
                                     />
                                 </div>
-                                <p className="text-sm text-gray-600 mt-2">Scan QR code to pay</p>
+                                <p className="text-sm text-gray-600 mt-2">Quét mã QR để thanh toán</p>
                             </div>
 
                             {/* Payment Information */}
                             <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                                <h4 className="font-semibold text-gray-800 mb-3">Bank Transfer Details</h4>
+                                <h4 className="font-semibold text-gray-800 mb-3">Thông tin chuyển khoản</h4>
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-600">Account Number:</span>
+                                        <span className="text-gray-600">Số tài khoản:</span>
                                         <span className="font-mono font-semibold text-gray-800">{paymentInfo.accountNumber}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-600">Account Name:</span>
+                                        <span className="text-gray-600">Tên tài khoản:</span>
                                         <span className="font-semibold text-gray-800">{paymentInfo.accountName}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-600">Order Code:</span>
+                                        <span className="text-gray-600">Mã đơn hàng:</span>
                                         <span className="font-mono text-sm text-gray-800">{paymentInfo.orderCode}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-600">Description:</span>
+                                        <span className="text-gray-600">Nội dung chuyển khoản:</span>
                                         <span className="text-sm text-gray-800 truncate max-w-32">{paymentInfo.description}</span>
                                     </div>
                                 </div>
@@ -921,20 +921,20 @@ const Checkout = () => {
                                 'bg-yellow-50 border-yellow-200'
                             }`}>
                                 <div className="flex items-center justify-between">
-                                    <span className="font-medium text-gray-800">Payment Status:</span>
+                                    <span className="font-medium text-gray-800">Trạng thái thanh toán:</span>
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                         paymentStatus === 'success' ? 'bg-green-100 text-green-800' :
                                         paymentStatus === 'failed' ? 'bg-red-100 text-red-800' :
                                         'bg-yellow-100 text-yellow-800'
                                     }`}>
-                                        {paymentStatus === 'success' ? '✓ Success' :
-                                         paymentStatus === 'failed' ? '✗ Failed' :
-                                         isCheckingPayment ? '⏳ Checking...' : '⏳ Pending'}
+                                        {paymentStatus === 'success' ? '✓ Thành công' :
+                                         paymentStatus === 'failed' ? '✗ Thất bại' :
+                                         isCheckingPayment ? '⏳ Đang kiểm tra...' : '⏳ Đang chờ'}
                                     </span>
                                 </div>
                                 {paymentStatus === 'pending' && (
                                     <p className="text-sm text-gray-600 mt-2">
-                                        Please complete the payment using the QR code above. We'll automatically check the payment status every 5 seconds.
+                                        Vui lòng hoàn tất thanh toán bằng mã QR phía trên. Hệ thống sẽ tự động kiểm tra trạng thái thanh toán mỗi 5 giây.
                                     </p>
                                 )}
                             </div>
@@ -945,7 +945,7 @@ const Checkout = () => {
                                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                     </svg>
-                                    <span className="text-sm font-medium">Expires at: {new Date(paymentInfo.expiresAt).toLocaleString()}</span>
+                                    <span className="text-sm font-medium">Hết hạn lúc: {new Date(paymentInfo.expiresAt).toLocaleString()}</span>
                                 </div>
                             </div>
 
@@ -955,18 +955,18 @@ const Checkout = () => {
                                     onClick={() => setShowPaymentModal(false)}
                                     className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                                 >
-                                    Close
+                                    Đóng
                                 </button>
                                 <button
                                     onClick={() => {
                                         // Copy payment details to clipboard
-                                        const paymentDetails = `Account: ${paymentInfo.accountNumber}\nName: ${paymentInfo.accountName}\nAmount: ${formatPrice(paymentType === 'deposit' ? 50000 : paymentInfo.amount)}\nDescription: ${paymentInfo.description}`;
+                                        const paymentDetails = `Số tài khoản: ${paymentInfo.accountNumber}\nTên tài khoản: ${paymentInfo.accountName}\nSố tiền: ${Math.round(paymentType === 'deposit' ? 50000 : paymentInfo.amount).toLocaleString('vi-VN')} VNĐ\nNội dung: ${paymentInfo.description}`;
                                         navigator.clipboard.writeText(paymentDetails);
-                                        alert('Payment details copied to clipboard!');
+                                        alert('Đã sao chép thông tin thanh toán!');
                                     }}
                                     className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
                                 >
-                                    Copy Details
+                                    Sao chép thông tin
                                 </button>
                             </div>
                         </div>

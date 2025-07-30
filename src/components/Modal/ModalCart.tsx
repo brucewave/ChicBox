@@ -187,12 +187,12 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
                     <div className="right cart-block w-full py-6 relative overflow-hidden">
                         {cartState.cartArray.length === 0 ? (
                             <div className="px-6 text-center text-title">
-                                Your cart is empty.
+                                Giỏ hàng của bạn đang trống.
                             </div>
                         ) : (
                             <>
                             <div className="heading px-6 pb-3 flex items-center justify-between relative">
-                                <div className="heading5">Shopping Cart</div>
+                                <div className="heading5">Giỏ hàng</div>
                                 <div
                                     className="close-btn absolute right-6 top-0 w-6 h-6 rounded-full bg-surface flex items-center justify-center duration-300 cursor-pointer hover:bg-black hover:text-white"
                                     onClick={closeModalCart}
@@ -220,14 +220,14 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
                                                         className="remove-cart-btn caption1 font-semibold text-red underline cursor-pointer"
                                                                 onClick={() => handleRemoveFromCart(product.id)}
                                                     >
-                                                        Remove
+                                                        Xoá
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-between gap-2 mt-3 w-full">
                                                     <div className="flex items-center text-secondary2 capitalize">
                                                                 {product.selectedSize || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : '')}/{product.selectedColor || (product.variation && product.variation.length > 0 ? product.variation[0].color : '')}
                                                     </div>
-                                                    <div className="product-price text-title">${product.price}</div>
+                                                    <div className="product-price text-title">{Math.round(product.price).toLocaleString('vi-VN')} VNĐ</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -236,8 +236,8 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
                             </div>
                             <div className="footer-modal bg-white absolute bottom-0 left-0 w-full">
                                 <div className="flex items-center justify-between pt-6 px-6">
-                                    <div className="heading5">Subtotal</div>
-                                    <div className="heading5">${totalCart}</div>
+                                    <div className="heading5">Tạm tính</div>
+                                    <div className="heading5">{Math.round(totalCart).toLocaleString('vi-VN')} VNĐ</div>
                                 </div>
                                 <div className="block-button text-center p-6">
                                     <div className="flex items-center gap-4">
@@ -246,17 +246,17 @@ const ModalCart = ({ serverTimeLeft }: { serverTimeLeft: CountdownTimeType }) =>
                                             className='button-main basis-1/2 bg-white border border-black text-black text-center uppercase'
                                             onClick={closeModalCart}
                                         >
-                                            View cart
+                                            Xem giỏ hàng
                                         </Link>
                                         <Link
                                             href={'/checkout'}
                                             className='button-main basis-1/2 text-center uppercase'
                                             onClick={closeModalCart}
                                         >
-                                            Check Out
+                                            Thanh toán
                                         </Link>
                                     </div>
-                                    <div onClick={closeModalCart} className="text-button-uppercase mt-4 text-center has-line-before cursor-pointer inline-block">Or continue shopping</div>
+                                    <div onClick={closeModalCart} className="text-button-uppercase mt-4 text-center has-line-before cursor-pointer inline-block">Hoặc tiếp tục mua sắm</div>
                                 </div>
                             </div>
                             </>

@@ -349,18 +349,18 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                 <Rate currentRate={productMain.rate} size={14} />
                                 {productData?.tag ? (
                                     <div className="tag-new caption2 px-3 py-3 font-semibold bg-green inline-block rounded-sm ml-2">
-                                        New
+                                        Mới
                                     </div>
                                 ) : (
-                                    <span className='caption1 text-secondary ml-2'>(1.234 reviews)</span>
+                                    null
                                 )}
                             </div>
                             <div className="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
-                                <div className="product-price heading5">${productMain.price}</div>
+                                <div className="product-price heading5">{Math.round(productMain.price).toLocaleString('vi-VN')} VNĐ</div>
                                 {productMain.originPrice > productMain.price && (
                                     <>
                                         <div className='w-px h-4 bg-line'></div>
-                                        <div className="product-origin-price font-normal text-secondary2"><del>${productMain.originPrice}</del></div>
+                                        <div className="product-origin-price font-normal text-secondary2"><del>{Math.round(productMain.originPrice).toLocaleString('vi-VN')} VNĐ</del></div>
                                         <div className="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">
                                             -{percentSale}%
                                         </div>
@@ -370,7 +370,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                 <div className='desc text-secondary mt-3'>{productMain.description}</div>
                             <div className="list-action mt-6">
                                 <div className="choose-color">
-                                    <div className="text-title">Colors: <span className='text-title color'>{activeColor}</span></div>
+                                    <div className="text-title">Màu sắc: <span className='text-title color'>{activeColor}</span></div>
                                     <div className="list-color flex items-center gap-2 flex-wrap mt-3">
                                         {(productMain?.variation || []).map((item, index) => (
                                             <div
@@ -394,12 +394,12 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                 </div>
                                 <div className="choose-size mt-5">
                                     <div className="heading flex items-center justify-between">
-                                        <div className="text-title">Size: <span className='text-title size'>{activeSize}</span></div>
+                                        <div className="text-title">Kích cỡ: <span className='text-title size'>{activeSize}</span></div>
                                         <div
                                             className="caption1 size-guide text-red underline cursor-pointer"
                                             onClick={handleOpenSizeGuide}
                                         >
-                                            Size Guide
+                                            Hướng dẫn chọn size
                                         </div>
                                         <ModalSizeguide data={productMain} isOpen={openSizeGuide} onClose={handleCloseSizeGuide} />
                                     </div>
@@ -415,42 +415,42 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         ))}
                                     </div>
                                     <div className="technical-specs mt-4 p-4 border border-line rounded-lg">
-                                        <div className="text-title mb-3">Technical Specifications</div>
+                                        <div className="text-title mb-3">Thông số kỹ thuật</div>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="spec-item">
-                                                <span className="text-secondary">Material:</span>
+                                                <span className="text-secondary">Chất liệu:</span>
                                                 <span className="ml-2">{productData?.material || '-'}</span>
                                             </div>
                                             <div className="spec-item">
-                                                <span className="text-secondary">Form:</span>
+                                                <span className="text-secondary">Form dáng:</span>
                                                 <span className="ml-2">{productData?.form || '-'}</span>
                                             </div>
                                             <div className="spec-item">
-                                                <span className="text-secondary">Shoulder:</span>
+                                                <span className="text-secondary">Vai:</span>
                                                 <span className="ml-2">{productData?.shoulder ? `${productData.shoulder}cm` : '-'}</span>
                                             </div>
                                             <div className="spec-item">
-                                                <span className="text-secondary">Width:</span>
+                                                <span className="text-secondary">Rộng:</span>
                                                 <span className="ml-2">{productData?.width ? `${productData.width}cm` : '-'}</span>
                                             </div>
                                             <div className="spec-item">
-                                                <span className="text-secondary">Length:</span>
+                                                <span className="text-secondary">Dài:</span>
                                                 <span className="ml-2">{productData?.length ? `${productData.length}cm` : '-'}</span>
                                             </div>
                                             <div className="spec-item">
-                                                <span className="text-secondary">Arm:</span>
+                                                <span className="text-secondary">Tay:</span>
                                                 <span className="ml-2">{productData?.arm ? `${productData.arm}cm` : '-'}</span>
                                             </div>
                                         </div>
                                         {productData?.fault && (
                                             <div className="fault-info mt-3 p-2 bg-red-50 rounded">
-                                                <span className="text-red">Note:</span>
+                                                <span className="text-red">Lưu ý:</span>
                                                 <span className="ml-2">{productData.fault}</span>
                                             </div>
                                         )}
                                     </div>
                                 </div>
-                                <div className="text-title mt-5">Quantity:</div>
+                                <div className="text-title mt-5">Số lượng:</div>
                                 <div className="choose-quantity flex items-center lg:justify-between gap-5 gap-y-3 mt-3">
                                     {productData?.stockQuantity > 1 ? (
                                         <div className="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
@@ -471,7 +471,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                             <div className="body1 font-semibold">1</div>
                                         </div>
                                     )}
-                                    <div onClick={handleAddToCart} className="button-main w-full text-center bg-white text-black border border-black">Add To Cart</div>
+                                    <div onClick={handleAddToCart} className="button-main w-full text-center bg-white text-black border border-black">Thêm vào giỏ hàng</div>
                                 </div>
                                 {/* <div className="button-block mt-5">
                                     <div className="button-main w-full text-center">Buy It Now</div>
@@ -481,13 +481,13 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                         <div className="compare-btn md:w-12 md:h-12 w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white">
                                             <Icon.ArrowsCounterClockwise className='heading6' />
                                         </div>
-                                        <span>Compare</span>
+                                        <span>So sánh</span>
                                     </div>
                                     <div className="share flex items-center gap-3 cursor-pointer">
                                         <div className="share-btn md:w-12 md:h-12 w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white">
                                             <Icon.ShareNetwork weight='fill' className='heading6' />
                                         </div>
-                                        <span>Share Products</span>
+                                        <span>Chia sẻ sản phẩm</span>
                                     </div>
                                 </div>
                                 {/* <div className="more-infor mt-6">
@@ -653,13 +653,13 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                                     className={`tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 ${activeTab === 'description' ? 'active' : ''}`}
                                     onClick={() => handleActiveTab('description')}
                                 >
-                                    Description
+                                    Mô tả
                                 </div>
                                 <div
                                     className={`tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 ${activeTab === 'specifications' ? 'active' : ''}`}
                                     onClick={() => handleActiveTab('specifications')}
                                 >
-                                    Specifications
+                                    Thông số kỹ thuật
                                 </div>
                             </div>
                         </div>
@@ -667,57 +667,57 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                             <div className={`desc-item description ${activeTab === 'description' ? 'open' : ''}`}>
                                 <div className='grid md:grid-cols-2 gap-8 gap-y-5'>
                                     <div>
-                                        <div className="heading6">Description</div>
+                                        <div className="heading6">Mô tả</div>
                                         <div className="text-secondary mt-2">{productMain.description}</div>
                                     </div>
                                 </div>
                                 <div className="grid lg:grid-cols-4 grid-cols-2 gap-[30px] md:mt-10 mt-6">
                                     <div className="item">
                                         <div className="icon-delivery-truck text-4xl"></div>
-                                        <div className="heading6 mt-4">Shipping Faster</div>
-                                        <div className="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                        <div className="heading6 mt-4">Giao hàng nhanh</div>
+                                        <div className="text-secondary mt-2">Giao hàng tận nơi, nhanh chóng và an toàn.</div>
                                     </div>
                                     <div className="item">
                                         <div className="icon-cotton text-4xl"></div>
-                                        <div className="heading6 mt-4">Cotton Material</div>
-                                        <div className="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                        <div className="heading6 mt-4">Chất liệu cotton</div>
+                                        <div className="text-secondary mt-2">Chất liệu mềm mại, thoáng mát, phù hợp với mọi loại da.</div>
                                     </div>
                                     <div className="item">
                                         <div className="icon-guarantee text-4xl"></div>
-                                        <div className="heading6 mt-4">High Quality</div>
-                                        <div className="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                        <div className="heading6 mt-4">Chất lượng cao</div>
+                                        <div className="text-secondary mt-2">Sản phẩm được kiểm định chất lượng nghiêm ngặt.</div>
                                     </div>
                                     <div className="item">
                                         <div className="icon-leaves-compatible text-4xl"></div>
-                                        <div className="heading6 mt-4">highly compatible</div>
-                                        <div className="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                        <div className="heading6 mt-4">Tương thích đa dạng</div>
+                                        <div className="text-secondary mt-2">Phù hợp với nhiều mục đích sử dụng khác nhau.</div>
                                     </div>
                                 </div>
                             </div>
                             <div className={`desc-item specifications flex items-center justify-center ${activeTab === 'specifications' ? 'open' : ''}`}>
                                 <div className='lg:w-1/2 sm:w-3/4 w-full'>
                                     <div className="item bg-surface flex items-center gap-8 py-3 px-10">
-                                        <div className="text-title sm:w-1/4 w-1/3">Brand</div>
+                                        <div className="text-title sm:w-1/4 w-1/3">Thương hiệu</div>
                                         <p>{productMain.brand || '-'}</p>
                                     </div>
                                     <div className="item flex items-center gap-8 py-3 px-10">
-                                        <div className="text-title sm:w-1/4 w-1/3">Size</div>
+                                        <div className="text-title sm:w-1/4 w-1/3">Kích cỡ</div>
                                         <p>{(productMain.sizes && productMain.sizes.length > 0) ? productMain.sizes.join(', ') : '-'}</p>
                                     </div>
                                     <div className="item bg-surface flex items-center gap-8 py-3 px-10">
-                                        <div className="text-title sm:w-1/4 w-1/3">Color</div>
+                                        <div className="text-title sm:w-1/4 w-1/3">Màu sắc</div>
                                         <p>{(productMain.variation && productMain.variation.length > 0) ? productMain.variation.map(v => v.color).join(', ') : '-'}</p>
                                     </div>
                                     <div className="item flex items-center gap-8 py-3 px-10">
-                                        <div className="text-title sm:w-1/4 w-1/3">Stock</div>
+                                        <div className="text-title sm:w-1/4 w-1/3">Tồn kho</div>
                                         <p>{productMain.quantity !== undefined ? productMain.quantity : '-'}</p>
                                     </div>
                                     <div className="item bg-surface flex items-center gap-8 py-3 px-10">
-                                        <div className="text-title sm:w-1/4 w-1/3">Category</div>
+                                        <div className="text-title sm:w-1/4 w-1/3">Danh mục</div>
                                         <p>{productMain.category || '-'}</p>
                                     </div>
                                     <div className="item bg-surface flex items-center gap-8 py-3 px-10">
-                                        <div className="text-title sm:w-1/4 w-1/3">Average Rating</div>
+                                        <div className="text-title sm:w-1/4 w-1/3">Đánh giá trung bình</div>
                                         <p>{typeof productMain.averageRating === 'number' ? productMain.averageRating : (typeof productMain.rate === 'number' ? productMain.rate : '-')}</p>
                                     </div>
                                 </div>
@@ -1054,23 +1054,23 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                             <div className="text-button more-review-btn text-center mt-2 underline">View More Comments</div>
                         </div>
                         <div id="form-review" className='form-review pt-6'>
-                            <div className="heading4">Leave A comment</div>
+                            <div className="heading4">Để lại bình luận</div>
                             <form className="grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
                                 <div className="name ">
-                                    <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="text" placeholder="Your Name *" required />
+                                    <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="text" placeholder="Tên của bạn *" required />
                                 </div>
                                 <div className="mail ">
-                                    <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" placeholder="Your Email *" required />
+                                    <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" placeholder="Email của bạn *" required />
                                 </div>
                                 <div className="col-span-full message">
-                                    <textarea className="border border-line px-4 py-3 w-full rounded-lg" id="message" name="message" placeholder="Your message *" required></textarea>
+                                    <textarea className="border border-line px-4 py-3 w-full rounded-lg" id="message" name="message" placeholder="Nội dung bình luận *" required></textarea>
                                 </div>
                                 <div className="col-span-full flex items-start -mt-2 gap-2">
                                     <input type="checkbox" id="saveAccount" name="saveAccount" className='mt-1.5' />
-                                    <label className="" htmlFor="saveAccount">Save my name, email, and website in this browser for the next time I comment.</label>
+                                    <label className="" htmlFor="saveAccount">Lưu tên, email và website của tôi cho lần bình luận tiếp theo.</label>
                                 </div>
                                 <div className="col-span-full sm:pt-3">
-                                    <button className='button-main bg-white text-black border border-black'>Submit Reviews</button>
+                                    <button className='button-main bg-white text-black border border-black'>Gửi đánh giá</button>
                                 </div>
                             </form>
                         </div>
@@ -1078,7 +1078,7 @@ const Default: React.FC<Props> = ({ data, productId }) => {
                 </div>
                 <div className="related-product md:py-20 py-10">
                     <div className="container">
-                        <div className="heading3 text-center">Next Products</div>
+                        <div className="heading3 text-center">Sản phẩm liên quan</div>
                         <div className="list-product hide-product-sold grid lg:grid-cols-4 grid-cols-2 md:gap-[30px] gap-5 md:mt-10 mt-6">
                             {data
                                 .filter(item => Number(item.id) > Number(productId))

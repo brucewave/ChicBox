@@ -209,7 +209,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
     if (filteredData.length === 0) {
         filteredData.push({
             id: 0,
-            name: 'No products found',
+            name: 'Không tìm thấy sản phẩm',
             description: '',
             price: 0,
             brandName: '',
@@ -265,11 +265,11 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                     <div className="container lg:pt-[134px] pt-24 pb-10 relative">
                         <div className="main-content w-full h-full flex flex-col items-center justify-center relative z-[1]">
                             <div className="text-content">
-                                <div className="heading2 text-center">{dataType === null ? 'Shop' : dataType}</div>
+                                <div className="heading2 text-center">{dataType === null ? 'Cửa hàng' : dataType}</div>
                                 <div className="link flex items-center justify-center gap-1 caption1 mt-3">
-                                    <Link href={'/'}>Homepage</Link>
+                                    <Link href={'/'}>Trang chủ</Link>
                                     <Icon.CaretRight size={14} className='text-secondary2' />
-                                    <div className='text-secondary2 capitalize'>{dataType === null ? 'Shop' : dataType}</div>
+                                    <div className='text-secondary2 capitalize'>{dataType === null ? 'Cửa hàng' : dataType}</div>
                                 </div>
                             </div>
                             <div className="list-tab flex flex-wrap items-center justify-center gap-y-5 gap-8 lg:mt-[70px] mt-12 overflow-hidden">
@@ -292,7 +292,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                     <div className="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
                         <div className="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
                             <div className="filter-type pb-8 border-b border-line">
-                                <div className="heading6">Products Type</div>
+                                <div className="heading6">Loại sản phẩm</div>
                                 <div className="list-type mt-4">
                                     {categories.map((category) => (
                                         <div
@@ -309,7 +309,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                 </div>
                             </div>
                             <div className="filter-size pb-8 border-b border-line mt-8">
-                                <div className="heading6">Size</div>
+                                <div className="heading6">Kích cỡ</div>
                                 <div className="list-size flex items-center flex-wrap gap-3 gap-y-4 mt-4">
                                     {['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'].map((item, index) => (
                                         <div
@@ -324,91 +324,91 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                         className={`size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line ${size === 'freesize' ? 'active' : ''}`}
                                         onClick={() => handleSize('freesize')}
                                     >
-                                        Freesize
+                                        Tự do
                                     </div>
                                 </div>
                             </div>
                             <div className="filter-price pb-8 border-b border-line mt-8">
-                                <div className="heading6">Price Range</div>
+                                <div className="heading6">Khoảng giá</div>
                                 <Slider
                                     range
-                                    defaultValue={[0, 100]}
+                                    defaultValue={[0, 1000000]}
                                     min={0}
-                                    max={100}
+                                    max={1000000}
                                     onChange={handlePriceChange}
                                     className='mt-5'
                                 />
                                 <div className="price-block flex items-center justify-between flex-wrap mt-4">
                                     <div className="min flex items-center gap-1">
-                                        <div>Min price:</div>
-                                        <div className='price-min'>$
-                                            <span>{priceRange.min}</span>
+                                        <div>Giá thấp nhất: </div>
+                                        <div className='price-min'>
+                                            <span>{priceRange.min.toLocaleString('vi-VN')} VNĐ</span>
                                         </div>
                                     </div>
                                     <div className="min flex items-center gap-1">
-                                        <div>Max price:</div>
-                                        <div className='price-max'>$
-                                            <span>{priceRange.max}</span>
+                                        <div>Giá cao nhất: </div>
+                                        <div className='price-max'>
+                                            <span>{priceRange.max.toLocaleString('vi-VN')} VNĐ</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="filter-color pb-8 border-b border-line mt-8">
-                                <div className="heading6">Colors</div>
+                                <div className="heading6">Màu sắc</div>
                                 <div className="list-color flex items-center flex-wrap gap-3 gap-y-4 mt-4">
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'pink' ? 'active' : ''}`}
                                         onClick={() => handleColor('pink')}
                                     >
                                         <div className="color bg-[#F4C5BF] w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">pink</div>
+                                        <div className="caption1 capitalize">hồng</div>
                                     </div>
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'red' ? 'active' : ''}`}
                                         onClick={() => handleColor('red')}
                                     >
                                         <div className="color bg-red w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">red</div>
+                                        <div className="caption1 capitalize">đỏ</div>
                                     </div>
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'green' ? 'active' : ''}`}
                                         onClick={() => handleColor('green')}
                                     >
                                         <div className="color bg-green w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">green</div>
+                                        <div className="caption1 capitalize">xanh lá</div>
                                     </div>
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'yellow' ? 'active' : ''}`}
                                         onClick={() => handleColor('yellow')}
                                     >
                                         <div className="color bg-yellow w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">yellow</div>
+                                        <div className="caption1 capitalize">vàng</div>
                                     </div>
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'purple' ? 'active' : ''}`}
                                         onClick={() => handleColor('purple')}
                                     >
                                         <div className="color bg-purple w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">purple</div>
+                                        <div className="caption1 capitalize">tím</div>
                                     </div>
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'black' ? 'active' : ''}`}
                                         onClick={() => handleColor('black')}
                                     >
                                         <div className="color bg-black w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">black</div>
+                                        <div className="caption1 capitalize">đen</div>
                                     </div>
                                     <div
                                         className={`color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line ${color === 'white' ? 'active' : ''}`}
                                         onClick={() => handleColor('white')}
                                     >
                                         <div className="color bg-[#F6EFDD] w-5 h-5 rounded-full"></div>
-                                        <div className="caption1 capitalize">white</div>
+                                        <div className="caption1 capitalize">trắng</div>
                                     </div>
                                 </div>
                             </div>
                             <div className="filter-brand mt-8">
-                                <div className="heading6">Brands</div>
+                                <div className="heading6">Thương hiệu</div>
                                 <div className="list-brand mt-4">
                                     {Object.entries(brandCounts).map(([brandName, count]) => (
                                         <div key={brandName} className="brand-item flex items-center justify-between">
@@ -459,7 +459,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                             className='border-line'
                                             onChange={handleShowOnlySale}
                                         />
-                                        <label htmlFor="filter-sale" className='cation1 cursor-pointer'>Show only products on sale</label>
+                                        <label htmlFor="filter-sale" className='cation1 cursor-pointer'>Chỉ hiển thị sản phẩm đang giảm giá</label>
                                     </div>
                                 </div>
                                 <div className="right flex items-center gap-3">
@@ -469,13 +469,13 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                             name="select-filter"
                                             className='caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-line'
                                             onChange={(e) => { handleSortChange(e.target.value) }}
-                                            defaultValue={'Sorting'}
+                                            defaultValue={'Sắp xếp'}
                                         >
-                                            <option value="Sorting" disabled>Sorting</option>
-                                            <option value="soldQuantityHighToLow">Best Selling</option>
-                                            <option value="discountHighToLow">Best Discount</option>
-                                            <option value="priceHighToLow">Price High To Low</option>
-                                            <option value="priceLowToHigh">Price Low To High</option>
+                                            <option value="Sắp xếp" disabled>Sắp xếp</option>
+                                            <option value="soldQuantityHighToLow">Bán chạy nhất</option>
+                                            <option value="discountHighToLow">Giảm giá nhiều nhất</option>
+                                            <option value="priceHighToLow">Giá cao đến thấp</option>
+                                            <option value="priceLowToHigh">Giá thấp đến cao</option>
                                         </select>
                                         <Icon.CaretDown size={12} className='absolute top-1/2 -translate-y-1/2 md:right-4 right-2' />
                                     </div>
@@ -485,7 +485,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                             <div className="list-filtered flex items-center gap-3 mt-4">
                                 <div className="total-product">
                                     {totalProducts}
-                                    <span className='text-secondary pl-1'>Products Found</span>
+                                    <span className='text-secondary pl-1'>Sản phẩm được tìm thấy</span>
                                 </div>
                                 {(selectedType || selectedSize || selectedColor || selectedBrand) && (
                                     <>
@@ -521,7 +521,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                                             onClick={handleClearAll}
                                         >
                                             <Icon.X color='rgb(219, 68, 68)' className='cursor-pointer' />
-                                            <span className='text-button-uppercase text-red'>Clear All</span>
+                                            <span className='text-button-uppercase text-red'>Xóa tất cả</span>
                                         </div>
                                     </>
                                 )}
@@ -530,7 +530,7 @@ const ShopBreadCrumb1: React.FC<Props> = ({ data, productPerPage, dataType, gend
                             <div className="list-product hide-product-sold grid lg:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7">
                                 {currentProducts.map((item) => (
                                     item.id === 0 ? (
-                                        <div key={item.id} className="no-data-product">No products match the selected criteria.</div>
+                                        <div key={item.id} className="no-data-product">Không có sản phẩm phù hợp với tiêu chí đã chọn.</div>
                                     ) : (
                                         <div key={item.id} className="product-wrapper">
                                             <Product 

@@ -183,7 +183,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                             href="/"
                                             className={`text-button-uppercase duration-300 h-full flex items-center justify-center gap-1 ${pathname === '/' ? 'active' : ''}`}
                                         >
-                                            HOME
+                                            TRANG CHỦ
                                         </Link>
                                     </li>
                                     <li className='h-full'>
@@ -191,7 +191,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                             href="/shop/default-grid"
                                             className={`text-button-uppercase duration-300 h-full flex items-center justify-center ${pathname.includes('/shop/') ? 'active' : ''}`}
                                         >
-                                            SHOP
+                                            CỬA HÀNG
                                         </Link>
                                         <div className="mega-menu absolute top-[74px] left-0 bg-white w-screen">
                                             <div className="container">
@@ -205,13 +205,13 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                                                     href="/shop/default-grid"
                                                                     className="link text-secondary duration-300 mt-4 inline-block hover:text-black"
                                                                 >
-                                                                    View All
+                                                                    Xem tất cả
                                                                 </Link>
                                                             </div>
                                                         ))}
                                                     </div>
                                                     <div className="recent-product pl-2.5 basis-1/3">
-                                                        <div className="text-button-uppercase pb-2">Recent Products</div>
+                                                        <div className="text-button-uppercase pb-2">Sản phẩm mới</div>
                                                         <div className="list-product hide-product-sold grid grid-cols-2 gap-5 mt-3">
                                                             {discountedProducts.map((prd, index) => (
                                                                 <Product key={index} data={prd} type='grid' />
@@ -227,7 +227,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                             href="/pages/about"
                                             className={`text-button-uppercase duration-300 h-full flex items-center justify-center ${pathname === '/pages/about' ? 'active' : ''}`}
                                                                     >
-                                            ABOUT US
+                                            VỀ CHÚNG TÔI
                                                                     </Link>
                                                                 </li>
                                     <li className='h-full'>
@@ -235,7 +235,7 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                             href="/pages/store-list"
                                             className={`text-button-uppercase duration-300 h-full flex items-center justify-center ${pathname === '/pages/store-list' ? 'active' : ''}`}
                                                                     >
-                                            STORE LIST
+                                            DANH SÁCH CỬA HÀNG
                                                                     </Link>
                                     </li>
                                 </ul>
@@ -253,21 +253,21 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                                 >
                                     {isLoggedIn ? (
                                         <>
-                                            <Link href={'/my-account'} className="button-main w-full text-center" onClick={handleLoginPopup}>My Account</Link>
+                                            <Link href={'/my-account'} className="button-main w-full text-center" onClick={handleLoginPopup}>Tài khoản của tôi</Link>
                                             <div className="text-secondary text-center mt-3 pb-4">
-                                                <button onClick={handleLogout} className='text-black hover:underline'>Logout</button>
+                                                <button onClick={handleLogout} className='text-black hover:underline'>Đăng xuất</button>
                                             </div>
                                             <div className="bottom pt-4 border-t border-line"></div>
-                                            <Link href={'#!'} className='body1 hover:underline'>Support</Link>
+                                            <Link href={'#!'} className='body1 hover:underline'>Hỗ trợ</Link>
                                         </>
                                     ) : (
                                         <>
-                                            <Link href={'/login'} className="button-main w-full text-center" onClick={handleLoginPopup}>Login</Link>
-                                            <div className="text-secondary text-center mt-3 pb-4">Don't have an account?
-                                                <Link href={'/register'} className='text-black pl-1 hover:underline' onClick={handleLoginPopup}>Register</Link>
+                                            <Link href={'/login'} className="button-main w-full text-center" onClick={handleLoginPopup}>Đăng nhập</Link>
+                                            <div className="text-secondary text-center mt-3 pb-4">Chưa có tài khoản?
+                                                <Link href={'/register'} className='text-black pl-1 hover:underline' onClick={handleLoginPopup}>Đăng ký</Link>
                                             </div>
                                             <div className="bottom pt-4 border-t border-line"></div>
-                                            <Link href={'#!'} className='body1 hover:underline'>Support</Link>
+                                            <Link href={'#!'} className='body1 hover:underline'>Hỗ trợ</Link>
                                         </>
                                     )}
                                 </div>
@@ -296,21 +296,21 @@ const MenuOne: React.FC<Props> = ({ props }) => {
                             </div>
                             <div className="form-search relative mt-2">
                                 <Icon.MagnifyingGlass size={20} className='absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer' />
-                                <input type="text" placeholder='What are you looking for?' className=' h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4' />
+                                <input type="text" placeholder='Bạn đang tìm gì?' className=' h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4' />
                             </div>
                             <div className="list-nav mt-6">
                                 <ul>
                                     <li>
-                                        <Link href={'/'} className='text-xl font-semibold flex items-center justify-between'>Home</Link>
+                                        <Link href={'/'} className='text-xl font-semibold flex items-center justify-between'>Trang chủ</Link>
                                     </li>
                                     <li>
-                                        <Link href={'/shop/default-grid'} className='text-xl font-semibold flex items-center justify-between mt-5'>Shop</Link>
+                                        <Link href={'/shop/default-grid'} className='text-xl font-semibold flex items-center justify-between mt-5'>Cửa hàng</Link>
                                     </li>
                                     <li>
-                                        <Link href={'/pages/about'} className='text-xl font-semibold flex items-center justify-between mt-5'>About Us</Link>
+                                        <Link href={'/pages/about'} className='text-xl font-semibold flex items-center justify-between mt-5'>Về chúng tôi</Link>
                                     </li>
                                     <li>
-                                        <Link href={'/pages/store-list'} className='text-xl font-semibold flex items-center justify-between mt-5'>Store List</Link>
+                                        <Link href={'/pages/store-list'} className='text-xl font-semibold flex items-center justify-between mt-5'>Danh sách cửa hàng</Link>
                                     </li>
                                 </ul>
                             </div>
