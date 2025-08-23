@@ -1,4 +1,4 @@
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.roomily.tech';
 
 const getAuthHeaders = () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -15,6 +15,7 @@ export interface Category {
     id: number;
     name: string;
     description: string;
+    isActive?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -33,34 +34,51 @@ export const categoryService = {
     },
 
     // Create a new category
-    async createCategory(categoryData: { name: string; description: string }): Promise<Category> {
+    async createCategory(categoryData: { name: string; description: string; isActive?: boolean }): Promise<Category> {
+        console.log('Creating category with data:', categoryData);
+        console.log('Using baseUrl:', baseUrl);
+        
         const response = await fetch(`${baseUrl}/api/v1/categories`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(categoryData),
         });
+        
+        console.log('Create category response status:', response.status);
+        console.log('Create category response headers:', response.headers);
+        
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-            throw new Error(errorData.message || `Failed to create category: ${response.status} ${response.statusText}`);
+            let errorMessage = `Failed to create category: ${response.status} ${response.statusText}`;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorMessage;
+                console.error('Create category error data:', errorData);
+            } catch (e) {
+                console.error('Could not parse error response:', e);
+            }
+            throw new Error(errorMessage);
         }
         
-        // Check if response has content before trying to parse JSON
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            try {
-                return await response.json();
-            } catch (error) {
-                // If JSON parsing fails, throw an error for create operations
-                throw new Error('Failed to parse response from server');
-            }
-        } else {
-            // If no JSON content, throw an error for create operations
-            throw new Error('Server did not return expected response format');
+        // Try to parse JSON response
+        try {
+            const result = await response.json();
+            console.log('Create category success response:', result);
+            return result;
+        } catch (error) {
+            console.error('Failed to parse success response:', error);
+            // If JSON parsing fails but status is OK, return a basic category object
+            return {
+                id: Date.now(), // Temporary ID
+                name: categoryData.name,
+                description: categoryData.description,
+                isActive: categoryData.isActive !== undefined ? categoryData.isActive : true,
+                createdAt: new Date().toISOString()
+            };
         }
     },
 
     // Update a category
-    async updateCategory(categoryId: number, categoryData: { name: string; description: string }): Promise<Category> {
+    async updateCategory(categoryId: number, categoryData: { name: string; description: string; isActive?: boolean }): Promise<Category> {
         const response = await fetch(`${baseUrl}/api/v1/categories/${categoryId}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
@@ -82,6 +100,7 @@ export const categoryService = {
                     id: categoryId,
                     name: categoryData.name,
                     description: categoryData.description,
+                    isActive: categoryData.isActive,
                     updatedAt: new Date().toISOString()
                 };
             }
@@ -91,6 +110,7 @@ export const categoryService = {
                 id: categoryId,
                 name: categoryData.name,
                 description: categoryData.description,
+                isActive: categoryData.isActive,
                 updatedAt: new Date().toISOString()
             };
         }

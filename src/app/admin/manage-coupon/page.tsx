@@ -35,7 +35,7 @@ const ManageCouponPage = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching coupons:', err);
-      setError('Failed to load coupons');
+      setError('Không thể tải mã giảm giá');
     } finally {
       setLoading(false);
     }
@@ -65,12 +65,12 @@ const ManageCouponPage = () => {
       if (editingCoupon) {
         // Update existing coupon
         await couponService.updateCoupon(editingCoupon.id, couponData);
-        setSuccess('Coupon updated successfully!');
+        setSuccess('Cập nhật mã giảm giá thành công!');
         setEditingCoupon(null);
       } else {
         // Create new coupon
         await couponService.createCoupon(couponData);
-        setSuccess('Coupon created successfully!');
+        setSuccess('Tạo mã giảm giá thành công!');
       }
       
       await fetchCoupons(); // Refresh the list
@@ -90,7 +90,7 @@ const ManageCouponPage = () => {
       console.error('Error saving coupon:', error);
       
       // Get more specific error message
-      let errorMessage = editingCoupon ? 'Failed to update coupon' : 'Failed to create coupon';
+      let errorMessage = editingCoupon ? 'Không thể cập nhật mã giảm giá' : 'Không thể tạo mã giảm giá';
       
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -104,16 +104,17 @@ const ManageCouponPage = () => {
 
   const copyToClipboard = (code: string) => {
     navigator.clipboard.writeText(code);
+    // Có thể thêm toast notification ở đây nếu muốn
   };
 
   const handleDeleteCoupon = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this coupon?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa mã giảm giá này?')) {
       try {
         await couponService.deleteCoupon(id);
         await fetchCoupons(); // Refresh the list
       } catch (error) {
         console.error('Error deleting coupon:', error);
-        setError('Failed to delete coupon');
+        setError('Không thể xóa mã giảm giá');
       }
     }
   };
@@ -158,15 +159,15 @@ const ManageCouponPage = () => {
 
   return (
     <AdminLayout 
-      title="Manage Coupons" 
-      subtitle="Create and manage discount coupons for your store"
+      title="Quản lý mã giảm giá" 
+      subtitle="Tạo và quản lý mã giảm giá cho cửa hàng của bạn"
     >
       <div className="space-y-6">
         {/* Header with Add Button */}
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Coupons</h2>
-            <p className="text-gray-600 mt-1">Manage your discount codes and promotions</p>
+            <h2 className="text-xl font-semibold text-gray-900">Mã giảm giá</h2>
+            <p className="text-gray-600 mt-1">Quản lý mã giảm giá và khuyến mãi</p>
           </div>
           <button
             onClick={() => {
@@ -176,7 +177,7 @@ const ManageCouponPage = () => {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <FiPlus className="w-4 h-4" />
-            Add Coupon
+            Thêm mã giảm giá
           </button>
         </div>
 
@@ -185,7 +186,7 @@ const ManageCouponPage = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
-                {editingCoupon ? 'Edit Coupon' : 'Add New Coupon'}
+                {editingCoupon ? 'Chỉnh sửa mã giảm giá' : 'Thêm mã giảm giá mới'}
               </h3>
               <button
                 onClick={handleCancelEdit}
@@ -198,7 +199,7 @@ const ManageCouponPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Coupon Name *
+                    Tên mã giảm giá *
                   </label>
                   <input
                     type="text"
@@ -206,12 +207,12 @@ const ManageCouponPage = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., Summer Sale"
+                    placeholder="Ví dụ: Khuyến mãi mùa hè"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Coupon Code *
+                    Mã giảm giá *
                   </label>
                   <input
                     type="text"
@@ -219,12 +220,12 @@ const ManageCouponPage = () => {
                     value={formData.couponCode}
                     onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., SUMMER20"
+                    placeholder="Ví dụ: SUMMER20"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Discount Percentage *
+                    Phần trăm giảm giá *
                   </label>
                   <div className="relative">
                     <span className="absolute right-3 top-3 text-gray-500">%</span>
@@ -242,7 +243,7 @@ const ManageCouponPage = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Remaining Uses *
+                    Số lần sử dụng còn lại *
                   </label>
                   <input
                     type="number"
@@ -256,7 +257,7 @@ const ManageCouponPage = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Valid From *
+                    Có hiệu lực từ *
                   </label>
                   <input
                     type="datetime-local"
@@ -268,7 +269,7 @@ const ManageCouponPage = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Valid Until *
+                    Có hiệu lực đến *
                   </label>
                   <input
                     type="datetime-local"
@@ -280,15 +281,15 @@ const ManageCouponPage = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status *
+                    Trạng thái *
                   </label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({...formData, status: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
+                    <option value="ACTIVE">Hoạt động</option>
+                    <option value="INACTIVE">Không hoạt động</option>
                   </select>
                 </div>
               </div>
@@ -298,13 +299,13 @@ const ManageCouponPage = () => {
                   onClick={handleCancelEdit}
                   className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  {editingCoupon ? 'Update Coupon' : 'Create Coupon'}
+                  {editingCoupon ? 'Cập nhật mã giảm giá' : 'Tạo mã giảm giá'}
                 </button>
               </div>
             </form>
@@ -315,7 +316,7 @@ const ManageCouponPage = () => {
         {loading && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading coupons...</p>
+            <p className="mt-2 text-gray-600">Đang tải mã giảm giá...</p>
           </div>
         )}
 
@@ -346,13 +347,13 @@ const ManageCouponPage = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Code</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Discount</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Remaining Uses</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Valid Period</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Actions</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Tên</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Mã</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Giảm giá</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Lần sử dụng còn lại</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Thời gian hiệu lực</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Trạng thái</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Hành động</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -367,7 +368,7 @@ const ManageCouponPage = () => {
                           <button
                             onClick={() => copyToClipboard(coupon.couponCode)}
                             className="p-1 text-gray-400 hover:text-gray-600"
-                            title="Copy code"
+                            title="Sao chép mã"
                           >
                             <FiCopy className="w-3 h-3" />
                           </button>
@@ -393,7 +394,7 @@ const ManageCouponPage = () => {
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {coupon.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+                          {coupon.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -401,14 +402,14 @@ const ManageCouponPage = () => {
                           <button 
                             onClick={() => handleEditCoupon(coupon)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit coupon"
+                            title="Chỉnh sửa mã giảm giá"
                           >
                             <FiEdit className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleDeleteCoupon(coupon.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete coupon"
+                            title="Xóa mã giảm giá"
                           >
                             <FiTrash2 className="w-4 h-4" />
                           </button>
@@ -427,7 +428,7 @@ const ManageCouponPage = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Coupons</p>
+                <p className="text-sm font-medium text-gray-600">Tổng số mã giảm giá</p>
                 <p className="text-2xl font-bold text-gray-900">{coupons.length}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
@@ -438,7 +439,7 @@ const ManageCouponPage = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Coupons</p>
+                <p className="text-sm font-medium text-gray-600">Mã giảm giá đang hoạt động</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {coupons.filter(c => c.status === 'ACTIVE').length}
                 </p>
@@ -451,12 +452,12 @@ const ManageCouponPage = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Remaining Uses</p>
+                <p className="text-sm font-medium text-gray-600">Tổng lần sử dụng còn lại</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {coupons.reduce((sum, c) => sum + c.remainingUses, 0)}
                 </p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-full">
+              <div className="p-6 bg-purple-100 rounded-full">
                 <FiCalendar className="w-6 h-6 text-purple-600" />
               </div>
             </div>

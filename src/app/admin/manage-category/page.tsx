@@ -50,8 +50,8 @@ const ManageCategoryPage = () => {
       setCategories(data);
     } catch (err: any) {
       console.error('Fetch categories error:', err);
-      setError(err.message || 'Failed to fetch categories');
-      toast.error('Failed to fetch categories');
+      setError(err.message || 'Không thể tải danh mục');
+      toast.error('Không thể tải danh mục');
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ const ManageCategoryPage = () => {
     });
   };
 
-  const openDeleteModal = (category: Category) => {
+  const openToggleStatusModal = (category: Category) => {
     setDeleteModal({
       isOpen: true,
       category,
@@ -100,7 +100,7 @@ const ManageCategoryPage = () => {
     });
   };
 
-  const closeDeleteModal = () => {
+  const closeToggleStatusModal = () => {
     setDeleteModal({
       isOpen: false,
       category: null,
@@ -120,7 +120,7 @@ const ManageCategoryPage = () => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Category name is required');
+      toast.error('Tên danh mục là bắt buộc');
       return;
     }
 
@@ -130,43 +130,55 @@ const ManageCategoryPage = () => {
       if (modal.mode === 'create') {
         const newCategory = await categoryService.createCategory(formData);
         setCategories(prev => [...prev, newCategory]);
-        toast.success('Category created successfully!');
+        toast.success('Tạo danh mục thành công!');
       } else {
         const updatedCategory = await categoryService.updateCategory(modal.category!.id, formData);
         setCategories(prev => prev.map(cat => 
           cat.id === modal.category!.id ? updatedCategory : cat
         ));
-        toast.success('Category updated successfully!');
+        toast.success('Cập nhật danh mục thành công!');
       }
       
       closeModal();
     } catch (err: any) {
       console.error('Save category error:', err);
-      const errorMessage = err.message || 'Failed to save category';
+      const errorMessage = err.message || 'Không thể lưu danh mục';
       toast.error(errorMessage);
       
       // If it's a JSON parsing error, provide more specific feedback
       if (err.message.includes('JSON') || err.message.includes('Unexpected end')) {
-        toast.error('Server response format issue. Please try again or contact support.');
+        toast.error('Lỗi định dạng phản hồi từ server. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
       }
     } finally {
       setModal(prev => ({ ...prev, saving: false }));
     }
   };
 
-  const handleDelete = async () => {
+  const handleToggleStatus = async () => {
     if (!deleteModal.category) return;
 
     try {
       setDeleteModal(prev => ({ ...prev, deleting: true }));
-      await categoryService.deleteCategory(deleteModal.category.id);
       
-      setCategories(prev => prev.filter(cat => cat.id !== deleteModal.category!.id));
-      toast.success('Category deleted successfully!');
-      closeDeleteModal();
+      // Toggle trạng thái hoạt động
+      const newStatus = !deleteModal.category.isActive;
+      const updatedCategory = await categoryService.updateCategory(deleteModal.category.id, {
+        name: deleteModal.category.name,
+        description: deleteModal.category.description,
+        isActive: newStatus
+      });
+      
+      // Cập nhật danh sách categories
+      setCategories(prev => prev.map(cat => 
+        cat.id === deleteModal.category!.id ? updatedCategory : cat
+      ));
+      
+      const statusText = newStatus ? 'kích hoạt' : 'vô hiệu hóa';
+      toast.success(`Đã ${statusText} danh mục "${deleteModal.category.name}" thành công!`);
+      closeToggleStatusModal();
     } catch (err: any) {
-      console.error('Delete category error:', err);
-      toast.error(err.message || 'Failed to delete category');
+      console.error('Toggle status error:', err);
+      toast.error(err.message || 'Không thể thay đổi trạng thái danh mục');
     } finally {
       setDeleteModal(prev => ({ ...prev, deleting: false }));
     }
@@ -190,11 +202,11 @@ const ManageCategoryPage = () => {
   if (loading) {
     return (
       <AdminLayout 
-        title="Manage Categories" 
-        subtitle="Create and manage product categories"
+        title="Quản lý danh mục" 
+        subtitle="Tạo và quản lý danh mục sản phẩm"
       >
         <div className="flex items-center justify-center h-64">
-          <div className="text-lg text-gray-600">Loading categories...</div>
+          <div className="text-lg text-gray-600">Đang tải danh mục...</div>
         </div>
       </AdminLayout>
     );
@@ -202,8 +214,8 @@ const ManageCategoryPage = () => {
 
   return (
     <AdminLayout 
-      title="Manage Categories" 
-      subtitle="Create and manage product categories"
+      title="Quản lý danh mục" 
+      subtitle="Tạo và quản lý danh mục sản phẩm"
     >
       <div className="space-y-6">
         {/* Header with Search and Add Button */}
@@ -214,7 +226,7 @@ const ManageCategoryPage = () => {
                 <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search categories by name or description..."
+                  placeholder="Tìm kiếm danh mục theo tên hoặc mô tả..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -226,7 +238,7 @@ const ManageCategoryPage = () => {
               className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               <FiPlus className="w-4 h-4" />
-              Add Category
+              Thêm danh mục
             </button>
           </div>
         </div>
@@ -244,26 +256,38 @@ const ManageCategoryPage = () => {
                   <button 
                     onClick={() => openEditModal(category)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Edit category"
+                    title="Chỉnh sửa danh mục"
                   >
                     <FiEdit className="w-4 h-4" />
                   </button>
                   <button 
-                    onClick={() => openDeleteModal(category)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Delete category"
+                    onClick={() => openToggleStatusModal(category)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      category.isActive 
+                        ? 'text-orange-600 hover:bg-orange-50' 
+                        : 'text-green-600 hover:bg-green-50'
+                    }`}
+                    title={category.isActive ? 'Vô hiệu hóa danh mục' : 'Kích hoạt danh mục'}
                   >
-                    <FiTrash2 className="w-4 h-4" />
+                    {category.isActive ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
               
               <div className="text-xs text-gray-500 space-y-1">
                 {category.createdAt && (
-                  <div>Created: {formatDate(category.createdAt)}</div>
+                  <div>Tạo lúc: {formatDate(category.createdAt)}</div>
                 )}
                 {category.updatedAt && (
-                  <div>Updated: {formatDate(category.updatedAt)}</div>
+                  <div>Cập nhật: {formatDate(category.updatedAt)}</div>
                 )}
               </div>
             </div>
@@ -275,11 +299,11 @@ const ManageCategoryPage = () => {
             <div className="text-gray-400 mb-4">
               <FiSearch className="w-16 h-16 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No categories found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy danh mục</h3>
             <p className="text-gray-500 mb-4">
               {searchTerm 
-                ? 'Try adjusting your search criteria'
-                : 'Get started by creating your first category'
+                ? 'Thử điều chỉnh từ khóa tìm kiếm'
+                : 'Bắt đầu bằng cách tạo danh mục đầu tiên'
               }
             </p>
             {!searchTerm && (
@@ -287,7 +311,7 @@ const ManageCategoryPage = () => {
                 onClick={openCreateModal}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Create First Category
+                Tạo danh mục đầu tiên
               </button>
             )}
           </div>
@@ -300,7 +324,7 @@ const ManageCategoryPage = () => {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
-                {modal.mode === 'create' ? 'Create New Category' : 'Edit Category'}
+                {modal.mode === 'create' ? 'Tạo danh mục mới' : 'Chỉnh sửa danh mục'}
               </h3>
               <button
                 onClick={closeModal}
@@ -313,7 +337,7 @@ const ManageCategoryPage = () => {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category Name *
+                  Tên danh mục *
                 </label>
                 <input
                   type="text"
@@ -321,14 +345,14 @@ const ManageCategoryPage = () => {
                   value={formData.name}
                   onChange={handleFormChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter category name"
+                  placeholder="Nhập tên danh mục"
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  Mô tả
                 </label>
                 <textarea
                   name="description"
@@ -336,7 +360,7 @@ const ManageCategoryPage = () => {
                   onChange={handleFormChange}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter category description"
+                  placeholder="Nhập mô tả danh mục"
                 />
               </div>
 
@@ -347,14 +371,14 @@ const ManageCategoryPage = () => {
                   disabled={modal.saving}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={modal.saving || !formData.name.trim()}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {modal.saving ? 'Saving...' : (modal.mode === 'create' ? 'Create Category' : 'Update Category')}
+                  {modal.saving ? 'Đang lưu...' : (modal.mode === 'create' ? 'Tạo danh mục' : 'Cập nhật danh mục')}
                 </button>
               </div>
             </form>
@@ -369,31 +393,56 @@ const ManageCategoryPage = () => {
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
-                  <FiTrash2 className="w-8 h-8 text-red-600" />
+                  {deleteModal.category?.isActive ? (
+                    <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  ) : (
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Delete Category</h3>
-                  <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {deleteModal.category?.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'} danh mục
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {deleteModal.category?.isActive 
+                      ? 'Danh mục sẽ không còn hiển thị trong hệ thống' 
+                      : 'Danh mục sẽ được kích hoạt và hiển thị trở lại'
+                    }
+                  </p>
                 </div>
               </div>
               <p className="text-gray-700 mb-6">
-                Are you sure you want to delete <strong>"{deleteModal.category.name}"</strong>? 
-                This will permanently remove the category from your system.
+                Bạn có chắc chắn muốn {deleteModal.category?.isActive ? 'vô hiệu hóa' : 'kích hoạt'} danh mục <strong>"{deleteModal.category?.name}"</strong>? 
+                {deleteModal.category?.isActive 
+                  ? 'Danh mục sẽ không còn hiển thị trong hệ thống.' 
+                  : 'Danh mục sẽ được kích hoạt và hiển thị trở lại.'
+                }
               </p>
               <div className="flex justify-end space-x-3">
                 <button
-                  onClick={closeDeleteModal}
+                  onClick={closeToggleStatusModal}
                   disabled={deleteModal.deleting}
                   className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
-                  onClick={handleDelete}
+                  onClick={handleToggleStatus}
                   disabled={deleteModal.deleting}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                  className={`px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${
+                    deleteModal.category?.isActive 
+                      ? 'bg-orange-600 text-white hover:bg-orange-700' 
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
                 >
-                  {deleteModal.deleting ? 'Deleting...' : 'Delete Category'}
+                  {deleteModal.deleting 
+                    ? 'Đang xử lý...' 
+                    : (deleteModal.category?.isActive ? 'Vô hiệu hóa' : 'Kích hoạt')
+                  }
                 </button>
               </div>
             </div>

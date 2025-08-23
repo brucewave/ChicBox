@@ -17,6 +17,8 @@ const AllProductPage = () => {
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortDir, setSortDir] = useState('desc');
+  const [searching, setSearching] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // Edit modal
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -36,10 +38,18 @@ const AllProductPage = () => {
     setLoadingProducts(true);
     setErrorProducts('');
     try {
+      console.log('Fetching products with:', { page, pageSize, sortBy, sortDir });
       const response = await productService.getProducts(page, pageSize, sortBy, sortDir);
+      console.log('Products response:', response);
       setProducts(response.content || []);
       setTotalPages(response.totalPages || 1);
+      console.log('Products loaded:', response.content?.length || 0);
+      if (response.content && response.content.length > 0) {
+        console.log('First product sample:', response.content[0]);
+        console.log('Product properties:', Object.keys(response.content[0]));
+      }
     } catch (err: any) {
+      console.error('Error fetching products:', err);
       setErrorProducts(err.message || 'Không thể tải sản phẩm');
       toast.error('Không thể tải sản phẩm');
     } finally {
@@ -47,28 +57,162 @@ const AllProductPage = () => {
     }
   };
 
+  // Search all products function
+  const searchAllProducts = async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setFilteredProducts(products);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    try {
+      console.log('Searching all products for:', searchQuery);
+      // Try to get all products with a large page size
+      const response = await fetch('https://api.roomily.tech/api/v1/products?page=0&size=1000', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      
+      console.log('Search API response status:', response.status);
+      console.log('Search API response headers:', response.headers);
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const responseData = await response.json();
+      console.log('Search API response data:', responseData);
+      console.log('Response data type:', typeof responseData);
+      
+      // Handle both array and paginated response formats
+      let allProducts: any[] = [];
+      
+      if (Array.isArray(responseData)) {
+        // Direct array response
+        allProducts = responseData;
+        console.log('Direct array response, products count:', allProducts.length);
+      } else if (responseData && responseData.content && Array.isArray(responseData.content)) {
+        // Paginated response format
+        allProducts = responseData.content;
+        console.log('Paginated response, products count:', allProducts.length);
+      } else {
+        console.error('Unexpected response format:', responseData);
+        throw new Error('API returned unexpected data format');
+      }
+      
+      // Filter products based on search term
+      const filtered = allProducts.filter((product: any) => {
+        const nameMatch = product.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        const descriptionMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        const brandMatch = product.brandName?.toLowerCase().includes(searchQuery.toLowerCase());
+        const colorMatch = product.color?.toLowerCase().includes(searchQuery.toLowerCase());
+        const sizeMatch = product.productSize?.toLowerCase().includes(searchQuery.toLowerCase());
+        const materialMatch = product.material?.toLowerCase().includes(searchQuery.toLowerCase());
+        const statusMatch = product.status?.toLowerCase().includes(searchQuery.toLowerCase());
+        const codeMatch = product.code?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const isMatch = nameMatch || descriptionMatch || brandMatch || colorMatch || sizeMatch || materialMatch || statusMatch || codeMatch;
+        
+        if (isMatch) {
+          console.log('Product matched:', product.name, 'by term:', searchQuery);
+        }
+        
+        return isMatch;
+      });
+      
+      setFilteredProducts(filtered);
+      console.log('Search results:', filtered.length, 'products found across all products');
+    } catch (err: any) {
+      console.error('Search error:', err);
+      toast.error('Lỗi tìm kiếm sản phẩm');
+      
+      // Fallback to local search on current page
+      console.log('Falling back to local search on current page products');
+      const filtered = products.filter((product: any) => {
+        const nameMatch = product.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        const descriptionMatch = product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        const brandMatch = product.brandName?.toLowerCase().includes(searchQuery.toLowerCase());
+        const colorMatch = product.color?.toLowerCase().includes(searchQuery.toLowerCase());
+        const sizeMatch = product.productSize?.toLowerCase().includes(searchQuery.toLowerCase());
+        const materialMatch = product.material?.toLowerCase().includes(searchQuery.toLowerCase());
+        const statusMatch = product.status?.toLowerCase().includes(searchQuery.toLowerCase());
+        const codeMatch = product.code?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        return nameMatch || descriptionMatch || colorMatch || sizeMatch || materialMatch || statusMatch || codeMatch;
+      });
+      
+      setFilteredProducts(filtered);
+      console.log('Fallback search results:', filtered.length, 'products found on current page');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // Initial load
   useEffect(() => {
+    console.log('Component mounted, fetching products...');
     fetchProducts();
-    // eslint-disable-next-line
+  }, []);
+
+  // Set initial filteredProducts when products are first loaded
+  useEffect(() => {
+    if (products.length > 0) {
+      console.log('Setting initial filteredProducts:', products.length);
+      setFilteredProducts(products);
+    }
+  }, [products]);
+
+  // Fetch products when page, sortBy, or sortDir change
+  useEffect(() => {
+    if (page > 0 || sortBy !== 'createdAt' || sortDir !== 'desc') {
+      console.log('Fetching products with:', { page, pageSize, sortBy, sortDir });
+      fetchProducts();
+    }
   }, [page, sortBy, sortDir]);
 
+  // Set filteredProducts to products when products change
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(product => 
-        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brandName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.color?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.productSize?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.code?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredProducts(filtered);
+    console.log('Products changed, updating filteredProducts:', products.length);
+    setFilteredProducts(products);
+  }, [products]);
+
+  useEffect(() => {
+    console.log('Search effect triggered:', { searchTerm, productsCount: products.length });
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
     }
-  }, [searchTerm, products]);
+    
+    if (!searchTerm.trim()) {
+      // When no search term, show current page products only
+      setFilteredProducts(products);
+      setSearching(false);
+      console.log('No search term, showing current page products:', products.length);
+    } else {
+      // Show searching state immediately but don't disable input
+      // const timeout = setTimeout(() => {
+      //   setSearching(true);
+      //   searchAllProducts(searchTerm);
+      // }, 500); // Wait 500ms after user stops typing
+      
+      // Debounce the actual search but don't block input
+      const timeout = setTimeout(() => {
+        searchAllProducts(searchTerm);
+      }, 300); // Reduced to 300ms for better responsiveness
+      
+      setSearchTimeout(timeout);
+    }
+    
+    // Cleanup timeout on unmount
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTerm, products]); // Add products as dependency
 
   // Edit modal logic
   const openEditModal = (product: any) => {
@@ -264,17 +408,24 @@ const AllProductPage = () => {
         </div>
         <div className="mb-6">
           <div className="relative max-w-md">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm theo tên, thương hiệu, danh mục, màu sắc, size..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+                         <input
+               type="text"
+               placeholder="Tìm kiếm sản phẩm theo tên, thương hiệu, danh mục, màu sắc, size..."
+               value={searchTerm}
+               onChange={(e) => {
+                 console.log('Search input changed:', e.target.value);
+                 setSearchTerm(e.target.value);
+               }}
+                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              {searching ? (
+                <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+              ) : (
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              )}
             </div>
             {searchTerm && (
               <button
@@ -287,11 +438,19 @@ const AllProductPage = () => {
               </button>
             )}
           </div>
-          {searchTerm && (
-            <p className="text-sm text-gray-600 mt-2">
-              Tìm thấy {filteredProducts.length} sản phẩm phù hợp với "{searchTerm}"
-            </p>
-          )}
+                     {searchTerm && (
+             <div className="mt-2">
+               {searching ? (
+                 <p className="text-sm text-blue-600">
+                   🔍 Đang tìm kiếm trong tất cả sản phẩm...
+                 </p>
+               ) : (
+                 <p className="text-sm text-gray-600">
+                   Tìm thấy {filteredProducts.length} sản phẩm phù hợp với "{searchTerm}"
+                 </p>
+               )}
+             </div>
+           )}
         </div>
         {loadingProducts ? (
           <div className="text-center py-8">Đang tải sản phẩm...</div>
@@ -318,7 +477,7 @@ const AllProductPage = () => {
                     <tr key={product.id}>
                       <td className="px-4 py-3">
                         {product.primaryImageUrl ? (
-                          <img src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${product.primaryImageUrl}`} alt={product.name} className="w-16 h-16 object-cover rounded" />
+                          <img src={`https://api.roomily.tech/api/v1/images/${product.primaryImageUrl}`} alt={product.name} className="w-16 h-16 object-cover rounded" />
                         ) : (
                           <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400">No Image</div>
                         )}
@@ -425,7 +584,7 @@ const AllProductPage = () => {
                   </div>
                   <div className="flex items-center mt-6">
                     <input type="checkbox" name="isIncluded" checked={!!editForm.isIncluded} onChange={handleEditFormChange} className="mr-2" />
-                    <label className="text-sm font-medium text-gray-700">Đã đăng</label>
+                    <label className="text-sm font-medium text-gray-700">Quà tặng kèm</label>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái *</label>
@@ -533,7 +692,7 @@ const AllProductPage = () => {
                           {editProduct.imageUrls.map((imageUrl: string, index: number) => (
                             <div key={index} className="relative group">
                               <img 
-                                src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/images/${imageUrl}`} 
+                                src={`https://api.roomily.tech/api/v1/images/${imageUrl}`} 
                                 alt={`Ảnh sản phẩm ${index + 1}`} 
                                 className="w-full h-24 object-cover rounded-lg border border-gray-300"
                               />

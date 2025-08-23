@@ -1,10 +1,8 @@
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.roomily.tech';
 
 const getAuthHeaders = () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-    };
+    const headers: Record<string, string> = {};
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
