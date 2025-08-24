@@ -16,7 +16,7 @@ const RotatingBadge: React.FC = () => {
   };
 
   return (
-    <div className="absolute" style={{ right: '80px', bottom: '150px' }}>
+    <div className="absolute" style={{ right: '80px', bottom: '120px' }}>
       <div 
         className={`relative w-24 h-24 md:w-32 md:h-32 transition-all duration-300 cursor-pointer ${
           isHovered ? 'scale-110' : 'scale-100'

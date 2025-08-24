@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Instrument_Sans } from 'next/font/google'
+import { Space_Grotesk } from 'next/font/google'
 import '@/styles/styles.scss'
 import GlobalProvider from './GlobalProvider'
 import ModalCart from '@/components/Modal/ModalCart'
@@ -15,7 +15,7 @@ import 'rc-slider/assets/index.css';
 
 const serverTimeLeft: CountdownTimeType = countdownTime();
 
-const instrument = Instrument_Sans({ subsets: ['latin'] })
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'ChicBox',
@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <GlobalProvider>
       <html lang="en">
-        <body suppressHydrationWarning={true} className={`${instrument.className} overflow-x-hidden`}>
+        <body suppressHydrationWarning={true} className={`${spaceGrotesk.className} overflow-x-hidden`}>
           {children}
           <ModalCart serverTimeLeft={serverTimeLeft} />
           <ModalWishlist />

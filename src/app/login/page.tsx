@@ -23,7 +23,7 @@ const Login = () => {
         setError('')
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
+            const response = await axios.post(`https://api.roomily.tech/api/v1/auth/login`, {
                 usernameOrEmail: email,
                 password: password
             })
@@ -66,19 +66,19 @@ const Login = () => {
             <TopNavOne props="style-one bg-black" />
             <div id="header" className='relative w-full'>
                 <MenuOne props="bg-transparent" />
-                <Breadcrumb heading='Login' subHeading='Login' />
+                <Breadcrumb heading='Đăng Nhập' subHeading='Đăng Nhập' />
             </div>
             <div className="login-block md:py-20 py-10">
                 <div className="container">
                     <div className="content-main flex gap-y-8 max-md:flex-col">
                         <div className="left md:w-1/2 w-full lg:pr-[60px] md:pr-[40px] md:border-r border-line">
-                            <div className="heading4">Login</div>
+                            <div className="heading4">Đăng Nhập</div>
                             <form className="md:mt-7 mt-4" onSubmit={handleLogin}>
                                 <div className="email">
                                     <input
                                         className="border-line px-4 pt-3 pb-3 w-full rounded-lg"
                                         type="text"
-                                        placeholder="Username or email address *"
+                                        placeholder="Tên đăng nhập hoặc email *"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -88,7 +88,7 @@ const Login = () => {
                                     <input
                                         className="border-line px-4 pt-3 pb-3 w-full rounded-lg"
                                         type={showPassword ? "text" : "password"}
-                                        placeholder="Password *"
+                                        placeholder="Mật khẩu *"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -106,8 +106,8 @@ const Login = () => {
                                     </button>
                                 </div>
                                 <div className="flex items-center justify-between mt-1">
-                                    <button type="submit" className="button-main bg-black text-white mt-2">Login</button>
-                                    <Link href={'/forgot-password'} className='font-semibold hover:underline'>Forgot Your Password?</Link>
+                                    <button type="submit" className="button-main bg-black text-white mt-2">Đăng Nhập</button>
+                                    <Link href={'/forgot-password'} className='font-semibold hover:underline'>Quên Mật Khẩu?</Link>
                                 </div>
                                 {error && (
                                     <div className="text-red-500 mt-2">{error}</div>
@@ -116,10 +116,10 @@ const Login = () => {
                         </div>
                         <div className="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
                             <div className="text-content">
-                                <div className="heading4">New Customer</div>
-                                <div className="mt-2 text-secondary">Be part of our growing family...</div>
+                                <div className="heading4">Khách Hàng Mới</div>
+                                <div className="mt-2 text-secondary">Tham gia cùng gia đình đang phát triển của chúng tôi...</div>
                                 <div className="block-button md:mt-7 mt-4">
-                                    <Link href={'/register'} className="button-main">Register</Link>
+                                    <Link href={'/register'} className="button-main">Đăng Ký</Link>
                                 </div>
                             </div>
                         </div>
