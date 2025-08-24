@@ -16,7 +16,7 @@ const RotatingBadge: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center w-full">
+    <div className="absolute" style={{ right: '80px', bottom: '150px' }}>
       <div 
         className={`relative w-24 h-24 md:w-32 md:h-32 transition-all duration-300 cursor-pointer ${
           isHovered ? 'scale-110' : 'scale-100'
@@ -70,17 +70,6 @@ const RotatingBadge: React.FC = () => {
         <div className={`absolute inset-0 w-full h-full rounded-full border-2 transition-all duration-300 ${
           isHovered ? 'border-gray-400 scale-110' : 'border-gray-300 scale-100'
         }`}></div>
-        
-        {/* Floating animation wrapper */}
-        <div className="absolute inset-0 animate-float">
-          {/* Enhanced decorative elements */}
-          <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-600 rounded-full transition-all duration-300 ${
-            isHovered ? 'scale-150' : 'scale-100'
-          }`}></div>
-          <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-600 rounded-full transition-all duration-300 ${
-            isHovered ? 'scale-150' : 'scale-100'
-          }`}></div>
-        </div>
       </div>
     </div>
   );
