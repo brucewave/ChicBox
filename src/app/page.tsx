@@ -1,6 +1,7 @@
 import React from 'react'
 import TopNavOne from '@/components/Header/TopNav/TopNavOne'
 import MenuOne from '@/components/Header/Menu/MenuOne'
+import BannerSliderConfig from '@/components/Slider/BannerSliderConfig'
 import HeroBanner from '@/components/Home1/HeroBanner'
 import SliderOne from '@/components/Slider/SliderOne'
 import WhatNewOne from '@/components/Home1/WhatNewOne'
@@ -25,10 +26,11 @@ export default function Home() {
         <MenuOne props="bg-transparent" />
       </div>
       <div className="mt-[74px] md:mt-[74px] h-0"></div>
+      <BannerSliderConfig />
+      <CategoryMarquee />
       <HeroBanner />
       {/* <SliderOne /> */}
       <WhatNewOne data={productData} start={0} limit={4} />
-      <CategoryMarquee />
       <Collection />
       <TabFeatures data={productData} start={0} limit={6} />
       <Banner />

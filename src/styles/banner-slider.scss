@@ -1,0 +1,140 @@
+// Banner Slider Styles
+.banner-slider-block {
+    .banner-swiper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        
+        // Override Swiper default colors
+        .swiper-button-prev::after,
+        .swiper-button-next::after {
+            display: none !important;
+        }
+        
+        .swiper-pagination {
+            bottom: 20px;
+            
+            .swiper-pagination-bullet {
+                background: rgba(255, 255, 255, 0.8);
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                opacity: 0.7;
+                transition: all 0.3s ease;
+                
+                &.swiper-pagination-bullet-active {
+                    background: #3b82f6;
+                    border-color: #3b82f6;
+                    opacity: 1;
+                    transform: scale(1.2);
+                }
+                
+                &:hover {
+                    background: #3b82f6;
+                    border-color: #3b82f6;
+                    opacity: 1;
+                }
+            }
+        }
+        
+        .swiper-button-prev,
+        .swiper-button-next {
+            transition: all 0.3s ease;
+            
+            &:hover {
+                transform: scale(1.1);
+            }
+            
+            svg {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+                color: white !important;
+                stroke: white !important;
+            }
+        }
+        
+        // Force white color for navigation buttons
+        .swiper-button-prev svg,
+        .swiper-button-next svg {
+            color: white !important;
+            stroke: white !important;
+        }
+        
+        // Override any Swiper blue colors
+        .swiper-button-prev,
+        .swiper-button-next {
+            color: transparent !important;
+            
+            &::after {
+                color: transparent !important;
+            }
+        }
+    }
+    
+    .banner-slide {
+        .banner-content {
+            h2 {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            
+            p {
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            }
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .banner-slider-block {
+        .banner-swiper {
+            .swiper-button-prev,
+            .swiper-button-next {
+                width: 40px;
+                height: 40px;
+                
+                svg {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        }
+        
+        .banner-slide {
+            .banner-content {
+                h2 {
+                    font-size: 2rem;
+                }
+                
+                p {
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-slider-block {
+        .banner-swiper {
+            .swiper-button-prev,
+            .swiper-button-next {
+                width: 36px;
+                height: 36px;
+                
+                svg {
+                    width: 20px;
+                    height: 20px;
+                }
+            }
+        }
+        
+        .banner-slide {
+            .banner-content {
+                h2 {
+                    font-size: 1.75rem;
+                }
+                
+                p {
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+}
